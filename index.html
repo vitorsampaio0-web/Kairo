@@ -14,6 +14,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
     :root {
       --bg: #07111f;
@@ -1329,9 +1332,235 @@
       }
     }
     /* ---- End Kairo AI Chat ---- */
+
+    /* ---- Login Screen ---- */
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background:
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.28), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(0, 194, 255, 0.18), transparent 32%),
+        linear-gradient(160deg, #050d18 0%, #07111f 48%, #0a1424 100%);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .login-screen.hidden {
+      display: none;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(13, 23, 40, 0.9);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(124, 92, 255, 0.22);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(124, 92, 255, 0.08);
+      padding: 52px 44px 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      text-align: center;
+    }
+
+    .login-logo {
+      height: 72px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(124, 92, 255, 0.42);
+      margin-bottom: 20px;
+    }
+
+    .login-title {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      letter-spacing: 0.18em;
+      background: linear-gradient(135deg, #fff 30%, rgba(124, 92, 255, 0.85));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-subtitle {
+      margin: 0 0 36px;
+      color: var(--muted);
+      font-size: 0.97rem;
+      line-height: 1.5;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #ffffff;
+      color: #1f1f1f;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 0.96rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .google-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+    }
+
+    .google-btn:active {
+      transform: translateY(0);
+    }
+
+    .google-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .login-footer {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin: 0;
+    }
+
+    .login-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .login-loading p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .spin-ring {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 3px solid rgba(124, 92, 255, 0.18);
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ---- Sidebar User ---- */
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .sidebar-user-photo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid rgba(124, 92, 255, 0.35);
+    }
+
+    .sidebar-user-initials {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sidebar-user-info strong {
+      display: block;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-user-info span {
+      font-size: 0.73rem;
+      color: var(--muted);
+    }
+
+    .logout-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: all 0.22s ease;
+    }
+
+    .logout-btn:hover {
+      color: var(--danger);
+      background: rgba(255, 107, 138, 0.1);
+      border-color: rgba(255, 107, 138, 0.25);
+    }
+    /* ---- End Login Screen ---- */
   </style>
 </head>
 <body>
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-box">
+      <img src="./logo-kairo.png" alt="Kairo" class="login-logo" />
+      <h1 class="login-title">KAIRO</h1>
+      <p class="login-subtitle">O teu centro de produtividade de alto nível</p>
+      <button id="google-signin-btn" class="google-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Entrar com Google
+      </button>
+      <p class="login-footer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Os teus dados ficam guardados de forma segura
+      </p>
+    </div>
+  </div>
+
   <div class="app-shell">
     <aside class="sidebar">
       <div class="sidebar-brand">
@@ -1351,6 +1580,16 @@
           </div>
         </div>
         <p class="subtle" id="sidebar-ai-copy"></p>
+        <div class="sidebar-user" id="sidebar-user" style="display:none;">
+          <div id="sidebar-user-avatar"></div>
+          <div class="sidebar-user-info" id="sidebar-user-info">
+            <strong id="sidebar-user-name"></strong>
+            <span>Conta Google</span>
+          </div>
+          <button id="logout-btn" class="logout-btn" title="Terminar sessão">
+            <i data-lucide="log-out"></i>
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -1460,17 +1699,34 @@
   </div>
 
   <script>
-    const appState = {
-      currentView: "dashboard",
-      agendaMode: "dia",
-      taskFilter: "todas",
-      priorityFilter: "todas",
-      historicoDateInicio: "",
-      historicoDateFim: "",
-      historicoCategFilter: "todas",
-      historicoStatusFilter: "todas",
-      today: "2026-05-11",
-      user: { nome: "Vitor" },
+    // ---- Firebase Initialization ----
+    const firebaseConfig = {
+      apiKey: 'AIzaSyAjkpXMcKg7651b0DIRbeMk0QDmx7a5JGM',
+      authDomain: 'kairo-3a7e4.firebaseapp.com',
+      projectId: 'kairo-3a7e4',
+      storageBucket: 'kairo-3a7e4.firebasestorage.app',
+      messagingSenderId: '137726126366',
+      appId: '1:137726126366:web:839bc38fc611a730a5810f'
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    db.enablePersistence({ synchronizeTabs: true })
+      .catch(err => {
+        if (err.code === 'failed-precondition') {
+          console.warn('[Firestore] Persistência: múltiplos separadores abertos.');
+        } else if (err.code === 'unimplemented') {
+          console.warn('[Firestore] Persistência não suportada neste browser.');
+        }
+      });
+
+    let currentUser = null;
+    let _firestoreUnsubs = [];
+    // ---- End Firebase Initialization ----
+
+    // ---- Mock Data (usado para novos utilizadores) ----
+    const MOCK_DATA = {
       tarefas: [
         { id: 1, titulo: "Revisar proposta comercial", descricao: "Ajustar narrativa do deck e validar números finais.", prioridade: "alta", status: "andamento", prazo: "2026-05-11T10:30", categoria: "Trabalho" },
         { id: 2, titulo: "Planejar roteiro da demo Kairo", descricao: "Definir sequência de telas e narrativa da gravação.", prioridade: "alta", status: "pendente", prazo: "2026-05-11T14:00", categoria: "Trabalho" },
@@ -1510,6 +1766,161 @@
         { id: 5, nome: "Dormir antes de 23h", frequencia: "Diário", progresso: 67, streak: 11, concluidoHoje: false }
       ]
     };
+    // ---- End Mock Data ----
+
+    const appState = {
+      currentView: "dashboard",
+      agendaMode: "dia",
+      taskFilter: "todas",
+      priorityFilter: "todas",
+      historicoDateInicio: "",
+      historicoDateFim: "",
+      historicoCategFilter: "todas",
+      historicoStatusFilter: "todas",
+      today: new Date().toISOString().slice(0, 10),
+      user: { nome: "Utilizador" },
+      tarefas: [],
+      eventos: [],
+      habitos: []
+    };
+
+    // ---- Firebase Functions ----
+    function fsPath(col) {
+      return `users/${currentUser.uid}/${col}`;
+    }
+
+    function showLoginScreen() {
+      document.getElementById("login-screen").classList.remove("hidden");
+      document.querySelector(".app-shell").style.display = "none";
+    }
+
+    function showApp(user) {
+      document.getElementById("login-screen").classList.add("hidden");
+      document.querySelector(".app-shell").style.display = "";
+      renderAll();
+    }
+
+    function updateSidebarUser(user) {
+      const sidebarUser = document.getElementById("sidebar-user");
+      const avatarEl = document.getElementById("sidebar-user-avatar");
+      const nameEl = document.getElementById("sidebar-user-name");
+      if (!sidebarUser || !avatarEl || !nameEl) return;
+
+      const displayName = user.displayName || user.email || "Utilizador";
+      const firstName = displayName.split(" ")[0];
+      appState.user.nome = firstName;
+      nameEl.textContent = displayName;
+
+      avatarEl.innerHTML = "";
+      if (user.photoURL) {
+        const img = document.createElement("img");
+        img.src = user.photoURL;
+        img.alt = displayName;
+        img.className = "sidebar-user-photo";
+        img.onerror = () => {
+          const initials = document.createElement("div");
+          initials.className = "sidebar-user-initials";
+          initials.textContent = firstName.charAt(0).toUpperCase();
+          avatarEl.innerHTML = "";
+          avatarEl.appendChild(initials);
+        };
+        avatarEl.appendChild(img);
+      } else {
+        const initials = document.createElement("div");
+        initials.className = "sidebar-user-initials";
+        initials.textContent = firstName.charAt(0).toUpperCase();
+        avatarEl.appendChild(initials);
+      }
+
+      sidebarUser.style.display = "flex";
+      lucide.createIcons();
+    }
+
+    async function loadUserData(uid) {
+      try {
+        const [tarefasSnap, habitosSnap, eventosSnap] = await Promise.all([
+          db.collection(`users/${uid}/tarefas`).get(),
+          db.collection(`users/${uid}/habitos`).get(),
+          db.collection(`users/${uid}/eventos`).get()
+        ]);
+
+        const isNewUser = tarefasSnap.empty && habitosSnap.empty && eventosSnap.empty;
+
+        if (isNewUser) {
+          await seedNewUser(uid);
+        }
+
+        subscribeRealtime(uid);
+      } catch (err) {
+        console.error("[Firestore] Erro ao carregar dados:", err);
+        // Offline ou erro: usar dados do MOCK_DATA como fallback
+        if (appState.tarefas.length === 0) {
+          appState.tarefas = JSON.parse(JSON.stringify(MOCK_DATA.tarefas));
+          appState.habitos = JSON.parse(JSON.stringify(MOCK_DATA.habitos));
+          appState.eventos = JSON.parse(JSON.stringify(MOCK_DATA.eventos));
+        }
+        renderAll();
+      }
+    }
+
+    async function seedNewUser(uid) {
+      try {
+        const batch = db.batch();
+        MOCK_DATA.tarefas.forEach(t => {
+          batch.set(db.doc(`users/${uid}/tarefas/${t.id}`), t);
+        });
+        MOCK_DATA.habitos.forEach(h => {
+          batch.set(db.doc(`users/${uid}/habitos/${h.id}`), h);
+        });
+        MOCK_DATA.eventos.forEach(e => {
+          batch.set(db.doc(`users/${uid}/eventos/${e.id}`), e);
+        });
+        await batch.commit();
+      } catch (err) {
+        console.error("[Firestore] Erro ao criar dados iniciais:", err);
+      }
+    }
+
+    function subscribeRealtime(uid) {
+      _firestoreUnsubs.forEach(fn => fn());
+      _firestoreUnsubs = [];
+
+      const unsub1 = db.collection(`users/${uid}/tarefas`).onSnapshot(snap => {
+        appState.tarefas = snap.docs.map(d => ({ ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) }));
+        renderAll();
+      }, err => console.error("[Firestore] tarefas onSnapshot:", err));
+
+      const unsub2 = db.collection(`users/${uid}/habitos`).onSnapshot(snap => {
+        appState.habitos = snap.docs.map(d => ({ ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) }));
+        renderAll();
+      }, err => console.error("[Firestore] habitos onSnapshot:", err));
+
+      const unsub3 = db.collection(`users/${uid}/eventos`).onSnapshot(snap => {
+        appState.eventos = snap.docs.map(d => ({ ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) }));
+        renderAll();
+      }, err => console.error("[Firestore] eventos onSnapshot:", err));
+
+      _firestoreUnsubs = [unsub1, unsub2, unsub3];
+    }
+
+    function fsSet(col, id, data) {
+      if (!currentUser) return;
+      db.collection(fsPath(col)).doc(String(id)).set(data)
+        .catch(err => console.error(`[Firestore] set ${col}/${id}:`, err));
+    }
+
+    function fsUpdate(col, id, data) {
+      if (!currentUser) return;
+      db.collection(fsPath(col)).doc(String(id)).update(data)
+        .catch(err => console.error(`[Firestore] update ${col}/${id}:`, err));
+    }
+
+    function fsDelete(col, id) {
+      if (!currentUser) return;
+      db.collection(fsPath(col)).doc(String(id)).delete()
+        .catch(err => console.error(`[Firestore] delete ${col}/${id}:`, err));
+    }
+    // ---- End Firebase Functions ----
 
     const navItems = [
       { id: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
@@ -2379,8 +2790,8 @@
       const taskDate = dateInput && dateInput.value ? dateInput.value : appState.today;
       const taskTime = timeInput && timeInput.value ? timeInput.value : "18:00";
 
-      const id = (appState.tarefas.length ? Math.max(...appState.tarefas.map(task => task.id)) : 0) + 1;
-      appState.tarefas.unshift({
+      const id = Date.now();
+      const newTask = {
         id,
         titulo: title,
         descricao: "Tarefa criada rapidamente para manter o fluxo de execução.",
@@ -2388,8 +2799,11 @@
         status: "pendente",
         prazo: `${taskDate}T${taskTime}`,
         categoria: categoryInput.value
-      });
+      };
+      appState.tarefas.unshift(newTask);
+      fsSet("tarefas", id, newTask);
 
+      titleInput.value = "";
       renderAll();
       switchView("tarefas");
       showToast(`Tarefa "${title}" criada com sucesso.`);
@@ -2404,50 +2818,62 @@
         showToast("Digite um nome para o hábito.");
         return;
       }
-      const id = appState.habitos.length ? Math.max(...appState.habitos.map(h => h.id)) + 1 : 1;
-      appState.habitos.push({
+      const id = Date.now();
+      const newHabit = {
         id,
         nome: name,
         frequencia: freqInput.value,
         progresso: 0,
         streak: 0,
         concluidoHoje: false
-      });
+      };
+      appState.habitos.push(newHabit);
+      fsSet("habitos", id, newHabit);
+
+      nameInput.value = "";
       renderAll();
       showToast(`Hábito "${name}" criado com sucesso.`);
     }
 
     function deleteHabit(habitId) {
-      const habit = appState.habitos.find(item => item.id === Number(habitId));
+      const nId = Number(habitId);
+      const habit = appState.habitos.find(item => item.id === nId);
       if (!habit) return;
       if (!confirm(`Apagar "${habit.nome}"? Esta ação não pode ser desfeita.`)) return;
-      appState.habitos = appState.habitos.filter(item => item.id !== Number(habitId));
+      appState.habitos = appState.habitos.filter(item => item.id !== nId);
+      fsDelete("habitos", habitId);
       renderAll();
       showToast(`Hábito "${habit.nome}" apagado.`);
     }
 
     function deleteEvent(eventId) {
-      const event = appState.eventos.find(e => e.id === Number(eventId));
+      const nId = Number(eventId);
+      const event = appState.eventos.find(e => e.id === nId);
       if (!event) return;
       if (!confirm(`Apagar "${event.titulo}"? Esta ação não pode ser desfeita.`)) return;
-      appState.eventos = appState.eventos.filter(e => e.id !== Number(eventId));
+      appState.eventos = appState.eventos.filter(e => e.id !== nId);
+      fsDelete("eventos", eventId);
       renderAll();
       showToast(`Evento "${event.titulo}" apagado.`);
     }
 
     function completeTask(taskId) {
-      const task = appState.tarefas.find(item => item.id === Number(taskId));
+      const nId = Number(taskId);
+      const task = appState.tarefas.find(item => item.id === nId);
       if (!task || task.status === "concluida") return;
       task.status = "concluida";
+      fsUpdate("tarefas", taskId, { status: "concluida" });
       renderAll();
       showToast(`Excelente! "${task.titulo}" foi concluída.`);
     }
 
     function deleteTask(taskId) {
-      const task = appState.tarefas.find(item => item.id === Number(taskId));
+      const nId = Number(taskId);
+      const task = appState.tarefas.find(item => item.id === nId);
       if (!task) return;
       if (!confirm(`Apagar "${task.titulo}"? Esta ação não pode ser desfeita.`)) return;
-      appState.tarefas = appState.tarefas.filter(item => item.id !== Number(taskId));
+      appState.tarefas = appState.tarefas.filter(item => item.id !== nId);
+      fsDelete("tarefas", taskId);
       renderAll();
       showToast(`Tarefa "${task.titulo}" apagada.`);
     }
@@ -2493,17 +2919,24 @@
       const time = document.getElementById("edit-task-time").value || "18:00";
       task.prazo = `${date}T${time}`;
 
+      fsSet("tarefas", id, task);
       closeEditModal();
       renderAll();
       showToast(`Tarefa "${task.titulo}" atualizada.`);
     }
 
     function completeHabit(habitId) {
-      const habit = appState.habitos.find(item => item.id === Number(habitId));
+      const nId = Number(habitId);
+      const habit = appState.habitos.find(item => item.id === nId);
       if (!habit || habit.concluidoHoje) return;
       habit.concluidoHoje = true;
       habit.streak += 1;
       habit.progresso = Math.min(100, habit.progresso + 12);
+      fsUpdate("habitos", habitId, {
+        concluidoHoje: habit.concluidoHoje,
+        streak: habit.streak,
+        progresso: habit.progresso
+      });
       renderAll();
       showToast(`Streak atualizado: ${habit.nome} agora está em ${habit.streak} dias.`);
     }
@@ -2731,7 +3164,8 @@
       }
     }
 
-    renderAll();
+    // Mostrar ecrã de login enquanto aguarda o estado auth
+    showLoginScreen();
 
     // Modal buttons (bound once, outside renderAll cycle)
     document.getElementById("modal-close-btn").onclick = closeEditModal;
@@ -2749,6 +3183,43 @@
           .catch((err) => console.warn("[SW] Falha no registo:", err));
       });
     }
+
+    // ---- Firebase Auth ----
+    document.getElementById("google-signin-btn").addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      auth.signInWithPopup(provider)
+        .catch(err => {
+          console.error("[Auth] Erro:", err);
+          showToast("Erro ao iniciar sessão. Tenta novamente.");
+        });
+    });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        updateSidebarUser(user);
+        await loadUserData(user.uid);
+        showApp(user);
+      } else {
+        currentUser = null;
+        _firestoreUnsubs.forEach(fn => fn());
+        _firestoreUnsubs = [];
+        appState.tarefas = [];
+        appState.habitos = [];
+        appState.eventos = [];
+        showLoginScreen();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("#logout-btn")) {
+        _firestoreUnsubs.forEach(fn => fn());
+        _firestoreUnsubs = [];
+        auth.signOut();
+      }
+    });
+    // ---- End Firebase Auth ----
 
     // ---- Kairo AI Chat ----
     function _escapeHTML(str) {
