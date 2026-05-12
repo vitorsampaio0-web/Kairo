@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kairo — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1728;
+      --panel: rgba(13, 23, 40, 0.9);
+      --panel-strong: #101c31;
+      --border: rgba(154, 170, 196, 0.14);
+      --text: #f4f7fb;
+      --muted: #95a5bf;
+      --muted-strong: #b8c4d8;
+      --primary: #7c5cff;
+      --primary-2: #00c2ff;
+      --success: #31d0aa;
+      --warning: #ffb84d;
+      --danger: #ff6b8a;
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      font-family: "Inter", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(0, 194, 255, 0.12), transparent 28%),
+        linear-gradient(160deg, #050d18 0%, #07111f 48%, #0a1424 100%);
+      color: var(--text);
+    }
+    body { padding: 24px; }
+    button, input, select, textarea { font: inherit; }
+    button { border: 0; cursor: pointer; }
+
+    /* ─── Layout ─── */
+    .admin-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .admin-brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 24px rgba(124, 92, 255, 0.3);
+    }
+
+    .admin-brand h1 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+    }
+
+    .admin-brand p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .admin-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 0.85rem;
+    }
+
+    .admin-user img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* ─── Panels ─── */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title i { color: var(--primary-2); }
+
+    /* ─── Metrics ─── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary-2);
+      line-height: 1;
+    }
+
+    .metric-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ─── Sections ─── */
+    .sections-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 960px) {
+      .sections-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ─── Table ─── */
+    .admin-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(154,170,196,0.07);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: 0; }
+
+    tbody tr:hover td { background: rgba(124,92,255,0.04); }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .user-avatar-placeholder {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .user-name { font-weight: 500; }
+    .user-email { font-size: 0.78rem; color: var(--muted); }
+
+    /* ─── Badges ─── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .badge-pro {
+      background: linear-gradient(90deg, rgba(124,92,255,0.22), rgba(0,194,255,0.14));
+      color: var(--primary-2);
+      border: 1px solid rgba(0,194,255,0.2);
+    }
+
+    .badge-free {
+      background: rgba(149,165,191,0.12);
+      color: var(--muted);
+    }
+
+    .badge-active { background: rgba(49,208,170,0.15); color: var(--success); }
+    .badge-canceled { background: rgba(255,107,138,0.15); color: var(--danger); }
+    .badge-voucher { background: rgba(255,184,77,0.15); color: var(--warning); }
+
+    /* ─── Filters ─── */
+    .table-filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(154,170,196,0.1);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .chip.active, .chip:hover {
+      background: rgba(124,92,255,0.18);
+      color: var(--text);
+      border-color: rgba(124,92,255,0.3);
+    }
+
+    /* ─── Form ─── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: end;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      color: var(--text);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus { border-color: var(--primary); }
+
+    .primary-btn {
+      background: linear-gradient(90deg, var(--primary), var(--primary-2));
+      color: #fff;
+      border-radius: var(--radius-sm);
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      border: 0;
+    }
+
+    .primary-btn:hover { opacity: 0.88; }
+    .primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .ghost-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted-strong);
+      border-radius: var(--radius-sm);
+      padding: 9px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .ghost-btn:hover { background: rgba(154,170,196,0.1); }
+
+    /* ─── Code chip ─── */
+    .code-chip {
+      font-family: monospace;
+      background: rgba(124,92,255,0.12);
+      border: 1px solid rgba(124,92,255,0.2);
+      color: var(--primary-2);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      user-select: all;
+    }
+
+    .code-chip:hover { background: rgba(124,92,255,0.2); }
+
+    /* ─── Access denied ─── */
+    .access-denied {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .access-denied .icon { font-size: 3rem; }
+    .access-denied h2 { font-size: 1.4rem; font-weight: 700; }
+    .access-denied p { color: var(--muted); max-width: 300px; }
+
+    /* ─── Loading ─── */
+    .loading-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(124,92,255,0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Toast ─── */
+    .toast-wrap {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10000;
+    }
+
+    .toast {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+
+    /* ─── Logout btn ─── */
+    .logout-btn {
+      background: rgba(255,107,138,0.1);
+      border: 1px solid rgba(255,107,138,0.2);
+      color: var(--danger);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .logout-btn:hover { background: rgba(255,107,138,0.18); }
+
+    .empty-msg {
+      text-align: center;
+      padding: 28px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="admin-shell" class="admin-shell" style="display:none;">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="admin-brand">
+        <div class="admin-brand-mark">
+          <i data-lucide="shield" style="color:#fff;width:22px;height:22px;"></i>
+        </div>
+        <div>
+          <h1>KAIRO</h1>
+          <p>Painel de Administração</p>
+        </div>
+      </div>
+      <div class="admin-header-right">
+        <div class="admin-user" id="admin-user-info">
+          <i data-lucide="user" style="color:var(--muted);width:16px;height:16px;"></i>
+          <span id="admin-user-name">—</span>
+        </div>
+        <button class="logout-btn" id="admin-logout-btn">
+          <i data-lucide="log-out" style="width:15px;height:15px;"></i>
+          Sair
+        </button>
+      </div>
+    </header>
+
+    <!-- Metrics -->
+    <div class="metrics-grid" id="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total Utilizadores</div>
+        <div class="metric-value" id="m-total">—</div>
+        <div class="metric-sub">registados</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Pro Activos</div>
+        <div class="metric-value" id="m-pro">—</div>
+        <div class="metric-sub">subscritores activos</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">MRR Estimado</div>
+        <div class="metric-value" id="m-mrr">—</div>
+        <div class="metric-sub">€/mês (stripe activos)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Vouchers Emitidos</div>
+        <div class="metric-value" id="m-vouchers">—</div>
+        <div class="metric-sub">total criados</div>
+      </div>
+    </div>
+
+    <div class="sections-grid">
+      <!-- Users Table -->
+      <div class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-title">
+          <i data-lucide="users" style="width:18px;height:18px;"></i>
+          Utilizadores
+        </div>
+        <div class="table-filters" id="user-filters">
+          <button class="chip active" data-filter="all">Todos</button>
+          <button class="chip" data-filter="pro">Pro</button>
+          <button class="chip" data-filter="free">Free</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table id="users-table">
+            <thead>
+              <tr>
+                <th>Utilizador</th>
+                <th>Plano</th>
+                <th>Fonte</th>
+                <th>Estado</th>
+                <th>Renova</th>
+                <th>Registo</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr><td colspan="6" class="empty-msg">A carregar utilizadores…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Create Voucher -->
+      <div class="panel">
+        <div class="panel-title">
+          <i data-lucide="ticket" style="width:18px;height:18px;"></i>
+          Criar Voucher
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Duração (dias)</label>
+            <input type="number" id="v-days" class="form-input" value="30" min="1" max="365" />
+          </div>
+          <div class="form-field">
+            <label>Máx. utilizações</label>
+            <input type="number" id="v-maxuses" class="form-input" value="1" min="1" max="100" />
+          </div>
+          <div class="form-field" style="grid-column:1/-1;">
+            <label>Código personalizado (opcional)</label>
+            <input type="text" id="v-code" class="form-input" placeholder="Ex: KAIRO-BETA2026 (deixa vazio para gerar automaticamente)"
+                   style="text-transform:uppercase;" />
+          </div>
+        </div>
+        <button class="primary-btn" id="create-voucher-btn">
+          <i data-lucide="plus" style="width:15px;height:15px;vertical-align:middle;margin-right:4px;"></i>
+          Gerar Voucher
+        </button>
+        <div id="voucher-create-result" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- Vouchers List -->
+      <div class="panel">
+        <div class="panel-title" style="justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="list" style="width:18px;height:18px;"></i>
+            Vouchers Criados
+          </span>
+          <button class="ghost-btn" id="refresh-vouchers-btn" style="padding:6px 12px;font-size:0.78rem;">
+            <i data-lucide="refresh-cw" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;"></i>
+            Atualizar
+          </button>
+        </div>
+        <div class="admin-table-wrap">
+          <table id="vouchers-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Duração</th>
+                <th>Usos</th>
+                <th>Criado em</th>
+              </tr>
+            </thead>
+            <tbody id="vouchers-tbody">
+              <tr><td colspan="4" class="empty-msg">A carregar vouchers…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading-screen" class="loading-overlay">
+    <div class="spinner"></div>
+    <p style="color:var(--muted);font-size:0.9rem;">A verificar acesso…</p>
+  </div>
+
+  <!-- Access Denied -->
+  <div id="access-denied" style="display:none;">
+    <div class="access-denied">
+      <div class="icon">🔒</div>
+      <h2>Acesso Restrito</h2>
+      <p>Não tens permissão para aceder ao painel de administração do Kairo.</p>
+      <a href="./app.html" style="color:var(--primary-2);font-size:0.9rem;margin-top:8px;">← Voltar à app</a>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <script>
+    // ─── Firebase Init ───
+    const firebaseConfig = {
+      apiKey: 'AIzaSyAjkpXMcKg7651b0DIRbeMk0QDmx7a5JGM',
+      authDomain: 'kairo-3a7e4.firebaseapp.com',
+      projectId: 'kairo-3a7e4',
+      storageBucket: 'kairo-3a7e4.firebasestorage.app',
+      messagingSenderId: '137726126366',
+      appId: '1:137726126366:web:839bc38fc611a730a5810f'
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const fns = firebase.functions();
+
+    // ─── Toast ───
+    function showToast(msg, type) {
+      const wrap = document.getElementById('toast-wrap');
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      if (type === 'success') t.style.borderColor = 'rgba(49,208,170,0.3)';
+      if (type === 'error') t.style.borderColor = 'rgba(255,107,138,0.3)';
+      wrap.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; }, 2800);
+      setTimeout(() => t.remove(), 3400);
+    }
+
+    // ─── Format helpers ───
+    function fmtDate(ms) {
+      if (!ms) return '—';
+      return new Date(ms).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function planBadge(plan, source) {
+      if (plan === 'pro') {
+        const src = source === 'voucher'
+          ? '<span class="badge badge-voucher">Voucher</span>'
+          : '<span class="badge badge-pro">Pro</span>';
+        return src;
+      }
+      return '<span class="badge badge-free">Free</span>';
+    }
+
+    function statusBadge(status) {
+      if (!status) return '<span style="color:var(--muted)">—</span>';
+      if (status === 'active' || status === 'trialing') return '<span class="badge badge-active">' + status + '</span>';
+      if (status === 'canceled') return '<span class="badge badge-canceled">Cancelado</span>';
+      return '<span class="badge">' + status + '</span>';
+    }
+
+    // ─── State ───
+    let allUsers = [];
+    let currentFilter = 'all';
+
+    // ─── Render users table ───
+    function renderUsers(filter) {
+      currentFilter = filter || currentFilter;
+      let list = allUsers;
+      if (currentFilter === 'pro') list = list.filter(u => u.plan === 'pro');
+      if (currentFilter === 'free') list = list.filter(u => u.plan !== 'pro');
+
+      const tbody = document.getElementById('users-tbody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">Nenhum utilizador encontrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(u => {
+        const initials = (u.displayName || u.email || '?').charAt(0).toUpperCase();
+        const avatarHtml = u.photoURL
+          ? `<img src="${u.photoURL}" class="user-avatar" onerror="this.style.display='none'" />`
+          : `<div class="user-avatar-placeholder">${initials}</div>`;
+        return `
+          <tr>
+            <td>
+              <div class="user-cell">
+                ${avatarHtml}
+                <div>
+                  <div class="user-name">${u.displayName || '—'}</div>
+                  <div class="user-email">${u.email || u.uid}</div>
+                </div>
+              </div>
+            </td>
+            <td>${planBadge(u.plan, u.source)}</td>
+            <td><span style="font-size:0.82rem;color:var(--muted)">${u.source || '—'}</span></td>
+            <td>${statusBadge(u.status)}</td>
+            <td style="font-size:0.82rem;color:var(--muted)">${fmtDate(u.currentPeriodEnd || u.expiresAt)}</td>
+            <td style="font-size:0.82rem;color:var(--muted)">${u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-PT') : '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ─── Load users ───
+    async function loadUsers() {
+      try {
+        const getUsers = fns.httpsCallable('adminGetUsers');
+        const res = await getUsers({});
+        allUsers = res.data.users || [];
+        renderUsers();
+        updateMetrics();
+      } catch (err) {
+        console.error('[Admin] loadUsers:', err);
+        showToast('Erro ao carregar utilizadores.', 'error');
+        document.getElementById('users-tbody').innerHTML =
+          '<tr><td colspan="6" class="empty-msg">Erro ao carregar dados.</td></tr>';
+      }
+    }
+
+    // ─── Load vouchers ───
+    async function loadVouchers() {
+      try {
+        const getVouchers = fns.httpsCallable('adminGetVouchers');
+        const res = await getVouchers({});
+        const vouchers = res.data.vouchers || [];
+        document.getElementById('m-vouchers').textContent = vouchers.length;
+        const tbody = document.getElementById('vouchers-tbody');
+        if (!vouchers.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">Nenhum voucher criado ainda.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = vouchers.map(v => `
+          <tr>
+            <td><span class="code-chip" title="Clica para copiar" onclick="navigator.clipboard.writeText('${v.code}').then(()=>showToast('Código copiado!','success'))">${v.code}</span></td>
+            <td style="font-size:0.85rem;">${v.durationDays} dias</td>
+            <td style="font-size:0.85rem;">${v.usedCount}/${v.maxUses}</td>
+            <td style="font-size:0.82rem;color:var(--muted)">${fmtDate(v.createdAt)}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('[Admin] loadVouchers:', err);
+        showToast('Erro ao carregar vouchers.', 'error');
+      }
+    }
+
+    // ─── Metrics ───
+    function updateMetrics() {
+      const total = allUsers.length;
+      const proStripe = allUsers.filter(u => u.plan === 'pro' && u.source === 'stripe' && u.status === 'active').length;
+      const proAll = allUsers.filter(u => u.plan === 'pro').length;
+      const mrr = (proStripe * 9.99).toFixed(2);
+      document.getElementById('m-total').textContent = total;
+      document.getElementById('m-pro').textContent = proAll;
+      document.getElementById('m-mrr').textContent = mrr + ' €';
+    }
+
+    // ─── Create voucher ───
+    document.getElementById('create-voucher-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('create-voucher-btn');
+      const resultEl = document.getElementById('voucher-create-result');
+      const days = Number(document.getElementById('v-days').value) || 30;
+      const maxUses = Number(document.getElementById('v-maxuses').value) || 1;
+      const code = document.getElementById('v-code').value.trim().toUpperCase();
+
+      btn.disabled = true;
+      btn.textContent = 'A criar…';
+      resultEl.innerHTML = '';
+
+      try {
+        const createVoucher = fns.httpsCallable('adminCreateVoucher');
+        const res = await createVoucher({ durationDays: days, maxUses, code: code || undefined });
+        const generatedCode = res.data.code;
+        resultEl.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(49,208,170,0.08);border:1px solid rgba(49,208,170,0.2);border-radius:var(--radius-sm);">
+            <span style="color:var(--success);font-size:0.85rem;">Voucher criado:</span>
+            <span class="code-chip" onclick="navigator.clipboard.writeText('${generatedCode}').then(()=>showToast('Copiado!','success'))" style="cursor:pointer;">${generatedCode}</span>
+            <span style="font-size:0.75rem;color:var(--muted)">(clica para copiar)</span>
+          </div>
+        `;
+        document.getElementById('v-code').value = '';
+        showToast('Voucher criado com sucesso!', 'success');
+        await loadVouchers();
+      } catch (err) {
+        resultEl.innerHTML = `<p style="color:var(--danger);font-size:0.85rem;">${err.message || 'Erro ao criar voucher.'}</p>`;
+        showToast('Erro ao criar voucher.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="plus" style="width:15px;height:15px;vertical-align:middle;margin-right:4px;"></i>Gerar Voucher';
+        lucide.createIcons();
+      }
+    });
+
+    // ─── Filter chips ───
+    document.querySelectorAll('#user-filters .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#user-filters .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        renderUsers(chip.dataset.filter);
+      });
+    });
+
+    // ─── Refresh vouchers ───
+    document.getElementById('refresh-vouchers-btn').addEventListener('click', loadVouchers);
+
+    // ─── Logout ───
+    document.getElementById('admin-logout-btn').addEventListener('click', () => auth.signOut());
+
+    // ─── Auth ───
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = './app.html';
+        return;
+      }
+
+      try {
+        const adminDoc = await db.doc('admins/' + user.uid).get();
+        if (!adminDoc.exists) {
+          document.getElementById('loading-screen').style.display = 'none';
+          document.getElementById('access-denied').style.display = 'block';
+          return;
+        }
+
+        // Admin confirmado
+        document.getElementById('admin-user-name').textContent = user.displayName || user.email || user.uid;
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('admin-shell').style.display = 'block';
+        lucide.createIcons();
+
+        // Carregar dados
+        await Promise.all([loadUsers(), loadVouchers()]);
+
+      } catch (err) {
+        console.error('[Admin] Auth check:', err);
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('access-denied').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
