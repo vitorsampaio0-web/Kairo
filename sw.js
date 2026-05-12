@@ -1,6 +1,7 @@
 const CACHE_NAME = "kairo-v1";
 const ASSETS = [
   "./index.html",
+  "./app.html",
   "./manifest.json",
   "./logo-kairo.png",
   "./icon-192.png",
