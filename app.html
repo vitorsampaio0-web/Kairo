@@ -17,6 +17,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
   <style>
     :root {
       --bg: #07111f;
@@ -900,6 +901,215 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* ---- Plan Badge ---- */
+    .plan-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .plan-badge.free {
+      background: rgba(149, 165, 191, 0.18);
+      color: var(--muted);
+    }
+    .plan-badge.pro {
+      background: linear-gradient(90deg, rgba(124,92,255,0.28), rgba(0,194,255,0.18));
+      color: var(--primary-2);
+      border: 1px solid rgba(0, 194, 255, 0.25);
+    }
+
+    /* ---- Upgrade Modal ---- */
+    .upgrade-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 13, 24, 0.84);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+    }
+    .upgrade-overlay.hidden { display: none; }
+
+    .upgrade-card {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 36px 32px 28px;
+      max-width: 440px;
+      width: 100%;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,92,255,0.12);
+      animation: slideUp 0.28s ease;
+    }
+
+    .upgrade-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(154, 170, 196, 0.1);
+      border: 0;
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .upgrade-close-btn:hover { background: rgba(154,170,196,0.2); }
+
+    .upgrade-icon {
+      font-size: 2.2rem;
+      margin-bottom: 14px;
+    }
+
+    .upgrade-card h2 {
+      margin: 0 0 6px;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .upgrade-card > p {
+      color: var(--muted);
+      margin: 0 0 20px;
+      font-size: 0.9rem;
+    }
+
+    .upgrade-features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .upgrade-features-list li {
+      font-size: 0.88rem;
+      color: var(--muted-strong);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .upgrade-features-list li::before {
+      content: "✓";
+      color: var(--success);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .upgrade-price {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary-2);
+      margin-bottom: 18px;
+    }
+
+    .upgrade-price span {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .upgrade-checkout-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      background: linear-gradient(90deg, var(--primary), var(--primary-2));
+      color: #fff;
+      border: 0;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .upgrade-checkout-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .upgrade-checkout-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .upgrade-cancel-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin: 10px 0 0;
+    }
+
+    .voucher-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .voucher-input-row .task-input {
+      flex: 1;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* ---- Pro Feature Overlay ---- */
+    .pro-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 17, 31, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-radius: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 10;
+      border-radius: var(--radius-xl);
+    }
+
+    .pro-overlay-icon {
+      font-size: 2.4rem;
+    }
+
+    .pro-overlay h4 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .pro-overlay p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+      max-width: 260px;
+    }
+
+    /* ---- Sidebar manage sub btn ---- */
+    .manage-sub-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      background: rgba(124, 92, 255, 0.1);
+      border: 1px solid rgba(124, 92, 255, 0.2);
+      color: var(--primary-2);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .manage-sub-btn:hover { background: rgba(124, 92, 255, 0.18); }
+
     @media (min-width: 768px) {
       body {
         padding: 22px;
@@ -1584,12 +1794,15 @@
           <div id="sidebar-user-avatar"></div>
           <div class="sidebar-user-info" id="sidebar-user-info">
             <strong id="sidebar-user-name"></strong>
-            <span>Conta Google</span>
+            <span>Conta Google <span id="sidebar-plan-badge" class="plan-badge free">FREE</span></span>
           </div>
           <button id="logout-btn" class="logout-btn" title="Terminar sessão">
             <i data-lucide="log-out"></i>
           </button>
         </div>
+        <button id="manage-sub-btn" class="manage-sub-btn" style="display:none;" title="Gerir subscrição">
+          <i data-lucide="credit-card"></i> Gerir Subscrição
+        </button>
       </div>
     </aside>
 
@@ -1673,7 +1886,8 @@
 
   <!-- Kairo AI Floating Chat Button -->
   <button class="kairo-chat-btn" id="kairo-chat-btn" title="Kairo AI">
-    <i data-lucide="bot"></i>
+    <i data-lucide="bot" id="kairo-chat-icon"></i>
+    <span id="kairo-chat-lock" style="display:none;position:absolute;bottom:2px;right:2px;width:16px;height:16px;background:var(--warning);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.55rem;">🔒</span>
   </button>
 
   <!-- Kairo AI Chat Panel -->
@@ -1782,7 +1996,8 @@
       user: { nome: "Utilizador" },
       tarefas: [],
       eventos: [],
-      habitos: []
+      habitos: [],
+      subscription: { plan: "free" }
     };
 
     // ---- Firebase Functions ----
@@ -2594,6 +2809,24 @@
 
     function renderHistorico() {
       const view = document.getElementById("historico-view");
+
+      // Feature gate: histórico é Pro
+      if (!isPro()) {
+        view.innerHTML = `
+          <div class="panel" style="position:relative;min-height:340px;overflow:hidden;">
+            <div class="panel-header"><div><h3>Histórico</h3><p>Análise e exportação de registos</p></div></div>
+            <div class="pro-overlay">
+              <div class="pro-overlay-icon">🔒</div>
+              <h4>Histórico Pro</h4>
+              <p>Acede ao histórico completo de tarefas, filtros avançados e exportação Word.</p>
+              <button class="primary-btn" onclick="showUpgradeModal('Histórico')">Upgrade para Pro →</button>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
       const dateInicio = appState.historicoDateInicio;
       const dateFim = appState.historicoDateFim;
       const categFilter = appState.historicoCategFilter;
@@ -2800,6 +3033,12 @@
         return;
       }
 
+      // Feature gate: limite de 10 tarefas no plano free
+      if (!isPro() && appState.tarefas.length >= 10) {
+        showUpgradeModal("Tarefas ilimitadas");
+        return;
+      }
+
       const taskDate = dateInput && dateInput.value ? dateInput.value : appState.today;
       const taskTime = timeInput && timeInput.value ? timeInput.value : "18:00";
 
@@ -2831,6 +3070,13 @@
         showToast("Digite um nome para o hábito.");
         return;
       }
+
+      // Feature gate: limite de 6 hábitos no plano free
+      if (!isPro() && appState.habitos.length >= 6) {
+        showUpgradeModal("Hábitos ilimitados");
+        return;
+      }
+
       const id = Date.now();
       const newHabit = {
         id,
@@ -2976,6 +3222,9 @@
       }
 
       btn.onclick = () => {
+        // Feature gate: voz é Pro
+        if (!isPro()) { showUpgradeModal("Criação por voz"); return; }
+
         if (_voiceListening) {
           if (_voiceRecognizer) _voiceRecognizer.stop();
           return;
@@ -3127,6 +3376,7 @@
       const exportWordHistBtn = document.getElementById("export-word-hist-btn");
       if (exportWordHistBtn) {
         exportWordHistBtn.onclick = () => {
+          if (!isPro()) { showUpgradeModal("Exportação Word"); return; }
           const di = appState.historicoDateInicio;
           const df = appState.historicoDateFim;
           const cat = appState.historicoCategFilter;
@@ -3141,7 +3391,10 @@
 
       const exportWordTasksBtn = document.getElementById("export-word-tasks-btn");
       if (exportWordTasksBtn) {
-        exportWordTasksBtn.onclick = () => exportToWord(appState.tarefas);
+        exportWordTasksBtn.onclick = () => {
+          if (!isPro()) { showUpgradeModal("Exportação Word"); return; }
+          exportToWord(appState.tarefas);
+        };
       }
 
       const quickTaskSubmit = document.getElementById("quick-task-submit");
@@ -3221,13 +3474,31 @@
         updateSidebarUser(user);
         await loadUserData(user.uid);
         showApp(user);
+        // Carregar subscription (onSnapshot em tempo real)
+        loadSubscription(user.uid);
+        // Detectar retorno do Stripe Checkout
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('checkout') === 'success') {
+          showToast('Subscrição Pro ativada! Bem-vindo ao Kairo Pro.');
+          window.history.replaceState({}, '', '/app.html');
+        } else if (urlParams.get('checkout') === 'cancelled') {
+          showToast('Pagamento cancelado. Podes tentar novamente quando quiseres.');
+          window.history.replaceState({}, '', '/app.html');
+        }
+        // Abrir modal de upgrade se vindo da landing com ?upgrade=pro
+        if (urlParams.get('upgrade') === 'pro') {
+          window.history.replaceState({}, '', '/app.html');
+          setTimeout(() => showUpgradeModal(), 600);
+        }
       } else {
         currentUser = null;
+        if (_subUnsub) { _subUnsub(); _subUnsub = null; }
         _firestoreUnsubs.forEach(fn => fn());
         _firestoreUnsubs = [];
         appState.tarefas = [];
         appState.habitos = [];
         appState.eventos = [];
+        appState.subscription = { plan: 'free' };
         showLoginScreen();
       }
     });
@@ -3441,13 +3712,220 @@
       }
     };
 
-    document.getElementById("kairo-chat-btn").addEventListener("click", () => kairoChat.toggle());
+    document.getElementById("kairo-chat-btn").addEventListener("click", () => {
+      if (!isPro()) { showUpgradeModal("Kairo AI Chat"); return; }
+      kairoChat.toggle();
+    });
     document.getElementById("kairo-chat-close").addEventListener("click", () => kairoChat.close());
     document.getElementById("chat-send-btn").addEventListener("click", () => kairoChat.handleSend());
     document.getElementById("chat-input").addEventListener("keydown", (e) => {
       if (e.key === "Enter") kairoChat.handleSend();
     });
     // ---- End Kairo AI Chat ----
+  </script>
+
+  <!-- Upgrade Modal -->
+  <div id="upgrade-modal" class="upgrade-overlay hidden">
+    <div class="upgrade-card">
+      <button id="upgrade-modal-close" class="upgrade-close-btn" title="Fechar">✕</button>
+      <div class="upgrade-icon">⚡</div>
+      <h2>Funcionalidade Pro</h2>
+      <p id="upgrade-modal-feature-msg">Esta funcionalidade está disponível no plano Pro.</p>
+      <ul class="upgrade-features-list">
+        <li>Kairo AI Chat com contexto real da tua agenda</li>
+        <li>Tarefas e hábitos ilimitados</li>
+        <li>Exportação Word de relatórios</li>
+        <li>Criação de tarefas por voz</li>
+        <li>Histórico e análise completa</li>
+        <li>Sincronização e modo offline avançado</li>
+      </ul>
+      <div class="upgrade-price">9,99 € <span>/mês</span></div>
+      <button id="upgrade-checkout-btn" class="upgrade-checkout-btn">
+        Upgrade para Pro →
+      </button>
+      <p class="upgrade-cancel-note">Cancela quando quiseres · Sem compromisso</p>
+      <hr style="border:0;border-top:1px solid var(--border);margin:20px 0 14px">
+      <p style="font-size:0.8rem;color:var(--muted);margin:0 0 4px">Tens um código de voucher?</p>
+      <div class="voucher-input-row">
+        <input id="voucher-code-input" class="task-input" type="text"
+               placeholder="EX: KAIRO-XXXXX" style="text-transform:uppercase;font-size:0.85rem;" />
+        <button id="voucher-redeem-btn" class="ghost-btn">Aplicar</button>
+      </div>
+      <p id="voucher-feedback" style="font-size:0.8rem;min-height:1.2rem;margin:6px 0 0;"></p>
+    </div>
+  </div>
+
+  <script>
+    // ---- Upgrade Modal + Subscription System ----
+
+    // Inline Stripe publishable key (safe for frontend)
+    const STRIPE_PRICE_ID = 'price_1TWHCbAhC7GjF6oy2gz7Hh2e';
+
+    function isPro() {
+      const sub = appState.subscription;
+      if (!sub || sub.plan !== 'pro') return false;
+      if (sub.source === 'voucher' && sub.expiresAt) {
+        const expMs = typeof sub.expiresAt === 'number'
+          ? sub.expiresAt
+          : (sub.expiresAt.toMillis ? sub.expiresAt.toMillis() : Number(sub.expiresAt));
+        if (expMs < Date.now()) return false;
+      }
+      return true;
+    }
+
+    let _subUnsub = null;
+
+    function loadSubscription(uid) {
+      // Aplicar cache do localStorage enquanto carrega
+      try {
+        const cached = localStorage.getItem('kairo_sub_' + uid);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          appState.subscription = parsed;
+          updatePlanUI();
+        }
+      } catch (e) {}
+
+      // Subscrever ao documento do user (contém subscription)
+      if (_subUnsub) _subUnsub();
+      _subUnsub = db.doc('users/' + uid).onSnapshot(snap => {
+        if (snap.exists) {
+          const data = snap.data();
+          if (data && data.subscription) {
+            appState.subscription = data.subscription;
+            // Cache offline (apenas campos não-sensíveis)
+            try {
+              localStorage.setItem('kairo_sub_' + uid, JSON.stringify({
+                plan: data.subscription.plan || 'free',
+                source: data.subscription.source || null,
+                expiresAt: data.subscription.expiresAt
+                  ? (data.subscription.expiresAt.toMillis ? data.subscription.expiresAt.toMillis() : data.subscription.expiresAt)
+                  : null
+              }));
+            } catch (e) {}
+          } else {
+            appState.subscription = { plan: 'free' };
+          }
+        } else {
+          appState.subscription = { plan: 'free' };
+        }
+        updatePlanUI();
+        renderAll();
+      }, () => {
+        // Offline: manter cache
+        updatePlanUI();
+      });
+    }
+
+    function updatePlanUI() {
+      const badge = document.getElementById('sidebar-plan-badge');
+      const manageBtn = document.getElementById('manage-sub-btn');
+      const lockSpan = document.getElementById('kairo-chat-lock');
+
+      if (badge) {
+        if (isPro()) {
+          badge.textContent = 'PRO';
+          badge.className = 'plan-badge pro';
+        } else {
+          badge.textContent = 'FREE';
+          badge.className = 'plan-badge free';
+        }
+      }
+
+      if (manageBtn) {
+        manageBtn.style.display = isPro() && appState.subscription && appState.subscription.source === 'stripe'
+          ? 'flex' : 'none';
+      }
+
+      if (lockSpan) {
+        lockSpan.style.display = isPro() ? 'none' : 'flex';
+      }
+    }
+
+    function showUpgradeModal(featureName) {
+      const modal = document.getElementById('upgrade-modal');
+      const msg = document.getElementById('upgrade-modal-feature-msg');
+      const feedback = document.getElementById('voucher-feedback');
+      const codeInput = document.getElementById('voucher-code-input');
+      if (msg && featureName) {
+        msg.textContent = '"' + featureName + '" está disponível no plano Pro.';
+      }
+      if (feedback) { feedback.textContent = ''; feedback.style.color = ''; }
+      if (codeInput) codeInput.value = '';
+      modal.classList.remove('hidden');
+    }
+
+    // Fechar modal
+    document.getElementById('upgrade-modal-close').addEventListener('click', () => {
+      document.getElementById('upgrade-modal').classList.add('hidden');
+    });
+    document.getElementById('upgrade-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('upgrade-modal')) {
+        document.getElementById('upgrade-modal').classList.add('hidden');
+      }
+    });
+
+    // Checkout
+    document.getElementById('upgrade-checkout-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('upgrade-checkout-btn');
+      btn.disabled = true;
+      btn.textContent = 'A processar…';
+      try {
+        const fns = firebase.functions();
+        const createSession = fns.httpsCallable('createCheckoutSession');
+        const result = await createSession({ priceId: STRIPE_PRICE_ID });
+        window.location.href = result.data.url;
+      } catch (err) {
+        console.error('[Checkout]', err);
+        showToast('Erro ao iniciar pagamento. Tenta novamente.');
+        btn.disabled = false;
+        btn.textContent = 'Upgrade para Pro →';
+      }
+    });
+
+    // Voucher
+    document.getElementById('voucher-redeem-btn').addEventListener('click', async () => {
+      const codeInput = document.getElementById('voucher-code-input');
+      const feedback = document.getElementById('voucher-feedback');
+      const code = codeInput.value.trim().toUpperCase();
+      if (!code) return;
+      feedback.style.color = 'var(--muted)';
+      feedback.textContent = 'A validar…';
+      try {
+        const fns = firebase.functions();
+        const redeemFn = fns.httpsCallable('redeemVoucher');
+        await redeemFn({ code });
+        feedback.style.color = 'var(--success)';
+        feedback.textContent = 'Voucher aplicado! Plano Pro ativado.';
+        setTimeout(() => {
+          document.getElementById('upgrade-modal').classList.add('hidden');
+        }, 1800);
+      } catch (err) {
+        feedback.style.color = 'var(--danger)';
+        feedback.textContent = err.message || 'Código inválido ou expirado.';
+      }
+    });
+
+    // Gerir subscrição
+    document.getElementById('manage-sub-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('manage-sub-btn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader"></i> A abrir…';
+      try {
+        const fns = firebase.functions();
+        const portalFn = fns.httpsCallable('createCustomerPortalSession');
+        const result = await portalFn({});
+        window.location.href = result.data.url;
+      } catch (err) {
+        console.error('[Portal]', err);
+        showToast('Erro ao abrir portal. Tenta novamente.');
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    });
+
+    // ---- End Upgrade Modal + Subscription System ----
   </script>
 </body>
 </html>
