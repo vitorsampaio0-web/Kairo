@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kairo — Your Day. Engineered.</title>
-  <meta name="description" content="The command center for leaders who ship. Kairo is the AI-powered productivity app built for CEOs, founders, and C-level executives." />
+  <title>Kairo — O teu dia. Projetado.</title>
+  <meta name="description" content="O centro de comando para líderes que executam. O Kairo é a app de produtividade com IA criada para CEOs, fundadores e executivos C-level." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
@@ -19,9 +19,10 @@
       --surface-3:  #1A1A1A;
       --border:     #222222;
       --border-2:   #2A2A2A;
-      --gold:       #C9A84C;
-      --gold-light: #E0C06A;
-      --gold-dim:   #9A7A30;
+      --gold:       #7c5cff;
+      --gold-light: #9b85ff;
+      --gold-dim:   #5a3fd9;
+      --accent:     #4ea8ff;
       --indigo:     #6B77C0;
       --indigo-dim: #3D4580;
       --white:      #F4F2ED;
@@ -85,8 +86,8 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--gold);
-      background: rgba(201, 168, 76, 0.08);
-      border: 1px solid rgba(201, 168, 76, 0.2);
+      background: rgba(124, 92, 255, 0.08);
+      border: 1px solid rgba(124, 92, 255, 0.2);
       padding: 6px 14px;
       border-radius: 100px;
     }
@@ -143,7 +144,7 @@
     .btn-primary:hover {
       background: var(--gold-light);
       transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(201, 168, 76, 0.3);
+      box-shadow: 0 12px 40px rgba(124, 92, 255, 0.3);
     }
 
     .btn-ghost {
@@ -198,7 +199,7 @@
     }
 
     .nav-logo img {
-      height: 32px;
+      height: 52px;
       width: auto;
     }
 
@@ -304,6 +305,14 @@
 
     .hero-eyebrow { margin-bottom: 32px; }
 
+    .hero-logo-large {
+      display: block;
+      height: 110px;
+      width: auto;
+      margin-bottom: 28px;
+      filter: drop-shadow(0 0 24px rgba(124, 92, 255, 0.55)) drop-shadow(0 0 8px rgba(124, 92, 255, 0.35));
+    }
+
     .hero-headline {
       font-size: clamp(3.5rem, 6vw, 6.5rem);
       line-height: 1.0;
@@ -395,9 +404,9 @@
       border-radius: var(--radius-xl);
       overflow: hidden;
       box-shadow:
-        0 0 0 1px rgba(201, 168, 76, 0.06),
+        0 0 0 1px rgba(124, 92, 255, 0.06),
         0 40px 120px rgba(0, 0, 0, 0.8),
-        0 0 80px rgba(201, 168, 76, 0.04);
+        0 0 80px rgba(124, 92, 255, 0.04);
       animation: mockup-float 6s ease-in-out infinite;
     }
 
@@ -504,7 +513,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: linear-gradient(135deg, rgba(107,119,192,0.12), rgba(201,168,76,0.08));
+      background: linear-gradient(135deg, rgba(107,119,192,0.12), rgba(124,92,255,0.08));
       border: 1px solid rgba(107,119,192,0.25);
       border-radius: var(--radius-md);
       padding: 12px 14px;
@@ -662,8 +671,8 @@
       width: 52px;
       height: 52px;
       border-radius: var(--radius-md);
-      background: rgba(201, 168, 76, 0.08);
-      border: 1px solid rgba(201, 168, 76, 0.18);
+      background: rgba(124, 92, 255, 0.08);
+      border: 1px solid rgba(124, 92, 255, 0.18);
       margin-bottom: 24px;
       color: var(--gold);
     }
@@ -690,8 +699,8 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--gold-dim);
-      background: rgba(201, 168, 76, 0.06);
-      border: 1px solid rgba(201, 168, 76, 0.12);
+      background: rgba(124, 92, 255, 0.06);
+      border: 1px solid rgba(124, 92, 255, 0.12);
       padding: 5px 12px;
       border-radius: 100px;
     }
@@ -719,7 +728,7 @@
       width: 200px;
       height: 200px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(201,168,76,0.07), transparent 70%);
+      background: radial-gradient(circle, rgba(124,92,255,0.07), transparent 70%);
     }
 
     .feat-row {
@@ -743,7 +752,7 @@
       font-size: 12px;
     }
 
-    .feat-row-icon.gold { background: rgba(201,168,76,0.15); color: var(--gold); }
+    .feat-row-icon.gold { background: rgba(124,92,255,0.15); color: var(--gold); }
     .feat-row-icon.indigo { background: rgba(107,119,192,0.15); color: var(--indigo); }
     .feat-row-icon.green { background: rgba(40,200,130,0.15); color: #28C882; }
 
@@ -756,7 +765,7 @@
     .feat-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
 
     .feat-ai-bubble {
-      background: linear-gradient(135deg, rgba(107,119,192,0.12), rgba(201,168,76,0.06));
+      background: linear-gradient(135deg, rgba(107,119,192,0.12), rgba(124,92,255,0.06));
       border: 1px solid rgba(107,119,192,0.2);
       border-radius: var(--radius-md);
       padding: 14px 16px;
@@ -807,8 +816,8 @@
       margin-left: auto;
       font-size: 0.65rem;
       color: var(--gold);
-      background: rgba(201,168,76,0.08);
-      border: 1px solid rgba(201,168,76,0.15);
+      background: rgba(124,92,255,0.08);
+      border: 1px solid rgba(124,92,255,0.15);
       padding: 2px 8px;
       border-radius: 100px;
     }
@@ -914,7 +923,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, var(--gold-dim), var(--indigo));
+      background: linear-gradient(90deg, var(--gold-dim), var(--accent));
       opacity: 0;
       transition: var(--transition);
     }
@@ -949,7 +958,7 @@
       font-family: var(--font-display);
     }
 
-    .av-gold { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.25); }
+    .av-gold { background: rgba(124,92,255,0.15); color: var(--gold); border: 1px solid rgba(124,92,255,0.25); }
     .av-indigo { background: rgba(107,119,192,0.15); color: var(--indigo); border: 1px solid rgba(107,119,192,0.25); }
     .av-green { background: rgba(40,200,130,0.1); color: #28C882; border: 1px solid rgba(40,200,130,0.2); }
 
@@ -1007,8 +1016,8 @@
 
     .pricing-card.featured {
       border-color: var(--gold);
-      background: linear-gradient(180deg, rgba(201,168,76,0.04) 0%, var(--black) 100%);
-      box-shadow: 0 0 0 1px rgba(201,168,76,0.1), 0 20px 60px rgba(201,168,76,0.08);
+      background: linear-gradient(180deg, rgba(124,92,255,0.04) 0%, var(--black) 100%);
+      box-shadow: 0 0 0 1px rgba(124,92,255,0.1), 0 20px 60px rgba(124,92,255,0.08);
     }
 
     .pricing-badge {
@@ -1112,7 +1121,7 @@
       transform: translate(-50%, -50%);
       width: 800px;
       height: 400px;
-      background: radial-gradient(ellipse, rgba(201,168,76,0.07) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(124,92,255,0.07) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -1336,12 +1345,12 @@
         <span class="nav-logo-text">Kairo</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#testimonials">Reviews</a></li>
-        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#features">Funcionalidades</a></li>
+        <li><a href="#testimonials">Testemunhos</a></li>
+        <li><a href="#pricing">Preços</a></li>
       </ul>
       <div class="nav-cta">
-        <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary">Get Kairo</a>
+        <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary">Obter Kairo</a>
       </div>
       <div class="hamburger" id="hamburger" aria-label="Open menu">
         <span></span><span></span><span></span>
@@ -1352,10 +1361,10 @@
   <!-- MOBILE MENU -->
   <div class="mobile-menu" id="mobileMenu">
     <button class="mobile-close" id="mobileClose" aria-label="Close menu">✕</button>
-    <a href="#features" onclick="closeMobileMenu()">Features</a>
-    <a href="#testimonials" onclick="closeMobileMenu()">Reviews</a>
-    <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
-    <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-lg">Get Kairo</a>
+    <a href="#features" onclick="closeMobileMenu()">Funcionalidades</a>
+    <a href="#testimonials" onclick="closeMobileMenu()">Testemunhos</a>
+    <a href="#pricing" onclick="closeMobileMenu()">Preços</a>
+    <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-lg">Obter Kairo</a>
   </div>
 
   <!-- HERO -->
@@ -1368,18 +1377,19 @@
     <div class="container">
       <div class="hero-grid">
         <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
+          <img src="./logo-kairo.png" alt="Kairo" class="hero-logo-large" onerror="this.style.display='none'" />
           <div class="hero-eyebrow">
-            <span class="eyebrow"><span class="eyebrow-dot"></span>Trusted by 2,000+ leaders worldwide</span>
+            <span class="eyebrow"><span class="eyebrow-dot"></span>Usado por mais de 2.000 líderes em todo o mundo</span>
           </div>
-          <h1 class="hero-headline">Your day.<br><em>Engineered.</em></h1>
-          <p class="hero-sub-headline">Execution over intention.</p>
-          <p class="hero-desc">Stop managing. Start executing. Kairo is the AI-powered command center built for the leaders who ship — not the ones who plan to.</p>
+          <h1 class="hero-headline">O teu dia.<br><em>Projetado.</em></h1>
+          <p class="hero-sub-headline">Execução acima de intenção.</p>
+          <p class="hero-desc">Para de gerir. Começa a executar. O Kairo é o centro de comando com IA criado para os líderes que entregam — não para os que planeiam entregar.</p>
           <div class="hero-ctas">
             <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-lg">
-              Start Free
+              Começar Grátis
               <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
             </a>
-            <a href="#features" class="btn btn-ghost btn-lg">See it in action</a>
+            <a href="#features" class="btn btn-ghost btn-lg">Ver em ação</a>
           </div>
           <div class="hero-social-proof">
             <div class="avatar-stack">
@@ -1389,7 +1399,7 @@
               <div class="av">AK</div>
               <div class="av">SR</div>
             </div>
-            <p class="social-proof-text"><strong>4.9 ★</strong> · Loved by founders &amp; executives in 60+ countries</p>
+            <p class="social-proof-text"><strong>4.9 ★</strong> · Adorado por fundadores e executivos em mais de 60 países</p>
           </div>
         </div>
 
@@ -1402,42 +1412,42 @@
               <span class="mockup-titlebar-text">Kairo — Dashboard</span>
             </div>
             <div class="mockup-body">
-              <div class="mock-greeting">Good morning, <span>Marcus</span></div>
+              <div class="mock-greeting">Bom dia, <span>Marcus</span></div>
               <div class="mock-stats">
                 <div class="mock-stat">
                   <div class="mock-stat-val">8</div>
-                  <div class="mock-stat-label">Tasks today</div>
+                  <div class="mock-stat-label">Tarefas hoje</div>
                 </div>
                 <div class="mock-stat">
                   <div class="mock-stat-val">3</div>
-                  <div class="mock-stat-label">In focus</div>
+                  <div class="mock-stat-label">Em foco</div>
                 </div>
                 <div class="mock-stat">
                   <div class="mock-stat-val">14</div>
-                  <div class="mock-stat-label">Day streak</div>
+                  <div class="mock-stat-label">Dias seguidos</div>
                 </div>
               </div>
               <div class="mock-task-list">
                 <div class="mock-task-item">
                   <div class="mock-check mock-check-done"></div>
-                  <span class="mock-task-done">Board deck review</span>
+                  <span class="mock-task-done">Revisão do deck do conselho</span>
                 </div>
                 <div class="mock-task-item">
                   <div class="mock-check mock-check-done"></div>
-                  <span class="mock-task-done">Q3 OKR alignment call</span>
+                  <span class="mock-task-done">Call de alinhamento OKR Q3</span>
                 </div>
                 <div class="mock-task-item">
                   <div class="mock-check mock-check-open"></div>
-                  <span>Series B term sheet review</span>
+                  <span>Revisão do term sheet Série B</span>
                 </div>
                 <div class="mock-task-item">
                   <div class="mock-check mock-check-open"></div>
-                  <span>1-on-1 with CPO</span>
+                  <span>1-on-1 com o CPO</span>
                 </div>
               </div>
               <div class="mock-ai-chip">
                 <div class="mock-ai-icon">✦</div>
-                <div class="mock-ai-text"><strong>Kairo AI:</strong> You have 2 conflicting priorities tomorrow. Want me to reorganize your schedule?</div>
+                <div class="mock-ai-text"><strong>Kairo AI:</strong> Tens 2 prioridades em conflito amanhã. Queres que reorganize o teu horário?</div>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 <div class="mock-habit-row">
@@ -1478,25 +1488,26 @@
   <section id="problem" class="section">
     <div class="container">
       <div class="section-header" data-aos="fade-up">
-        <span class="eyebrow">The problem</span>
-        <h2>Every tool promises clarity.<br>Most deliver noise.</h2>
-        <p>You're running on a patchwork of apps that don't talk to each other. Your focus is fragmented before the morning standup ends.</p>
+        <span class="eyebrow">O problema</span>
+        <h2>Cada ferramenta promete clareza.<br>A maioria entrega ruído.</h2>
+        <p>Estás a trabalhar com um conjunto fragmentado de apps que não comunicam entre si. O teu foco dispersa antes mesmo do standup da manhã terminar.</p>
       </div>
       <div class="problem-grid" data-aos="fade-up" data-aos-delay="100">
         <div class="problem-card">
           <div class="problem-number">01</div>
-          <h3>12 apps. Zero focus.</h3>
-          <p>Slack, Notion, Todoist, Calendar, email, notes — every system is a separate decision. Context switching costs you more than you realise.</p>
+          <h3>12 apps. Zero foco.</h3>
+          <p>Demasiadas ferramentas. Nenhuma visão clara. Perdes horas a organizar em vez de executar.</p>
+          <p>Slack, Notion, Todoist, Calendário, email, notas — cada sistema é uma decisão separada. A troca de contexto custa-te mais do que pensas.</p>
         </div>
         <div class="problem-card">
           <div class="problem-number">02</div>
-          <h3>Priorities shift. Nothing tracks.</h3>
-          <p>What was urgent at 9am is irrelevant by noon. Most tools freeze your priorities in place. Kairo adapts with you.</p>
+          <h3>As prioridades mudam. Nada acompanha.</h3>
+          <p>O que era urgente às 9h é irrelevante ao meio-dia. A maioria das ferramentas congela as tuas prioridades. O Kairo adapta-se contigo.</p>
         </div>
         <div class="problem-card">
           <div class="problem-number">03</div>
-          <h3>Hours organising. Minutes executing.</h3>
-          <p>The cruel irony of productivity apps: they make productivity your full-time job. Leaders should be deciding, not filing.</p>
+          <h3>Horas a organizar. Minutos a executar.</h3>
+          <p>A ironia cruel das apps de produtividade: tornam a produtividade no teu trabalho a tempo inteiro. Os líderes devem decidir, não arquivar.</p>
         </div>
       </div>
     </div>
@@ -1506,8 +1517,8 @@
   <section id="features" class="section" style="background: var(--black);">
     <div class="container">
       <div class="section-header" data-aos="fade-up">
-        <span class="eyebrow">Features</span>
-        <h2>Built for the way<br>you actually lead.</h2>
+        <span class="eyebrow">Funcionalidades</span>
+        <h2>Construído para a forma<br>como realmente lideras.</h2>
       </div>
 
       <!-- Feature 1: Dashboard -->
@@ -1516,37 +1527,37 @@
           <div class="feature-icon-wrap">
             <i data-lucide="layout-dashboard" style="width:22px;height:22px;"></i>
           </div>
-          <h3>Smart Dashboard</h3>
-          <p>Everything you need. Nothing you don't. Your entire day — tasks, schedule, habits, and metrics — visible in a single, uncluttered glance.</p>
+          <h3>Dashboard Inteligente</h3>
+          <p>Tudo o que precisas. Nada a mais. O teu dia inteiro visível num relance.</p>
           <div class="feature-tags">
-            <span class="feature-tag">At-a-glance view</span>
-            <span class="feature-tag">Daily clarity</span>
-            <span class="feature-tag">Zero noise</span>
+            <span class="feature-tag">Vista global</span>
+            <span class="feature-tag">Clareza diária</span>
+            <span class="feature-tag">Zero ruído</span>
           </div>
         </div>
         <div class="feat-visual">
           <div class="feat-row">
             <div class="feat-row-icon gold"><i data-lucide="check-circle" style="width:14px;height:14px;"></i></div>
-            <span class="feat-row-label">Tasks completed today</span>
+            <span class="feat-row-label">Tarefas concluídas hoje</span>
             <span class="feat-row-value">6 / 8</span>
           </div>
           <div class="feat-row">
             <div class="feat-row-icon indigo"><i data-lucide="calendar" style="width:14px;height:14px;"></i></div>
-            <span class="feat-row-label">Next meeting</span>
+            <span class="feat-row-label">Próxima reunião</span>
             <span class="feat-row-value">2:30 PM</span>
           </div>
           <div class="feat-row">
             <div class="feat-row-icon green"><i data-lucide="trending-up" style="width:14px;height:14px;"></i></div>
-            <span class="feat-row-label">Focus score</span>
+            <span class="feat-row-label">Pontuação de foco</span>
             <span class="feat-row-value">92%</span>
           </div>
           <div style="margin-top:8px;">
             <div class="feat-bar-wrap">
-              <div class="feat-bar-label">Daily progress</div>
+              <div class="feat-bar-label">Progresso diário</div>
               <div class="feat-bar-bg"><div class="feat-bar-fill" style="width:75%;"></div></div>
             </div>
             <div class="feat-bar-wrap" style="margin-top:10px;">
-              <div class="feat-bar-label">Weekly streak</div>
+              <div class="feat-bar-label">Sequência semanal</div>
               <div class="feat-bar-bg"><div class="feat-bar-fill" style="width:86%;background:linear-gradient(90deg, var(--indigo-dim), var(--indigo));"></div></div>
             </div>
           </div>
@@ -1560,37 +1571,37 @@
             <i data-lucide="sparkles" style="width:22px;height:22px;"></i>
           </div>
           <h3>Kairo AI</h3>
-          <p>An executive assistant that learns your rhythm. It surfaces what matters, reschedules what conflicts, and silences what doesn't deserve your attention.</p>
+          <p>Um assistente que conversa contigo. Analisa tarefas, sugere prioridades, responde em tempo real.</p>
           <div class="feature-tags">
-            <span class="feature-tag">Priority surfacing</span>
-            <span class="feature-tag">Smart scheduling</span>
-            <span class="feature-tag">Contextual insights</span>
+            <span class="feature-tag">Sugestão de prioridades</span>
+            <span class="feature-tag">Agendamento inteligente</span>
+            <span class="feature-tag">Insights contextuais</span>
           </div>
         </div>
         <div class="feat-visual" style="background:linear-gradient(135deg,var(--surface),rgba(107,119,192,0.04));">
           <div class="feat-ai-label">✦ Kairo AI</div>
-          <div class="feat-ai-bubble"><strong>You have 3 deep work blocks tomorrow but 5 conflicting calls.</strong> I've moved the least urgent call to Thursday and protected your 9–11am block. Want me to notify the team?</div>
-          <div class="feat-ai-bubble" style="margin-top:4px;"><strong>Series B review is due Friday.</strong> Based on your velocity, I recommend blocking 2h today and 3h Wednesday.</div>
+          <div class="feat-ai-bubble"><strong>Tens 3 blocos de trabalho profundo amanhã mas 5 calls em conflito.</strong> Movi a call menos urgente para quinta e protegi o teu bloco das 9–11h. Queres que notifique a equipa?</div>
+          <div class="feat-ai-bubble" style="margin-top:4px;"><strong>A revisão Série B é para sexta.</strong> Com base no teu ritmo, recomendo bloquear 2h hoje e 3h na quarta.</div>
           <div class="feat-row" style="margin-top:8px;">
             <div class="feat-row-icon indigo"><i data-lucide="brain" style="width:14px;height:14px;"></i></div>
-            <span class="feat-row-label">AI confidence</span>
+            <span class="feat-row-label">Confiança da IA</span>
             <span class="feat-row-value" style="color:var(--indigo);">98.2%</span>
           </div>
         </div>
       </div>
 
-      <!-- Feature 3: Habits -->
+      <!-- Feature 3: Tarefas Inteligentes -->
       <div class="feature-block" data-aos="fade-up">
         <div class="feature-content">
           <div class="feature-icon-wrap" style="background:rgba(40,200,130,0.08);border-color:rgba(40,200,130,0.18);color:#28C882;">
             <i data-lucide="trending-up" style="width:22px;height:22px;"></i>
           </div>
-          <h3>Habits &amp; Streaks</h3>
-          <p>Consistency is the only real compound interest. Build the rituals that drive results — and watch them become non-negotiable, day after day.</p>
+          <h3>Tarefas Inteligentes</h3>
+          <p>Cria por voz ou texto. Prioridade, data, edição, histórico e exportação para Word.</p>
           <div class="feature-tags">
-            <span class="feature-tag">Daily streaks</span>
-            <span class="feature-tag">Progress tracking</span>
-            <span class="feature-tag">Momentum builder</span>
+            <span class="feature-tag">Criação por voz</span>
+            <span class="feature-tag">Histórico completo</span>
+            <span class="feature-tag">Export para Word</span>
           </div>
         </div>
         <div class="feat-visual">
@@ -1600,7 +1611,7 @@
               <div class="feat-habit-streak">
                 <div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-off"></div>
               </div>
-              <span class="feat-streak-badge">6d streak</span>
+              <span class="feat-streak-badge">6d seguidos</span>
             </div>
             <div class="feat-habit-row">
               <span class="feat-habit-label">Reading</span>
@@ -1675,7 +1686,7 @@
               <div class="feat-device-header">
                 <i data-lucide="wifi-off" style="width:14px;height:14px;color:var(--gold);"></i>
                 Offline mode
-                <span class="feat-device-status" style="color:var(--gold);background:rgba(201,168,76,0.1);">Ready</span>
+                <span class="feat-device-status" style="color:var(--gold);background:rgba(124,92,255,0.1);">Ready</span>
               </div>
               <div class="feat-device-sync">No connection needed</div>
             </div>
@@ -1719,7 +1730,7 @@
   <section id="testimonials" class="section">
     <div class="container">
       <div class="section-header centered" data-aos="fade-up">
-        <span class="eyebrow">Testimonials</span>
+        <span class="eyebrow">Testemunhos</span>
         <h2>What leaders<br>actually say.</h2>
         <p>No marketing. No corporate speak. Just the people who use Kairo every day.</p>
       </div>
