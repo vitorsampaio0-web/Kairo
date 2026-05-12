@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users: cada utilizador acede apenas aos seus dados
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      // Escrita directa ao documento do user bloqueada (apenas Cloud Functions via Admin SDK)
+      allow write: if false;
+
+      match /tarefas/{id} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+      match /habitos/{id} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+      match /eventos/{id} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // Vouchers: totalmente bloqueados no frontend (apenas Cloud Functions)
+    match /vouchers/{code} {
+      allow read, write: if false;
+    }
+
+    // Admins: cada admin pode ler o seu proprio registo (para verificacao UI)
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}
