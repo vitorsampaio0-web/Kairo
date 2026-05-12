@@ -923,6 +923,51 @@
       border: 1px solid rgba(0, 194, 255, 0.25);
     }
 
+    /* ---- Topbar User/Upgrade (mobile) ---- */
+    .topbar-upgrade-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(45,127,249,0.2), rgba(0,194,255,0.12));
+      border: 1px solid rgba(45,127,249,0.4);
+      color: #2d7ff9;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .topbar-user-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(154,170,196,0.1);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .topbar-user-menu {
+      position: absolute;
+      top: 44px; right: 0;
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+      z-index: 100;
+    }
+    .topbar-user-menu.hidden { display: none; }
+    .topbar-user-menu button {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      width: 100%;
+      background: transparent;
+      color: var(--danger);
+      font-size: 0.82rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .topbar-user-menu button:hover { background: rgba(255,70,70,0.1); }
+
     /* ---- Sidebar Upgrade Button ---- */
     .sidebar-upgrade-btn {
       width: 100%;
@@ -1842,6 +1887,14 @@
         <div class="topbar-meta">
           <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
           <div class="pill"><i data-lucide="zap"></i><span id="topbar-focus"></span></div>
+          <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
+          <button id="topbar-user-btn" class="topbar-user-btn" onclick="document.getElementById('topbar-user-menu').classList.toggle('hidden')">
+            <img id="topbar-avatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;display:none;" />
+            <i data-lucide="user" id="topbar-avatar-icon"></i>
+          </button>
+          <div id="topbar-user-menu" class="topbar-user-menu hidden">
+            <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
+          </div>
         </div>
       </div>
 
@@ -3496,6 +3549,14 @@
       if (user) {
         currentUser = user;
         updateSidebarUser(user);
+        // Topbar avatar
+        const tAvatar = document.getElementById('topbar-avatar');
+        const tIcon = document.getElementById('topbar-avatar-icon');
+        if (user.photoURL && tAvatar) {
+          tAvatar.src = user.photoURL;
+          tAvatar.style.display = 'block';
+          if (tIcon) tIcon.style.display = 'none';
+        }
         await loadUserData(user.uid);
         showApp(user);
         // Carregar subscription (onSnapshot em tempo real)
@@ -3865,6 +3926,10 @@
       if (upgradeBtn) {
         upgradeBtn.style.display = isPro() ? 'none' : 'block';
       }
+      const topbarUpgradeBtn = document.getElementById('topbar-upgrade-btn');
+      if (topbarUpgradeBtn) {
+        topbarUpgradeBtn.style.display = isPro() ? 'none' : 'inline-block';
+      }
 
       if (lockSpan) {
         lockSpan.style.display = isPro() ? 'none' : 'flex';
@@ -3900,10 +3965,15 @@
       btn.disabled = true;
       btn.textContent = 'A processar…';
       try {
-        const fns = firebase.app().functions('us-central1');
-        const createSession = fns.httpsCallable('createCheckoutSession');
-        const result = await createSession({ priceId: STRIPE_PRICE_ID });
-        window.location.href = result.data.url;
+        const token = await firebase.auth().currentUser.getIdToken();
+        const resp = await fetch('https://us-central1-kairo-3a7e4.cloudfunctions.net/createCheckoutSession', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ data: { priceId: STRIPE_PRICE_ID } })
+        });
+        if (!resp.ok) throw new Error('Erro ' + resp.status);
+        const data = await resp.json();
+        window.location.href = data.result.url;
       } catch (err) {
         console.error('[Checkout]', err);
         showToast('Erro ao iniciar pagamento. Tenta novamente.');
@@ -3921,9 +3991,16 @@
       feedback.style.color = 'var(--muted)';
       feedback.textContent = 'A validar…';
       try {
-        const fns = firebase.app().functions('us-central1');
-        const redeemFn = fns.httpsCallable('redeemVoucher');
-        await redeemFn({ code });
+        const token = await firebase.auth().currentUser.getIdToken();
+        const resp = await fetch('https://us-central1-kairo-3a7e4.cloudfunctions.net/redeemVoucher', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ data: { code } })
+        });
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          throw new Error((errData.error && errData.error.message) || 'Codigo invalido');
+        }
         feedback.style.color = 'var(--success)';
         feedback.textContent = 'Voucher aplicado! Plano Pro ativado.';
         setTimeout(() => {
@@ -3942,10 +4019,15 @@
       btn.disabled = true;
       btn.innerHTML = '<i data-lucide="loader"></i> A abrir…';
       try {
-        const fns = firebase.app().functions('us-central1');
-        const portalFn = fns.httpsCallable('createCustomerPortalSession');
-        const result = await portalFn({});
-        window.location.href = result.data.url;
+        const token = await firebase.auth().currentUser.getIdToken();
+        const resp = await fetch('https://us-central1-kairo-3a7e4.cloudfunctions.net/createCustomerPortalSession', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({})
+        });
+        if (!resp.ok) throw new Error('Erro ' + resp.status);
+        const data = await resp.json();
+        window.location.href = data.result.url;
       } catch (err) {
         console.error('[Portal]', err);
         showToast('Erro ao abrir portal. Tenta novamente.');
