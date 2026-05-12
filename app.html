@@ -1,0 +1,3453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kairo</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#7c5cff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Kairo" />
+  <link rel="apple-touch-icon" href="./logo-kairo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1728;
+      --panel: rgba(13, 23, 40, 0.86);
+      --panel-strong: #101c31;
+      --panel-elevated: rgba(18, 31, 53, 0.94);
+      --border: rgba(154, 170, 196, 0.14);
+      --text: #f4f7fb;
+      --muted: #95a5bf;
+      --muted-strong: #b8c4d8;
+      --primary: #7c5cff;
+      --primary-2: #00c2ff;
+      --success: #31d0aa;
+      --warning: #ffb84d;
+      --danger: #ff6b8a;
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Inter", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.22), transparent 30%),
+        radial-gradient(circle at top right, rgba(0, 194, 255, 0.16), transparent 28%),
+        linear-gradient(160deg, #050d18 0%, #07111f 48%, #0a1424 100%);
+      color: var(--text);
+    }
+
+    body {
+      padding: 16px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: calc(100vh - 32px);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      max-width: 1600px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .sidebar {
+      display: none;
+    }
+
+    .main {
+      width: 100%;
+      min-width: 0;
+      padding-bottom: 96px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 12px 28px rgba(124, 92, 255, 0.36);
+    }
+
+    .brand h1,
+    .sidebar-brand h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: 0.12em;
+    }
+
+    .brand p,
+    .sidebar-brand p,
+    .section-heading p,
+    .hero-copy p,
+    .subtle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .topbar-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--muted-strong);
+      font-size: 0.85rem;
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .hero-card,
+    .panel,
+    .metric-card,
+    .timeline-block,
+    .task-row,
+    .habit-card,
+    .event-card,
+    .planner-card,
+    .ai-card,
+    .suggestion-card {
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 18px;
+      background:
+        linear-gradient(135deg, rgba(124, 92, 255, 0.18), rgba(0, 194, 255, 0.08)),
+        var(--panel);
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 194, 255, 0.18), transparent 65%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .hero-copy h2 {
+      margin: 0 0 8px;
+      font-size: 1.65rem;
+      line-height: 1.15;
+    }
+
+    .hero-copy strong {
+      color: white;
+    }
+
+    .hero-grid,
+    .dashboard-grid,
+    .planning-grid,
+    .agenda-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .metric-card {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      min-height: 118px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .metric-card:hover,
+    .panel:hover,
+    .timeline-block:hover,
+    .task-row:hover,
+    .habit-card:hover,
+    .event-card:hover,
+    .planner-card:hover,
+    .suggestion-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(124, 92, 255, 0.32);
+    }
+
+    .metric-card small,
+    .label {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .metric-card strong {
+      font-size: 1.6rem;
+      margin-top: 8px;
+    }
+
+    .dashboard-grid,
+    .planning-grid,
+    .agenda-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .panel {
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      min-width: 0;
+    }
+
+    .panel-header,
+    .section-heading,
+    .row-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .section-heading h3,
+    .panel-header h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .next-event-card {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      background:
+        linear-gradient(135deg, rgba(49, 208, 170, 0.16), rgba(124, 92, 255, 0.1)),
+        rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(49, 208, 170, 0.25);
+      margin-bottom: 14px;
+    }
+
+    .event-time,
+    .badge,
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted-strong);
+    }
+
+    .badge.high,
+    .priority-alta {
+      background: rgba(255, 107, 138, 0.14);
+      color: #ff9ab0;
+    }
+
+    .badge.medium,
+    .priority-media {
+      background: rgba(255, 184, 77, 0.14);
+      color: #ffca7c;
+    }
+
+    .badge.low,
+    .priority-baixa {
+      background: rgba(49, 208, 170, 0.14);
+      color: #82efd0;
+    }
+
+    .status-pendente {
+      background: rgba(255, 184, 77, 0.12);
+      color: #ffd48f;
+    }
+
+    .status-andamento {
+      background: rgba(0, 194, 255, 0.12);
+      color: #75ddff;
+    }
+
+    .status-concluida {
+      background: rgba(49, 208, 170, 0.12);
+      color: #7ff0cf;
+    }
+
+    .list-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-item,
+    .task-row,
+    .habit-card,
+    .event-card,
+    .planner-card,
+    .suggestion-card {
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+
+    .mini-item {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .mini-item h4,
+    .task-row h4,
+    .habit-card h4,
+    .event-card h4,
+    .planner-card h4,
+    .suggestion-card h4 {
+      margin: 0 0 6px;
+      font-size: 0.98rem;
+    }
+
+    .mini-item p,
+    .task-row p,
+    .habit-card p,
+    .event-card p,
+    .planner-card p,
+    .suggestion-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.9rem;
+    }
+
+    .ai-card {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(135deg, rgba(124, 92, 255, 0.22), rgba(0, 194, 255, 0.08)),
+        rgba(255, 255, 255, 0.04);
+    }
+
+    .ai-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .ai-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    .progress-ring {
+      width: 126px;
+      height: 126px;
+      border-radius: 50%;
+      background: conic-gradient(var(--success) calc(var(--value) * 1%), rgba(255, 255, 255, 0.08) 0);
+      display: grid;
+      place-items: center;
+      margin: 4px auto 16px;
+      position: relative;
+    }
+
+    .progress-ring::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: #0b1628;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .progress-ring strong {
+      position: relative;
+      z-index: 1;
+      font-size: 1.45rem;
+    }
+
+    .filters,
+    .tab-switch,
+    .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip,
+    .switch-btn,
+    .nav-btn,
+    .ghost-btn,
+    .primary-btn,
+    .habit-action {
+      border-radius: 14px;
+      transition: all 0.24s ease;
+    }
+
+    .chip,
+    .switch-btn,
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--muted-strong);
+      padding: 10px 14px;
+    }
+
+    .chip.active,
+    .switch-btn.active,
+    .ghost-btn:hover {
+      border-color: rgba(124, 92, 255, 0.4);
+      background: rgba(124, 92, 255, 0.14);
+      color: #fff;
+    }
+
+    .primary-btn,
+    .habit-action {
+      background: linear-gradient(135deg, var(--primary), #5d89ff);
+      color: white;
+      padding: 11px 16px;
+      box-shadow: 0 14px 30px rgba(124, 92, 255, 0.28);
+    }
+
+    .primary-btn:hover,
+    .habit-action:hover {
+      transform: translateY(-1px) scale(1.01);
+    }
+
+    .task-input-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .task-input,
+    .task-select {
+      width: 100%;
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid var(--border);
+      color: white;
+      outline: none;
+    }
+
+    input[type="date"].task-input,
+    input[type="time"].task-input,
+    input[type="date"].task-input::-webkit-calendar-picker-indicator,
+    input[type="time"].task-input::-webkit-calendar-picker-indicator {
+      color-scheme: dark;
+    }
+
+    .task-select option {
+      background: #0f1a2d;
+    }
+
+    .task-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: flex-start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .task-row.done {
+      opacity: 0.72;
+    }
+
+    .task-row.done h4 {
+      text-decoration: line-through;
+    }
+
+    .task-row.overdue {
+      border-color: rgba(255, 107, 138, 0.32);
+      background:
+        linear-gradient(135deg, rgba(255, 107, 138, 0.12), transparent 40%),
+        var(--panel);
+    }
+
+    .checkbox-btn {
+      margin-top: 2px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.03);
+      display: grid;
+      place-items: center;
+      color: transparent;
+      flex-shrink: 0;
+    }
+
+    .checkbox-btn.checked {
+      color: white;
+      background: linear-gradient(135deg, var(--success), #4fe3bc);
+      border-color: transparent;
+      animation: pop 0.3s ease;
+    }
+
+    .task-top,
+    .habit-top,
+    .event-top,
+    .planner-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .task-meta,
+    .habit-meta,
+    .event-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .habit-card.done {
+      border-color: rgba(49, 208, 170, 0.3);
+      background:
+        linear-gradient(135deg, rgba(49, 208, 170, 0.15), transparent 45%),
+        var(--panel);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      margin: 14px 0 12px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), var(--primary-2));
+    }
+
+    .agenda-grid .panel,
+    .planning-grid .panel {
+      height: 100%;
+    }
+
+    .event-card {
+      display: grid;
+      gap: 10px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
+        rgba(255, 255, 255, 0.02);
+    }
+
+    .timeline-stack {
+      display: grid;
+      gap: 12px;
+      position: relative;
+    }
+
+    .timeline-block,
+    .planner-card {
+      position: relative;
+    }
+
+    .timeline-block::before,
+    .planner-card::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 20px;
+      bottom: 20px;
+      width: 3px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--primary), transparent);
+      opacity: 0.55;
+    }
+
+    .timeline-inner,
+    .planner-inner {
+      padding-left: 24px;
+    }
+
+    .suggestion-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 14px;
+      z-index: 30;
+      background: rgba(9, 16, 28, 0.9);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
+      border-radius: 24px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 8px;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      min-height: 58px;
+      background: transparent;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.72rem;
+    }
+
+    .nav-btn.active {
+      color: white;
+      background: rgba(124, 92, 255, 0.14);
+    }
+
+    .toast-wrap {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 50;
+      display: grid;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      min-width: 240px;
+      max-width: 320px;
+      background: rgba(11, 20, 36, 0.96);
+      color: white;
+      border: 1px solid rgba(124, 92, 255, 0.22);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      animation: slideIn 0.35s ease;
+    }
+
+    .empty-state {
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    /* Task action buttons */
+    .task-actions {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .task-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      transition: all 0.22s ease;
+      flex-shrink: 0;
+    }
+
+    .task-action-btn:hover {
+      border-color: rgba(124, 92, 255, 0.4);
+      background: rgba(124, 92, 255, 0.1);
+      color: white;
+    }
+
+    .task-action-btn.danger:hover {
+      border-color: rgba(255, 107, 138, 0.4);
+      background: rgba(255, 107, 138, 0.1);
+      color: var(--danger);
+    }
+
+    /* Voice button */
+    .task-title-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .task-title-wrapper .task-input {
+      width: 100%;
+      padding-right: 48px;
+    }
+
+    .voice-btn {
+      position: absolute;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      transition: all 0.22s ease;
+      flex-shrink: 0;
+    }
+
+    .voice-btn:hover {
+      border-color: rgba(124, 92, 255, 0.4);
+      background: rgba(124, 92, 255, 0.1);
+      color: white;
+    }
+
+    .voice-btn.recording {
+      background: rgba(255, 107, 138, 0.18);
+      border-color: rgba(255, 107, 138, 0.55);
+      color: var(--danger);
+      animation: pulse-mic 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-mic {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 138, 0.45); }
+      50% { box-shadow: 0 0 0 7px rgba(255, 107, 138, 0); }
+    }
+
+    /* Edit modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 560px;
+      background: #0d1728;
+      border: 1px solid rgba(124, 92, 255, 0.28);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 32px 72px rgba(0, 0, 0, 0.64), 0 0 0 1px rgba(124, 92, 255, 0.08);
+      padding: 26px;
+      animation: slideUp 0.26s ease;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.08rem;
+    }
+
+    .modal-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      transition: all 0.22s ease;
+    }
+
+    .modal-close:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-field {
+      margin-bottom: 14px;
+    }
+
+    .modal-field label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .modal-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-textarea {
+      width: 100%;
+      border-radius: 16px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid var(--border);
+      color: white;
+      outline: none;
+      font: inherit;
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 22px;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 22px;
+      }
+
+      .task-input-row {
+        grid-template-columns: 2fr 1fr 1fr 130px 90px auto;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+
+      .agenda-grid,
+      .planning-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+    }
+
+    @media (min-width: 1100px) {
+      body {
+        padding: 24px;
+      }
+
+      .app-shell {
+        grid-template-columns: 280px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background: rgba(8, 15, 28, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 30px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+        position: sticky;
+        top: 24px;
+        height: calc(100vh - 48px);
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+
+      .sidebar-nav {
+        display: grid;
+        gap: 10px;
+      }
+
+      .sidebar .nav-btn {
+        flex-direction: row;
+        justify-content: flex-start;
+        min-height: 54px;
+        padding: 0 16px;
+        border: 1px solid transparent;
+        border-radius: 18px;
+        font-size: 0.92rem;
+      }
+
+      .sidebar .nav-btn.active {
+        border-color: rgba(124, 92, 255, 0.22);
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        padding: 18px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, rgba(124, 92, 255, 0.18), rgba(0, 194, 255, 0.08));
+        border: 1px solid rgba(124, 92, 255, 0.2);
+      }
+
+      .main {
+        padding-bottom: 24px;
+      }
+
+      .bottom-nav {
+        display: none;
+      }
+
+      .hero-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: stretch;
+      }
+
+      .hero-copy {
+        max-width: 48%;
+      }
+
+      .hero-grid {
+        width: 48%;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* ---- Kairo AI Chat ---- */
+    .kairo-chat-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 100px;
+      z-index: 35;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border: none;
+      color: white;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 28px rgba(124, 92, 255, 0.48);
+      cursor: pointer;
+      animation: kairo-pulse 2.6s ease-in-out infinite;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .kairo-chat-btn:hover {
+      transform: scale(1.09);
+      box-shadow: 0 12px 36px rgba(124, 92, 255, 0.65);
+      animation: none;
+    }
+
+    @keyframes kairo-pulse {
+      0%, 100% { box-shadow: 0 8px 28px rgba(124, 92, 255, 0.48), 0 0 0 0 rgba(124, 92, 255, 0.38); }
+      50% { box-shadow: 0 8px 28px rgba(124, 92, 255, 0.48), 0 0 0 11px rgba(124, 92, 255, 0); }
+    }
+
+    .kairo-chat-panel {
+      position: fixed;
+      right: 16px;
+      bottom: 166px;
+      z-index: 90;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      height: 520px;
+      max-height: calc(100vh - 184px);
+      background: #0d1728;
+      border: 1px solid rgba(124, 92, 255, 0.3);
+      border-radius: 26px;
+      box-shadow: 0 32px 72px rgba(0, 0, 0, 0.64), 0 0 0 1px rgba(124, 92, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform-origin: bottom right;
+      transform: scale(0.82) translateY(10px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.32s cubic-bezier(0.34, 1.46, 0.64, 1), opacity 0.26s ease;
+    }
+
+    .kairo-chat-panel.open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(124, 92, 255, 0.2), rgba(0, 194, 255, 0.09));
+      flex-shrink: 0;
+    }
+
+    .chat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(124, 92, 255, 0.36);
+    }
+
+    .chat-header strong {
+      display: block;
+      font-size: 0.94rem;
+    }
+
+    .chat-status-line {
+      color: var(--muted);
+      font-size: 0.76rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 1px;
+    }
+
+    .chat-status-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      flex-shrink: 0;
+    }
+
+    .chat-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      transition: all 0.22s ease;
+      flex-shrink: 0;
+    }
+
+    .chat-close-btn:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 14px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+
+    .chat-msg {
+      display: flex;
+      gap: 7px;
+      max-width: 90%;
+      animation: fadeIn 0.28s ease;
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .chat-msg.ai {
+      align-self: flex-start;
+    }
+
+    .chat-msg-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .chat-bubble {
+      padding: 9px 13px;
+      border-radius: 16px;
+      font-size: 0.87rem;
+      line-height: 1.5;
+      word-wrap: break-word;
+      white-space: pre-line;
+    }
+
+    .chat-msg.user .chat-bubble {
+      background: linear-gradient(135deg, var(--primary), #5a86ff);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-msg.ai .chat-bubble {
+      background: rgba(255, 255, 255, 0.058);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-timestamp {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .chat-msg.user .chat-timestamp {
+      text-align: right;
+    }
+
+    .chat-typing-wrap {
+      display: flex;
+      gap: 7px;
+      align-self: flex-start;
+      animation: fadeIn 0.24s ease;
+    }
+
+    .chat-typing {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 9px 13px;
+      background: rgba(255, 255, 255, 0.058);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-typing span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: typing-dot 1.3s ease-in-out infinite;
+    }
+
+    .chat-typing span:nth-child(2) { animation-delay: 0.18s; }
+    .chat-typing span:nth-child(3) { animation-delay: 0.36s; }
+
+    @keyframes typing-dot {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      background: rgba(7, 13, 24, 0.6);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 13px;
+      color: white;
+      font: inherit;
+      font-size: 0.87rem;
+      outline: none;
+      transition: border-color 0.22s ease;
+    }
+
+    .chat-input::placeholder {
+      color: var(--muted);
+    }
+
+    .chat-input:focus {
+      border-color: rgba(124, 92, 255, 0.48);
+    }
+
+    .chat-send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--primary), #5a86ff);
+      color: white;
+      display: grid;
+      place-items: center;
+      border: none;
+      flex-shrink: 0;
+      box-shadow: 0 5px 16px rgba(124, 92, 255, 0.32);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .chat-send-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 8px 22px rgba(124, 92, 255, 0.48);
+    }
+
+    @media (min-width: 1100px) {
+      .kairo-chat-btn {
+        bottom: 32px;
+      }
+
+      .kairo-chat-panel {
+        bottom: 98px;
+        right: 28px;
+        max-height: calc(100vh - 116px);
+      }
+    }
+    /* ---- End Kairo AI Chat ---- */
+
+    /* ---- Login Screen ---- */
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background:
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.28), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(0, 194, 255, 0.18), transparent 32%),
+        linear-gradient(160deg, #050d18 0%, #07111f 48%, #0a1424 100%);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .login-screen.hidden {
+      display: none;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(13, 23, 40, 0.9);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(124, 92, 255, 0.22);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(124, 92, 255, 0.08);
+      padding: 52px 44px 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      text-align: center;
+    }
+
+    .login-logo {
+      height: 72px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(124, 92, 255, 0.42);
+      margin-bottom: 20px;
+    }
+
+    .login-title {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      letter-spacing: 0.18em;
+      background: linear-gradient(135deg, #fff 30%, rgba(124, 92, 255, 0.85));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-subtitle {
+      margin: 0 0 36px;
+      color: var(--muted);
+      font-size: 0.97rem;
+      line-height: 1.5;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #ffffff;
+      color: #1f1f1f;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 0.96rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .google-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+    }
+
+    .google-btn:active {
+      transform: translateY(0);
+    }
+
+    .google-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .login-footer {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin: 0;
+    }
+
+    .login-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .login-loading p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .spin-ring {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 3px solid rgba(124, 92, 255, 0.18);
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ---- Sidebar User ---- */
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .sidebar-user-photo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid rgba(124, 92, 255, 0.35);
+    }
+
+    .sidebar-user-initials {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sidebar-user-info strong {
+      display: block;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-user-info span {
+      font-size: 0.73rem;
+      color: var(--muted);
+    }
+
+    .logout-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: all 0.22s ease;
+    }
+
+    .logout-btn:hover {
+      color: var(--danger);
+      background: rgba(255, 107, 138, 0.1);
+      border-color: rgba(255, 107, 138, 0.25);
+    }
+    /* ---- End Login Screen ---- */
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-box">
+      <img src="./logo-kairo.png" alt="Kairo" class="login-logo" />
+      <h1 class="login-title">KAIRO</h1>
+      <p class="login-subtitle">O teu centro de produtividade de alto nível</p>
+      <button id="google-signin-btn" class="google-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Entrar com Google
+      </button>
+      <p class="login-footer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Os teus dados ficam guardados de forma segura
+      </p>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="./logo-kairo.png" alt="Kairo" style="height:44px;width:auto;object-fit:contain;border-radius:12px;flex-shrink:0;" />
+        <div>
+          <h1>Kairo</h1>
+          <p>Produtividade de alto nível</p>
+        </div>
+      </div>
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+      <div class="sidebar-footer">
+        <div class="ai-card-header">
+          <div class="ai-mark"><i data-lucide="bot"></i></div>
+          <div>
+            <strong>Kairo AI</strong>
+            <p class="subtle">Assistente interno</p>
+          </div>
+        </div>
+        <p class="subtle" id="sidebar-ai-copy"></p>
+        <div class="sidebar-user" id="sidebar-user" style="display:none;">
+          <div id="sidebar-user-avatar"></div>
+          <div class="sidebar-user-info" id="sidebar-user-info">
+            <strong id="sidebar-user-name"></strong>
+            <span>Conta Google</span>
+          </div>
+          <button id="logout-btn" class="logout-btn" title="Terminar sessão">
+            <i data-lucide="log-out"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="brand">
+          <img src="./logo-kairo.png" alt="Kairo" style="height:44px;width:auto;object-fit:contain;border-radius:12px;flex-shrink:0;" />
+          <div>
+            <h1>Kairo</h1>
+            <p>Seu centro de execução diária</p>
+          </div>
+        </div>
+        <div class="topbar-meta">
+          <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
+          <div class="pill"><i data-lucide="zap"></i><span id="topbar-focus"></span></div>
+        </div>
+      </div>
+
+      <section id="dashboard-view" class="view active"></section>
+      <section id="agenda-view" class="view"></section>
+      <section id="tarefas-view" class="view"></section>
+      <section id="habitos-view" class="view"></section>
+      <section id="historico-view" class="view"></section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" id="bottom-nav"></nav>
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <!-- Edit Task Modal -->
+  <div class="modal-overlay hidden" id="edit-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Editar Tarefa</h3>
+        <button class="modal-close" id="modal-close-btn"><i data-lucide="x"></i></button>
+      </div>
+      <input type="hidden" id="edit-task-id" />
+      <div class="modal-field">
+        <label>Título</label>
+        <input id="edit-task-title" class="task-input" type="text" placeholder="Título da tarefa" />
+      </div>
+      <div class="modal-field">
+        <label>Descrição</label>
+        <textarea id="edit-task-desc" class="modal-textarea" placeholder="Descrição da tarefa"></textarea>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Prioridade</label>
+          <select id="edit-task-priority" class="task-select">
+            <option value="alta">Alta</option>
+            <option value="media">Média</option>
+            <option value="baixa">Baixa</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label>Categoria</label>
+          <select id="edit-task-category" class="task-select">
+            <option value="Trabalho">Trabalho</option>
+            <option value="Pessoal">Pessoal</option>
+            <option value="Saúde">Saúde</option>
+            <option value="Desporto">Desporto</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Data</label>
+          <input id="edit-task-date" class="task-input" type="date" />
+        </div>
+        <div class="modal-field">
+          <label>Hora</label>
+          <input id="edit-task-time" class="task-input" type="time" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="ghost-btn" id="modal-cancel-btn">Cancelar</button>
+        <button class="primary-btn" id="modal-save-btn">Guardar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kairo AI Floating Chat Button -->
+  <button class="kairo-chat-btn" id="kairo-chat-btn" title="Kairo AI">
+    <i data-lucide="bot"></i>
+  </button>
+
+  <!-- Kairo AI Chat Panel -->
+  <div class="kairo-chat-panel" id="kairo-chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="chat-avatar"><i data-lucide="bot"></i></div>
+        <div>
+          <strong>Kairo AI</strong>
+          <div class="chat-status-line">
+            <span class="chat-status-dot"></span>
+            Online · Assistente inteligente
+          </div>
+        </div>
+      </div>
+      <button class="chat-close-btn" id="kairo-chat-close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" type="text" placeholder="Pergunta algo ao Kairo AI..." autocomplete="off" />
+      <button class="chat-send-btn" id="chat-send-btn"><i data-lucide="send"></i></button>
+    </div>
+  </div>
+
+  <script>
+    // Nota: O app usa a hora local do browser. Para Portugal/Lisboa, o browser deve estar em Europe/Lisbon
+    // ---- Firebase Initialization ----
+    const firebaseConfig = {
+      apiKey: 'AIzaSyAjkpXMcKg7651b0DIRbeMk0QDmx7a5JGM',
+      authDomain: 'kairo-3a7e4.firebaseapp.com',
+      projectId: 'kairo-3a7e4',
+      storageBucket: 'kairo-3a7e4.firebasestorage.app',
+      messagingSenderId: '137726126366',
+      appId: '1:137726126366:web:839bc38fc611a730a5810f'
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    db.enablePersistence({ synchronizeTabs: true })
+      .catch(err => {
+        if (err.code === 'failed-precondition') {
+          console.warn('[Firestore] Persistência: múltiplos separadores abertos.');
+        } else if (err.code === 'unimplemented') {
+          console.warn('[Firestore] Persistência não suportada neste browser.');
+        }
+      });
+
+    let currentUser = null;
+    let _firestoreUnsubs = [];
+    // ---- End Firebase Initialization ----
+
+    // ---- Mock Data (usado para novos utilizadores) ----
+    const MOCK_DATA = {
+      tarefas: [
+        { id: 1, titulo: "Revisar proposta comercial", descricao: "Ajustar narrativa do deck e validar números finais.", prioridade: "alta", status: "andamento", prazo: "2026-05-11T10:30", categoria: "Trabalho" },
+        { id: 2, titulo: "Planejar roteiro da demo Kairo", descricao: "Definir sequência de telas e narrativa da gravação.", prioridade: "alta", status: "pendente", prazo: "2026-05-11T14:00", categoria: "Trabalho" },
+        { id: 3, titulo: "Responder e-mails estratégicos", descricao: "Retorno para parceiros e alinhamento interno.", prioridade: "media", status: "pendente", prazo: "2026-05-11T17:00", categoria: "Trabalho" },
+        { id: 4, titulo: "Treino funcional", descricao: "Sessão de 45 minutos focada em mobilidade.", prioridade: "media", status: "pendente", prazo: "2026-05-11T19:00", categoria: "Desporto" },
+        { id: 5, titulo: "Atualizar orçamento mensal", descricao: "Consolidar gastos da última semana.", prioridade: "baixa", status: "concluida", prazo: "2026-05-10T18:30", categoria: "Pessoal" },
+        { id: 6, titulo: "Enviar briefing para design", descricao: "Detalhar ajustes visuais da próxima campanha.", prioridade: "alta", status: "pendente", prazo: "2026-05-10T16:00", categoria: "Trabalho" },
+        { id: 7, titulo: "Ler capítulo de liderança", descricao: "Capítulo 8 do livro de gestão.", prioridade: "baixa", status: "andamento", prazo: "2026-05-11T21:00", categoria: "Pessoal" },
+        { id: 101, titulo: "Criar landing page do produto", descricao: "Estrutura inicial com hero, features e CTA.", prioridade: "alta", status: "concluida", prazo: "2026-05-09T16:00", categoria: "Trabalho" },
+        { id: 102, titulo: "Reunião com investidores", descricao: "Apresentação do deck de captação Series A.", prioridade: "alta", status: "concluida", prazo: "2026-05-08T10:00", categoria: "Trabalho" },
+        { id: 103, titulo: "Revisão do contrato de parceria", descricao: "Verificar cláusulas e enviar feedback ao jurídico.", prioridade: "media", status: "concluida", prazo: "2026-05-07T14:00", categoria: "Trabalho" },
+        { id: 104, titulo: "Sessão de yoga matinal", descricao: "60 minutos de yoga restaurativa e meditação.", prioridade: "baixa", status: "concluida", prazo: "2026-05-07T07:00", categoria: "Saúde" },
+        { id: 105, titulo: "Enviar proposta ao cliente enterprise", descricao: "Ajustar valores e enviar revisão final com anexos.", prioridade: "alta", status: "concluida", prazo: "2026-05-06T18:00", categoria: "Trabalho" },
+        { id: 106, titulo: "Treino de força", descricao: "Séries de musculação, core e mobilidade.", prioridade: "media", status: "concluida", prazo: "2026-05-06T19:00", categoria: "Desporto" },
+        { id: 107, titulo: "Planeamento quinzenal", descricao: "Definir metas e KPIs das próximas duas semanas.", prioridade: "alta", status: "concluida", prazo: "2026-05-05T09:00", categoria: "Pessoal" },
+        { id: 108, titulo: "Atualizar perfil LinkedIn", descricao: "Adicionar novas experiências e publicar artigo.", prioridade: "baixa", status: "pendente", prazo: "2026-05-04T15:00", categoria: "Pessoal" },
+        { id: 109, titulo: "Testar integração da API de pagamentos", descricao: "Validar endpoints, webhooks e casos de erro.", prioridade: "alta", status: "concluida", prazo: "2026-05-03T11:00", categoria: "Trabalho" },
+        { id: 110, titulo: "Leitura livro de estratégia", descricao: "Capítulos 5 e 6 do livro de posicionamento.", prioridade: "baixa", status: "concluida", prazo: "2026-05-02T21:00", categoria: "Pessoal" },
+        { id: 111, titulo: "Configurar pipeline de CI/CD", descricao: "GitHub Actions para deploy automático em staging.", prioridade: "alta", status: "concluida", prazo: "2026-05-01T17:00", categoria: "Trabalho" },
+        { id: 112, titulo: "Consulta médica de rotina", descricao: "Check-up anual com exames de sangue.", prioridade: "media", status: "concluida", prazo: "2026-04-30T09:30", categoria: "Saúde" }
+      ],
+      eventos: [
+        { id: 1, titulo: "Daily com equipe produto", horario: "09:00", data: "2026-05-11", categoria: "Reunião" },
+        { id: 2, titulo: "Bloco de foco: proposta comercial", horario: "10:00", data: "2026-05-11", categoria: "Foco" },
+        { id: 3, titulo: "Call com cliente enterprise", horario: "13:30", data: "2026-05-11", categoria: "Cliente" },
+        { id: 4, titulo: "Revisão da sprint", horario: "16:00", data: "2026-05-11", categoria: "Reunião" },
+        { id: 5, titulo: "Treino funcional", horario: "19:00", data: "2026-05-11", categoria: "Saúde" },
+        { id: 6, titulo: "Janela de planeamento semanal", horario: "08:30", data: "2026-05-12", categoria: "Planeamento" },
+        { id: 7, titulo: "Deep work produto", horario: "11:00", data: "2026-05-12", categoria: "Foco" },
+        { id: 8, titulo: "Alinhamento marketing", horario: "15:00", data: "2026-05-13", categoria: "Reunião" }
+      ],
+      habitos: [
+        { id: 1, nome: "Beber 2L de água", frequencia: "Diário", progresso: 72, streak: 9, concluidoHoje: true },
+        { id: 2, nome: "Leitura de 20 minutos", frequencia: "Diário", progresso: 58, streak: 6, concluidoHoje: false },
+        { id: 3, nome: "Planeamento matinal", frequencia: "Seg-Sex", progresso: 84, streak: 14, concluidoHoje: true },
+        { id: 4, nome: "Alongamento", frequencia: "Diário", progresso: 41, streak: 4, concluidoHoje: false },
+        { id: 5, nome: "Dormir antes de 23h", frequencia: "Diário", progresso: 67, streak: 11, concluidoHoje: false }
+      ]
+    };
+    // ---- End Mock Data ----
+
+    const appState = {
+      currentView: "dashboard",
+      agendaMode: "dia",
+      taskFilter: "todas",
+      priorityFilter: "todas",
+      historicoDateInicio: "",
+      historicoDateFim: "",
+      historicoCategFilter: "todas",
+      historicoStatusFilter: "todas",
+      today: new Date().toISOString().slice(0, 10),
+      user: { nome: "Utilizador" },
+      tarefas: [],
+      eventos: [],
+      habitos: []
+    };
+
+    // ---- Firebase Functions ----
+    function fsPath(col) {
+      return `users/${currentUser.uid}/${col}`;
+    }
+
+    function showLoginScreen() {
+      document.getElementById("login-screen").classList.remove("hidden");
+      document.querySelector(".app-shell").style.display = "none";
+    }
+
+    function showApp(user) {
+      document.getElementById("login-screen").classList.add("hidden");
+      document.querySelector(".app-shell").style.display = "";
+      renderAll();
+    }
+
+    function updateSidebarUser(user) {
+      const sidebarUser = document.getElementById("sidebar-user");
+      const avatarEl = document.getElementById("sidebar-user-avatar");
+      const nameEl = document.getElementById("sidebar-user-name");
+      if (!sidebarUser || !avatarEl || !nameEl) return;
+
+      const displayName = user.displayName || user.email || "Utilizador";
+      const firstName = displayName.split(" ")[0];
+      appState.user.nome = firstName;
+      nameEl.textContent = displayName;
+
+      avatarEl.innerHTML = "";
+      if (user.photoURL) {
+        const img = document.createElement("img");
+        img.src = user.photoURL;
+        img.alt = displayName;
+        img.className = "sidebar-user-photo";
+        img.onerror = () => {
+          const initials = document.createElement("div");
+          initials.className = "sidebar-user-initials";
+          initials.textContent = firstName.charAt(0).toUpperCase();
+          avatarEl.innerHTML = "";
+          avatarEl.appendChild(initials);
+        };
+        avatarEl.appendChild(img);
+      } else {
+        const initials = document.createElement("div");
+        initials.className = "sidebar-user-initials";
+        initials.textContent = firstName.charAt(0).toUpperCase();
+        avatarEl.appendChild(initials);
+      }
+
+      sidebarUser.style.display = "flex";
+      lucide.createIcons();
+    }
+
+    async function loadUserData(uid) {
+      try {
+        const [tarefasSnap, habitosSnap, eventosSnap] = await Promise.all([
+          db.collection(`users/${uid}/tarefas`).get(),
+          db.collection(`users/${uid}/habitos`).get(),
+          db.collection(`users/${uid}/eventos`).get()
+        ]);
+
+        const isNewUser = tarefasSnap.empty && habitosSnap.empty && eventosSnap.empty;
+
+        if (isNewUser) {
+          await seedNewUser(uid);
+        }
+
+        subscribeRealtime(uid);
+      } catch (err) {
+        console.error("[Firestore] Erro ao carregar dados:", err);
+        // Offline ou erro: usar dados do MOCK_DATA como fallback
+        if (appState.tarefas.length === 0) {
+          appState.tarefas = JSON.parse(JSON.stringify(MOCK_DATA.tarefas));
+          appState.habitos = JSON.parse(JSON.stringify(MOCK_DATA.habitos));
+          appState.eventos = JSON.parse(JSON.stringify(MOCK_DATA.eventos));
+        }
+        renderAll();
+      }
+    }
+
+    async function seedNewUser(uid) {
+      try {
+        const batch = db.batch();
+        MOCK_DATA.tarefas.forEach(t => {
+          batch.set(db.doc(`users/${uid}/tarefas/${t.id}`), t);
+        });
+        MOCK_DATA.habitos.forEach(h => {
+          batch.set(db.doc(`users/${uid}/habitos/${h.id}`), h);
+        });
+        MOCK_DATA.eventos.forEach(e => {
+          batch.set(db.doc(`users/${uid}/eventos/${e.id}`), e);
+        });
+        await batch.commit();
+      } catch (err) {
+        console.error("[Firestore] Erro ao criar dados iniciais:", err);
+      }
+    }
+
+    function subscribeRealtime(uid) {
+      _firestoreUnsubs.forEach(fn => fn());
+      _firestoreUnsubs = [];
+
+      const unsub1 = db.collection(`users/${uid}/tarefas`).onSnapshot(snap => {
+        appState.tarefas = snap.docs.map(d => ({ ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) }));
+        renderAll();
+      }, err => console.error("[Firestore] tarefas onSnapshot:", err));
+
+      const unsub2 = db.collection(`users/${uid}/habitos`).onSnapshot(snap => {
+        appState.habitos = snap.docs.map(d => ({ ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) }));
+        renderAll();
+      }, err => console.error("[Firestore] habitos onSnapshot:", err));
+
+      const unsub3 = db.collection(`users/${uid}/eventos`).onSnapshot(snap => {
+        appState.eventos = snap.docs.map(d => ({ ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) }));
+        renderAll();
+      }, err => console.error("[Firestore] eventos onSnapshot:", err));
+
+      _firestoreUnsubs = [unsub1, unsub2, unsub3];
+    }
+
+    function fsSet(col, id, data) {
+      if (!currentUser) return;
+      db.collection(fsPath(col)).doc(String(id)).set(data)
+        .catch(err => console.error(`[Firestore] set ${col}/${id}:`, err));
+    }
+
+    function fsUpdate(col, id, data) {
+      if (!currentUser) return;
+      db.collection(fsPath(col)).doc(String(id)).update(data)
+        .catch(err => console.error(`[Firestore] update ${col}/${id}:`, err));
+    }
+
+    function fsDelete(col, id) {
+      if (!currentUser) return;
+      db.collection(fsPath(col)).doc(String(id)).delete()
+        .catch(err => console.error(`[Firestore] delete ${col}/${id}:`, err));
+    }
+    // ---- End Firebase Functions ----
+
+    const navItems = [
+      { id: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
+      { id: "agenda", label: "Agenda", icon: "calendar-range" },
+      { id: "tarefas", label: "Tarefas", icon: "check-square" },
+      { id: "habitos", label: "Hábitos", icon: "heart-pulse" },
+      { id: "historico", label: "Histórico", icon: "clock" }
+    ];
+
+    const viewIds = {
+      dashboard: "dashboard-view",
+      agenda: "agenda-view",
+      tarefas: "tarefas-view",
+      habitos: "habitos-view",
+      historico: "historico-view"
+    };
+
+    function formatDateLong(dateString) {
+      const date = new Date(dateString + "T12:00:00");
+      return new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "2-digit", month: "long" }).format(date);
+    }
+
+    function getTodayTasks() {
+      return appState.tarefas.filter(task => task.prazo.startsWith(appState.today));
+    }
+
+    function getTodayEvents() {
+      return appState.eventos.filter(event => event.data === appState.today).sort((a, b) => a.horario.localeCompare(b.horario));
+    }
+
+    function getOverdueTasks() {
+      const now = new Date(appState.today + "T12:00:00");
+      return appState.tarefas.filter(task => task.status !== "concluida" && new Date(task.prazo) < now);
+    }
+
+    function getOpenTasks() {
+      return appState.tarefas.filter(task => task.status !== "concluida");
+    }
+
+    function getCompletedTasks() {
+      return appState.tarefas.filter(task => task.status === "concluida");
+    }
+
+    function getPendingHabits() {
+      return appState.habitos.filter(habit => !habit.concluidoHoje);
+    }
+
+    function getCompletedHabitsToday() {
+      return appState.habitos.filter(habit => habit.concluidoHoje);
+    }
+
+    function getNextEvent() {
+      return getTodayEvents()[0] || null;
+    }
+
+    function getWeeklyHabitAverage() {
+      if (!appState.habitos.length) return 0;
+      const total = appState.habitos.reduce((acc, habit) => acc + habit.progresso, 0);
+      return Math.round(total / appState.habitos.length);
+    }
+
+    function getProductivityScore() {
+      const totalTasks = appState.tarefas.length || 1;
+      const totalHabits = appState.habitos.length || 1;
+      const taskScore = (getCompletedTasks().length / totalTasks) * 65;
+      const habitScore = (getCompletedHabitsToday().length / totalHabits) * 35;
+      return Math.min(100, Math.round(taskScore + habitScore));
+    }
+
+    function getImportantTodayCount() {
+      return getTodayTasks().filter(task => task.prioridade === "alta" && task.status !== "concluida").length;
+    }
+
+    function getBusyDayInsight() {
+      const eventCount = getTodayEvents().length;
+      const taskCount = getTodayTasks().filter(task => task.status !== "concluida").length;
+      if (eventCount >= 4 && taskCount >= 3) {
+        return "Sua agenda está intensa após o almoço. Proteja um bloco de foco entre 10h e 11h30.";
+      }
+      if (getOverdueTasks().length) {
+        return "Há tarefas atrasadas no radar. Feche as pendências críticas antes de iniciar novas demandas.";
+      }
+      return "Seu dia está equilibrado. Mantenha os blocos de foco e preserve a rotina de hábitos.";
+    }
+
+    function generateKairoInsights() {
+      const events = getTodayEvents().length;
+      const tasks = getTodayTasks().filter(task => task.status !== "concluida").length;
+      const habits = getPendingHabits().length;
+      const overdue = getOverdueTasks().length;
+      const highPriorityTask = appState.tarefas
+        .filter(task => task.status !== "concluida")
+        .sort((a, b) => {
+          const priorityWeight = { alta: 3, media: 2, baixa: 1 };
+          return priorityWeight[b.prioridade] - priorityWeight[a.prioridade] || new Date(a.prazo) - new Date(b.prazo);
+        })[0];
+
+      const insights = [];
+      insights.push({
+        id: "dynamic-summary",
+        tipo: "resumo",
+        mensagem: `Bom dia! Você tem ${events} compromissos, ${tasks} tarefas e ${habits} hábitos hoje.`,
+        acaoRecomendada: highPriorityTask ? `Priorize "${highPriorityTask.titulo}" no próximo bloco disponível.` : "Seu ritmo está sob controle hoje."
+      });
+
+      if (overdue) {
+        insights.push({
+          id: "dynamic-overdue",
+          tipo: "alerta",
+          mensagem: `Você tem ${overdue} tarefa${overdue > 1 ? "s" : ""} atrasada${overdue > 1 ? "s" : ""}.`,
+          acaoRecomendada: "Realoque itens de baixa prioridade e feche as pendências mais antigas antes das 11h."
+        });
+      }
+
+      if (events >= 4) {
+        insights.push({
+          id: "dynamic-load",
+          tipo: "carga",
+          mensagem: "Seu dia está denso com reuniões e blocos de execução.",
+          acaoRecomendada: "Mantenha uma pausa curta entre 15h e 16h para preservar energia cognitiva."
+        });
+      }
+
+      if (getPendingHabits().length >= 2) {
+        insights.push({
+          id: "dynamic-habit",
+          tipo: "habito",
+          mensagem: "Você pode fortalecer sua consistência hoje com um hábito rápido.",
+          acaoRecomendada: "Marque leitura ou alongamento logo após seu próximo compromisso."
+        });
+      }
+
+      return insights;
+    }
+
+    function categoryBadge(category) {
+      return `<span class="badge">${category}</span>`;
+    }
+
+    function formatPriority(priority) {
+      return priority.charAt(0).toUpperCase() + priority.slice(1);
+    }
+
+    function formatStatus(status) {
+      if (status === "andamento") return "Em andamento";
+      return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+
+    function renderNav() {
+      const markup = navItems.map(item => `
+        <button class="nav-btn ${appState.currentView === item.id ? "active" : ""}" data-view="${item.id}">
+          <i data-lucide="${item.icon}"></i>
+          <span>${item.label}</span>
+        </button>
+      `).join("");
+      document.getElementById("sidebar-nav").innerHTML = markup;
+      document.getElementById("bottom-nav").innerHTML = markup;
+    }
+
+    function renderDashboard() {
+      const nextEvent = getNextEvent();
+      const todayTasks = getTodayTasks().filter(task => task.status !== "concluida");
+      const topTasks = todayTasks.slice(0, 3);
+      const todayHabits = appState.habitos.slice(0, 3);
+      const productivity = getProductivityScore();
+      const insights = generateKairoInsights();
+      const dashboard = document.getElementById("dashboard-view");
+
+      const _overdueCount = getOverdueTasks().length;
+      const _overdueBar = _overdueCount > 0
+        ? `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(255,107,138,0.18),rgba(255,107,138,0.06)),var(--panel);border:1px solid rgba(255,107,138,0.35);display:flex;align-items:center;gap:12px;"><i data-lucide="alert-triangle" style="color:var(--danger);flex-shrink:0;"></i><strong style="color:var(--danger);font-size:0.95rem;">${_overdueCount} tarefa${_overdueCount > 1 ? "s" : ""} atrasada${_overdueCount > 1 ? "s" : ""}</strong></div>`
+        : `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);background:rgba(49,208,170,0.08);border:1px solid rgba(49,208,170,0.25);display:flex;align-items:center;gap:12px;"><i data-lucide="check-circle-2" style="color:var(--success);flex-shrink:0;"></i><strong style="color:var(--success);font-size:0.95rem;">Tudo em dia</strong></div>`;
+      dashboard.innerHTML = `
+        ${_overdueBar}
+        <div class="hero-card">
+          <div class="hero-content">
+            <div class="hero-copy">
+              <div class="pill"><i data-lucide="sparkles"></i><span>Kairo AI ativo</span></div>
+              <h2>Bem-vindo ao <strong>Kairo</strong>, ${appState.user.nome}.</h2>
+              <p>${insights[0].mensagem}</p>
+              <p class="subtle">${getBusyDayInsight()}</p>
+            </div>
+            <div class="hero-grid">
+              <div class="metric-card">
+                <small>Compromissos de hoje</small>
+                <strong>${getTodayEvents().length}</strong>
+                <span class="label">Próximo: ${nextEvent ? `${nextEvent.horario} · ${nextEvent.titulo}` : "Sem eventos"}</span>
+              </div>
+              <div class="metric-card">
+                <small>Tarefas importantes</small>
+                <strong>${getImportantTodayCount()}</strong>
+                <span class="label">Alta prioridade no radar</span>
+              </div>
+              <div class="metric-card">
+                <small>Hábitos concluídos</small>
+                <strong>${getCompletedHabitsToday().length}/${appState.habitos.length}</strong>
+                <span class="label">Consistência diária</span>
+              </div>
+              <div class="metric-card">
+                <small>Produtividade</small>
+                <strong>${productivity}%</strong>
+                <span class="label">Atualizado em tempo real</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="section-heading">
+                <div>
+                  <h3>Resumo do dia</h3>
+                  <p>Visão rápida para entrar em execução</p>
+                </div>
+              </div>
+            </div>
+            ${nextEvent ? `
+              <div class="next-event-card">
+                <div class="row-between">
+                  <div>
+                    <small>Próximo compromisso</small>
+                    <h3>${nextEvent.titulo}</h3>
+                    <p>${nextEvent.horario} · ${nextEvent.categoria}</p>
+                  </div>
+                  <span class="event-time">${nextEvent.horario}</span>
+                </div>
+              </div>
+            ` : ""}
+            <div class="list-stack">
+              ${topTasks.map(task => `
+                <div class="mini-item">
+                  <div>
+                    <h4>${task.titulo}</h4>
+                    <p>${task.descricao}</p>
+                  </div>
+                  <div class="chips">
+                    <span class="badge priority-${task.prioridade}">${formatPriority(task.prioridade)}</span>
+                  </div>
+                </div>
+              `).join("")}
+              ${!topTasks.length ? `<div class="empty-state">Tudo concluído hoje. Excelente ritmo.</div>` : ""}
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Produtividade e Kairo AI</h3>
+                <p>Indicadores inteligentes do seu dia</p>
+              </div>
+            </div>
+            <div class="progress-ring" style="--value:${productivity}">
+              <strong>${productivity}%</strong>
+            </div>
+            <div class="ai-card">
+              <div class="ai-card-header">
+                <div class="ai-mark"><i data-lucide="bot"></i></div>
+                <div>
+                  <strong>Sugestão Kairo AI</strong>
+                  <p class="subtle">${insights[0].tipo}</p>
+                </div>
+              </div>
+              <p>${insights[0].acaoRecomendada}</p>
+            </div>
+            <div class="list-stack" style="margin-top: 14px;">
+              ${todayHabits.map(habit => `
+                <div class="mini-item">
+                  <div>
+                    <h4>${habit.nome}</h4>
+                    <p>Streak de ${habit.streak} dias · ${habit.frequencia}</p>
+                  </div>
+                  <span class="badge ${habit.concluidoHoje ? "status-concluida" : "status-pendente"}">${habit.concluidoHoje ? "Feito hoje" : "Pendente"}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+          <div class="panel-header">
+            <div>
+              <h3>Mensagens inteligentes</h3>
+              <p>Alertas, priorização e reorganização automática</p>
+            </div>
+          </div>
+          <div class="suggestion-list">
+            ${insights.map(insight => `
+              <div class="suggestion-card">
+                <div class="task-top">
+                  <div>
+                    <h4>${insight.mensagem}</h4>
+                    <p>${insight.acaoRecomendada}</p>
+                  </div>
+                  <span class="badge">${insight.tipo}</span>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAgenda() {
+      const agenda = document.getElementById("agenda-view");
+      const todayEvents = getTodayEvents();
+      // Ler tarefas de hoje directamente de appState.tarefas — sem cópias separadas
+      const todayTasks = getTodayTasks();
+
+      // Combinar eventos e tarefas do dia, ordenados por hora
+      const _agendaOverdueIds = new Set(getOverdueTasks().map(t => t.id));
+      const combinedToday = [
+        ...todayEvents.map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria, _overdue: false })),
+        ...todayTasks.map(t => ({
+          _type: "task",
+          id: t.id,
+          horario: t.prazo.split("T")[1] ? t.prazo.split("T")[1].slice(0, 5) : "00:00",
+          titulo: t.titulo,
+          descricao: t.descricao,
+          categoria: t.categoria,
+          status: t.status,
+          prioridade: t.prioridade,
+          _overdue: _agendaOverdueIds.has(t.id)
+        }))
+      ].sort((a, b) => {
+        if (a._overdue && !b._overdue) return -1;
+        if (!a._overdue && b._overdue) return 1;
+        return a.horario.localeCompare(b.horario);
+      });
+
+      const weekDates = ["2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15"];
+      // Para a vista semanal, combinar eventos e tarefas por data — lendo sempre de appState.tarefas
+      const weeklyGroups = weekDates.map(date => {
+        const evts = appState.eventos.filter(e => e.data === date).map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria }));
+        const tsks = appState.tarefas.filter(t => t.prazo.startsWith(date)).map(t => ({
+          _type: "task",
+          horario: t.prazo.split("T")[1] ? t.prazo.split("T")[1].slice(0, 5) : "00:00",
+          titulo: t.titulo,
+          categoria: t.categoria,
+          status: t.status,
+          prioridade: t.prioridade
+        }));
+        const items = [...evts, ...tsks].sort((a, b) => a.horario.localeCompare(b.horario));
+        return { date, items };
+      });
+
+      // Destaques dinâmicos baseados no estado actual
+      const _todayOpenTasks = getTodayTasks().filter(t => t.status !== "concluida");
+      const _overdueNow = getOverdueTasks();
+      const _pendingHabitsNow = getPendingHabits();
+      const _highPriToday = _todayOpenTasks.filter(t => t.prioridade === "alta");
+      const destaquesCards = [];
+      if (todayEvents.length === 0 && _todayOpenTasks.length === 0) {
+        destaquesCards.push({ h: "Agenda limpa", p: "Sem compromissos ou tarefas hoje. Ótima janela para trabalho profundo ou recuperação." });
+      } else {
+        if (_highPriToday.length) {
+          destaquesCards.push({ h: "Alta prioridade em aberto", p: `${_highPriToday.length} tarefa${_highPriToday.length > 1 ? "s" : ""} de alta prioridade hoje: ${_highPriToday.slice(0, 2).map(t => '"' + t.titulo + '"').join(", ")}.` });
+        }
+        if (_overdueNow.length) {
+          destaquesCards.push({ h: "Tarefas atrasadas", p: `${_overdueNow.length} tarefa${_overdueNow.length > 1 ? "s" : ""} atrasada${_overdueNow.length > 1 ? "s" : ""}. Feche as pendências críticas antes de iniciar novas demandas.` });
+        } else if (todayEvents.length >= 3) {
+          destaquesCards.push({ h: "Dia cheio detectado", p: `${todayEvents.length} compromissos hoje. Proteja blocos de foco entre reuniões para manter a produtividade.` });
+        }
+        if (_pendingHabitsNow.length >= 2) {
+          destaquesCards.push({ h: "Recomendação Kairo AI", p: `${_pendingHabitsNow.length} hábito${_pendingHabitsNow.length > 1 ? "s" : ""} pendente${_pendingHabitsNow.length > 1 ? "s" : ""} hoje. Aproveite as pausas entre compromissos para mantê-los.` });
+        }
+        if (!destaquesCards.length) {
+          destaquesCards.push({ h: "Ritmo equilibrado", p: "Seu dia está bem distribuído. Mantenha os blocos de foco e preserve a rotina de hábitos." });
+        }
+      }
+
+      agenda.innerHTML = `
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>Agenda</h3>
+              <p>Calendário diário e semanal com blocos reais de execução</p>
+            </div>
+            <div class="tab-switch">
+              <button class="switch-btn ${appState.agendaMode === "dia" ? "active" : ""}" data-agenda-mode="dia">Hoje</button>
+              <button class="switch-btn ${appState.agendaMode === "semana" ? "active" : ""}" data-agenda-mode="semana">Semana</button>
+            </div>
+          </div>
+          <div class="agenda-grid">
+            <div class="panel">
+              <div class="section-heading">
+                <div>
+                  <h3>${appState.agendaMode === "dia" ? "Agenda do dia" : "Visão semanal"}</h3>
+                  <p>${appState.agendaMode === "dia" ? "Compromissos e tarefas de hoje" : "Distribuição dos eventos e tarefas da semana"}</p>
+                </div>
+              </div>
+              <div class="timeline-stack">
+                ${appState.agendaMode === "dia"
+                  ? (combinedToday.length
+                    ? combinedToday.map(item => item._type === "event" ? `
+                        <div class="timeline-block event-card">
+                          <div class="timeline-inner">
+                            <div class="event-top">
+                              <div>
+                                <h4>${item.titulo}</h4>
+                                <p>${item.categoria}</p>
+                              </div>
+                              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                <span class="event-time">${item.horario}</span>
+                                <button class="task-action-btn danger" data-delete-event="${item.id}" title="Apagar evento"><i data-lucide="trash-2"></i></button>
+                              </div>
+                            </div>
+                            <div class="event-meta">${categoryBadge(item.categoria)}</div>
+                          </div>
+                        </div>` : `
+                        <div class="timeline-block event-card ${item.status === "concluida" ? "done" : ""}">
+                          <div class="timeline-inner">
+                            <div class="event-top">
+                              <div>
+                                <h4>${item.titulo}</h4>
+                                <p>${item.descricao || item.categoria}</p>
+                              </div>
+                              <span class="event-time">${item.horario}</span>
+                            </div>
+                            <div class="event-meta">
+                              <span class="badge">Tarefa</span>
+                              <span class="badge priority-${item.prioridade}">${formatPriority(item.prioridade)}</span>
+                              <span class="badge status-${item.status}">${formatStatus(item.status)}</span>
+                            </div>
+                          </div>
+                        </div>`
+                    ).join("")
+                    : `<div class="empty-state">Sem compromissos ou tarefas hoje.</div>`)
+                  : weeklyGroups.map(group => `
+                    <div class="timeline-block planner-card">
+                      <div class="timeline-inner">
+                        <div class="planner-top">
+                          <div>
+                            <h4>${formatDateLong(group.date)}</h4>
+                            <p>${group.items.length} item${group.items.length !== 1 ? "s" : ""}</p>
+                          </div>
+                          <span class="badge">${group.date === appState.today ? "Hoje" : "Semana"}</span>
+                        </div>
+                        <div class="list-stack">
+                          ${group.items.length ? group.items.map(item => `
+                            <div class="mini-item">
+                              <div>
+                                <h4>${item.horario} · ${item.titulo}</h4>
+                                <p>${item.categoria}${item._type === "task" ? " · Tarefa" : ""}</p>
+                              </div>
+                              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                                ${item._type === "task"
+                                  ? `<span class="badge priority-${item.prioridade}">${formatPriority(item.prioridade)}</span>`
+                                  : categoryBadge(item.categoria)}
+                                ${item._type === "event"
+                                  ? `<button class="task-action-btn danger" data-delete-event="${item.id}" title="Apagar evento"><i data-lucide="trash-2"></i></button>`
+                                  : ""}
+                              </div>
+                            </div>
+                          `).join("") : `<div class="empty-state">Sem eventos ou tarefas planeados.</div>`}
+                        </div>
+                      </div>
+                    </div>
+                  `).join("")}
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="section-heading">
+                <div>
+                  <h3>Destaques</h3>
+                  <p>Leitura rápida para sua execução</p>
+                </div>
+              </div>
+              <div class="list-stack">
+                ${destaquesCards.map(c => `
+                  <div class="suggestion-card">
+                    <h4>${c.h}</h4>
+                    <p>${c.p}</p>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function filteredTasks() {
+      return appState.tarefas.filter(task => {
+        const taskMatches = appState.taskFilter === "todas" || task.status === appState.taskFilter;
+        const priorityMatches = appState.priorityFilter === "todas" || task.prioridade === appState.priorityFilter;
+        return taskMatches && priorityMatches;
+      }).sort((a, b) => new Date(a.prazo) - new Date(b.prazo));
+    }
+
+    function renderTarefas() {
+      const tarefasView = document.getElementById("tarefas-view");
+      const tasks = filteredTasks();
+      const overdueIds = new Set(getOverdueTasks().map(task => task.id));
+
+      tarefasView.innerHTML = `
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>Tarefas</h3>
+              <p>Execute prioridades com agilidade e clareza</p>
+            </div>
+            <div class="chips">
+              <span class="pill"><i data-lucide="alert-triangle"></i>${getOverdueTasks().length} atrasadas</span>
+              <span class="pill"><i data-lucide="circle-check-big"></i>${getCompletedTasks().length} concluídas</span>
+              <button class="ghost-btn" id="export-word-tasks-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;">
+                <i data-lucide="download"></i> Exportar Word
+              </button>
+            </div>
+          </div>
+
+          <div class="task-input-row">
+            <div class="task-title-wrapper">
+              <input id="quick-task-title" class="task-input" type="text" placeholder="Criar tarefa rápida..." />
+              <button id="voice-task-btn" class="voice-btn" title="Criar tarefa por voz (pt-PT)" type="button">
+                <i data-lucide="mic"></i>
+              </button>
+            </div>
+            <select id="quick-task-priority" class="task-select">
+              <option value="media">Prioridade média</option>
+              <option value="alta">Alta prioridade</option>
+              <option value="baixa">Baixa prioridade</option>
+            </select>
+            <select id="quick-task-category" class="task-select">
+              <option value="Trabalho">Trabalho</option>
+              <option value="Pessoal">Pessoal</option>
+              <option value="Saúde">Saúde</option>
+              <option value="Desporto">Desporto</option>
+            </select>
+            <input id="quick-task-date" class="task-input" type="date" />
+            <input id="quick-task-time" class="task-input" type="time" />
+            <button id="quick-task-submit" class="primary-btn">Adicionar</button>
+          </div>
+
+          <div class="row-between" style="margin-bottom: 14px;">
+            <div class="filters">
+              <button class="chip ${appState.taskFilter === "todas" ? "active" : ""}" data-task-filter="todas">Todas</button>
+              <button class="chip ${appState.taskFilter === "pendente" ? "active" : ""}" data-task-filter="pendente">Pendentes</button>
+              <button class="chip ${appState.taskFilter === "andamento" ? "active" : ""}" data-task-filter="andamento">Em andamento</button>
+              <button class="chip ${appState.taskFilter === "concluida" ? "active" : ""}" data-task-filter="concluida">Concluídas</button>
+            </div>
+            <div class="filters">
+              <button class="chip ${appState.priorityFilter === "todas" ? "active" : ""}" data-priority-filter="todas">Todas prioridades</button>
+              <button class="chip ${appState.priorityFilter === "alta" ? "active" : ""}" data-priority-filter="alta">Alta</button>
+              <button class="chip ${appState.priorityFilter === "media" ? "active" : ""}" data-priority-filter="media">Média</button>
+              <button class="chip ${appState.priorityFilter === "baixa" ? "active" : ""}" data-priority-filter="baixa">Baixa</button>
+            </div>
+          </div>
+
+          <div class="list-stack">
+            ${tasks.map(task => `
+              <div class="task-row ${task.status === "concluida" ? "done" : ""} ${overdueIds.has(task.id) ? "overdue" : ""}" data-task-id="${task.id}">
+                <button class="checkbox-btn ${task.status === "concluida" ? "checked" : ""}" data-complete-task="${task.id}">
+                  <i data-lucide="check"></i>
+                </button>
+                <div>
+                  <div class="task-top">
+                    <div>
+                      <h4>${task.titulo}</h4>
+                      <p>${task.descricao}</p>
+                    </div>
+                    <span class="badge status-${task.status}">${formatStatus(task.status)}</span>
+                  </div>
+                  <div class="task-meta">
+                    <span class="badge priority-${task.prioridade}">${formatPriority(task.prioridade)}</span>
+                    <span class="badge">${task.categoria}</span>
+                    <span class="badge">${new Date(task.prazo).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                    ${overdueIds.has(task.id) ? `<span class="badge high">Atrasada</span>` : ""}
+                  </div>
+                </div>
+                <div class="task-actions">
+                  <button class="task-action-btn" data-edit-task="${task.id}" title="Editar tarefa">
+                    <i data-lucide="edit"></i>
+                  </button>
+                  <button class="task-action-btn danger" data-delete-task="${task.id}" title="Apagar tarefa">
+                    <i data-lucide="trash-2"></i>
+                  </button>
+                </div>
+              </div>
+            `).join("")}
+            ${!tasks.length ? `<div class="empty-state">Nenhuma tarefa nesse filtro.</div>` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHabitos() {
+      const habitsView = document.getElementById("habitos-view");
+      const average = getWeeklyHabitAverage();
+
+      habitsView.innerHTML = `
+        <div class="dashboard-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Hábitos</h3>
+                <p>Consistência com progresso visual e streaks</p>
+              </div>
+              <span class="pill"><i data-lucide="flame"></i>${appState.habitos.reduce((max, habit) => Math.max(max, habit.streak), 0)} dias melhor streak</span>
+            </div>
+
+            <div class="task-input-row" style="grid-template-columns: 1fr 160px auto;">
+              <input id="quick-habit-name" class="task-input" type="text" placeholder="Novo hábito..." />
+              <select id="quick-habit-freq" class="task-select">
+                <option value="Diário">Diário</option>
+                <option value="Semanal">Semanal</option>
+              </select>
+              <button id="quick-habit-submit" class="primary-btn">Adicionar</button>
+            </div>
+
+            <div class="list-stack">
+              ${appState.habitos.map(habit => `
+                <div class="habit-card ${habit.concluidoHoje ? "done" : ""}">
+                  <div class="habit-top">
+                    <div>
+                      <h4>${habit.nome}</h4>
+                      <p>${habit.frequencia} · streak atual de ${habit.streak} dias</p>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:flex-start; flex-shrink:0;">
+                      <button class="habit-action" data-complete-habit="${habit.id}" ${habit.concluidoHoje ? "disabled" : ""}>
+                        ${habit.concluidoHoje ? "Feito hoje" : "Marcar como feito"}
+                      </button>
+                      <button class="task-action-btn danger" data-delete-habit="${habit.id}" title="Apagar hábito">
+                        <i data-lucide="trash-2"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width:${habit.progresso}%"></div>
+                  </div>
+                  <div class="habit-meta">
+                    <span class="badge">${habit.progresso}% na semana</span>
+                    <span class="badge ${habit.concluidoHoje ? "status-concluida" : "status-pendente"}">${habit.concluidoHoje ? "Concluído hoje" : "Pendente hoje"}</span>
+                  </div>
+                </div>
+              `).join("")}
+              ${!appState.habitos.length ? `<div class="empty-state">Nenhum hábito criado ainda. Adicione o primeiro acima.</div>` : ""}
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Progresso semanal</h3>
+                <p>Indicadores para reforçar rotina</p>
+              </div>
+            </div>
+            <div class="progress-ring" style="--value:${average}">
+              <strong>${average}%</strong>
+            </div>
+            <div class="list-stack">
+              <div class="suggestion-card">
+                <h4>Feedback do dia</h4>
+                <p>${getCompletedHabitsToday().length >= 2 ? "Ótimo ritmo. Sua rotina já começou forte hoje." : "Você ainda pode elevar sua consistência com hábitos rápidos nas próximas horas."}</p>
+              </div>
+              <div class="suggestion-card">
+                <h4>Recomendação Kairo AI</h4>
+                <p>Associe leitura ao pós-almoço e alongamento ao fim da última reunião para facilitar aderência.</p>
+              </div>
+              <div class="suggestion-card">
+                <h4>Automação</h4>
+                <p>Quando você conclui um hábito, o streak e o progresso semanal são atualizados instantaneamente para reforçar motivação.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHistorico() {
+      const view = document.getElementById("historico-view");
+      const dateInicio = appState.historicoDateInicio;
+      const dateFim = appState.historicoDateFim;
+      const categFilter = appState.historicoCategFilter;
+      const statusFilter = appState.historicoStatusFilter;
+
+      const categories = ["todas", ...new Set(appState.tarefas.map(t => t.categoria))];
+
+      const filtered = appState.tarefas.filter(task => {
+        const taskDate = task.prazo.slice(0, 10);
+        const afterStart = !dateInicio || taskDate >= dateInicio;
+        const beforeEnd = !dateFim || taskDate <= dateFim;
+        const categMatches = categFilter === "todas" || task.categoria === categFilter;
+        const statusMatches = statusFilter === "todas" || task.status === statusFilter;
+        return afterStart && beforeEnd && categMatches && statusMatches;
+      }).sort((a, b) => new Date(b.prazo) - new Date(a.prazo));
+
+      view.innerHTML = `
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>Histórico</h3>
+              <p>Registo completo de todas as tarefas</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <span class="pill"><i data-lucide="list-checks"></i>${appState.tarefas.filter(t => t.status === "concluida").length} concluídas</span>
+              <button class="ghost-btn" id="export-word-hist-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;">
+                <i data-lucide="download"></i> Exportar Word
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <label style="font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.02em;">Data início</label>
+              <input type="date" class="task-input" id="hist-date-inicio" value="${dateInicio}" style="max-width:165px;" />
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <label style="font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.02em;">Data fim</label>
+              <input type="date" class="task-input" id="hist-date-fim" value="${dateFim}" style="max-width:165px;" />
+            </div>
+            ${(dateInicio || dateFim) ? `<button class="ghost-btn" id="hist-clear-dates" style="padding:10px 14px;align-self:flex-end;" title="Limpar datas"><i data-lucide="x-circle"></i></button>` : ""}
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
+            ${categories.map(cat => `<button class="chip ${categFilter === cat ? "active" : ""}" data-hist-categ="${cat}">${cat === "todas" ? "Todas categorias" : cat}</button>`).join("")}
+          </div>
+          <div class="filters" style="margin-bottom:16px;">
+            <button class="chip ${statusFilter === "todas" ? "active" : ""}" data-hist-status="todas">Todos status</button>
+            <button class="chip ${statusFilter === "concluida" ? "active" : ""}" data-hist-status="concluida">Concluídas</button>
+            <button class="chip ${statusFilter === "pendente" ? "active" : ""}" data-hist-status="pendente">Pendentes</button>
+            <button class="chip ${statusFilter === "andamento" ? "active" : ""}" data-hist-status="andamento">Em andamento</button>
+          </div>
+
+          <div class="list-stack">
+            ${filtered.map(task => `
+              <div class="task-row ${task.status === "concluida" ? "done" : ""}">
+                <div style="width:26px;height:26px;flex-shrink:0;border-radius:50%;background:${task.status === "concluida" ? "linear-gradient(135deg,var(--success),#4fe3bc)" : "rgba(255,255,255,0.03)"};border:1px solid ${task.status === "concluida" ? "transparent" : "rgba(255,255,255,0.16)"};display:grid;place-items:center;">
+                  <i data-lucide="check" style="width:14px;height:14px;color:${task.status === "concluida" ? "white" : "transparent"};"></i>
+                </div>
+                <div>
+                  <div class="task-top">
+                    <div>
+                      <h4>${task.titulo}</h4>
+                      <p>${task.descricao}</p>
+                    </div>
+                    <span class="badge status-${task.status}">${formatStatus(task.status)}</span>
+                  </div>
+                  <div class="task-meta">
+                    <span class="badge priority-${task.prioridade}">${formatPriority(task.prioridade)}</span>
+                    <span class="badge">${task.categoria}</span>
+                    <span class="badge">${new Date(task.prazo).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                  </div>
+                </div>
+                <div style="width:24px;flex-shrink:0;"></div>
+              </div>
+            `).join("")}
+            ${!filtered.length ? `<div class="empty-state">Nenhuma tarefa encontrada com os filtros selecionados.</div>` : ""}
+          </div>
+          <p style="margin-top:14px;color:var(--muted);font-size:0.85rem;">${filtered.length} tarefa${filtered.length !== 1 ? "s" : ""} encontrada${filtered.length !== 1 ? "s" : ""}</p>
+        </div>
+      `;
+    }
+
+    function exportToWord(tasks) {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+
+      const concluded = tasks.filter(t => t.status === "concluida");
+      const inProgress = tasks.filter(t => t.status === "andamento");
+      const pending = tasks.filter(t => t.status === "pendente");
+
+      function priorityColor(p) {
+        if (p === "alta") return "#c0392b";
+        if (p === "media") return "#e67e22";
+        return "#27ae60";
+      }
+      function priorityBg(p) {
+        if (p === "alta") return "#fde8ec";
+        if (p === "media") return "#fef3e2";
+        return "#e9f9ef";
+      }
+
+      function taskTable(list) {
+        if (!list.length) return `<p style="color:#888;font-style:italic;margin:6px 0 18px;">Nenhuma tarefa nesta secção.</p>`;
+        return `
+          <table style="width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px;">
+            <thead>
+              <tr style="background:#1a1a2e;color:#ffffff;">
+                <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;">Título</th>
+                <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;white-space:nowrap;">Prioridade</th>
+                <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;">Categoria</th>
+                <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;white-space:nowrap;">Prazo</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map((t, i) => `
+                <tr style="background:${i % 2 === 0 ? "#f5f5fa" : "#ffffff"};">
+                  <td style="padding:9px 12px;border:1px solid #d0d0dc;">
+                    <strong style="color:#1a1a2e;">${t.titulo}</strong><br/>
+                    <span style="font-size:11px;color:#666;">${t.descricao}</span>
+                  </td>
+                  <td style="padding:9px 12px;border:1px solid #d0d0dc;">
+                    <span style="background:${priorityBg(t.prioridade)};color:${priorityColor(t.prioridade)};padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600;">${formatPriority(t.prioridade)}</span>
+                  </td>
+                  <td style="padding:9px 12px;border:1px solid #d0d0dc;color:#444;">${t.categoria}</td>
+                  <td style="padding:9px 12px;border:1px solid #d0d0dc;color:#444;white-space:nowrap;">${new Date(t.prazo).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`;
+      }
+
+      const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family:Calibri,Arial,sans-serif;margin:48px;color:#1a1a2e;line-height:1.5;">
+  <div style="border-bottom:3px solid #7c5cff;padding-bottom:14px;margin-bottom:8px;">
+    <h1 style="margin:0;font-size:26px;color:#1a1a2e;letter-spacing:-0.5px;">Kairo &mdash; Relat&oacute;rio de Tarefas</h1>
+  </div>
+  <p style="color:#666;font-size:13px;margin:6px 0 32px;">Data do relat&oacute;rio: ${dateStr} &nbsp;&middot;&nbsp; Total de tarefas: ${tasks.length}</p>
+
+  <h2 style="font-size:14px;color:#7c5cff;text-transform:uppercase;letter-spacing:1px;margin:28px 0 10px;border-left:4px solid #31d0aa;padding-left:10px;">Conclu&#237;das (${concluded.length})</h2>
+  ${taskTable(concluded)}
+
+  <h2 style="font-size:14px;color:#7c5cff;text-transform:uppercase;letter-spacing:1px;margin:28px 0 10px;border-left:4px solid #00c2ff;padding-left:10px;">Em Andamento (${inProgress.length})</h2>
+  ${taskTable(inProgress)}
+
+  <h2 style="font-size:14px;color:#7c5cff;text-transform:uppercase;letter-spacing:1px;margin:28px 0 10px;border-left:4px solid #ffb84d;padding-left:10px;">Pendentes (${pending.length})</h2>
+  ${taskTable(pending)}
+
+  <div style="margin-top:40px;padding-top:12px;border-top:1px solid #ddd;color:#999;font-size:12px;text-align:center;">
+    Gerado por Kairo &nbsp;&middot;&nbsp; ${dateStr}
+  </div>
+</body>
+</html>`;
+
+      const blob = new Blob(["\ufeff" + html], { type: "application/msword" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `kairo-tarefas-${new Date().toISOString().slice(0, 10)}.doc`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("Relatório exportado com sucesso.");
+    }
+
+    function renderAll() {
+      document.getElementById("today-label").textContent = formatDateLong(appState.today);
+      document.getElementById("topbar-focus").textContent = `${getImportantTodayCount()} prioridades críticas`;
+      const dynamicInsights = generateKairoInsights();
+      document.getElementById("sidebar-ai-copy").textContent = dynamicInsights[0].acaoRecomendada;
+
+      renderNav();
+      renderDashboard();
+      renderAgenda();
+      renderTarefas();
+      renderHabitos();
+      renderHistorico();
+
+      Object.entries(viewIds).forEach(([key, id]) => {
+        document.getElementById(id).classList.toggle("active", key === appState.currentView);
+      });
+
+      bindEvents();
+      lucide.createIcons();
+    }
+
+    function switchView(view) {
+      appState.currentView = view;
+      renderAll();
+    }
+
+    function addQuickTask() {
+      const titleInput = document.getElementById("quick-task-title");
+      const priorityInput = document.getElementById("quick-task-priority");
+      const categoryInput = document.getElementById("quick-task-category");
+      const dateInput = document.getElementById("quick-task-date");
+      const timeInput = document.getElementById("quick-task-time");
+      if (!titleInput) return;
+      const title = titleInput.value.trim();
+      if (!title) {
+        showToast("Digite um título para criar a tarefa.");
+        return;
+      }
+
+      const taskDate = dateInput && dateInput.value ? dateInput.value : appState.today;
+      const taskTime = timeInput && timeInput.value ? timeInput.value : "18:00";
+
+      const id = Date.now();
+      const newTask = {
+        id,
+        titulo: title,
+        descricao: "Tarefa criada rapidamente para manter o fluxo de execução.",
+        prioridade: priorityInput.value,
+        status: "pendente",
+        prazo: `${taskDate}T${taskTime}`,
+        categoria: categoryInput.value
+      };
+      appState.tarefas.unshift(newTask);
+      fsSet("tarefas", id, newTask);
+
+      titleInput.value = "";
+      renderAll();
+      switchView("tarefas");
+      showToast(`Tarefa "${title}" criada com sucesso.`);
+    }
+
+    function addQuickHabit() {
+      const nameInput = document.getElementById("quick-habit-name");
+      const freqInput = document.getElementById("quick-habit-freq");
+      if (!nameInput) return;
+      const name = nameInput.value.trim();
+      if (!name) {
+        showToast("Digite um nome para o hábito.");
+        return;
+      }
+      const id = Date.now();
+      const newHabit = {
+        id,
+        nome: name,
+        frequencia: freqInput.value,
+        progresso: 0,
+        streak: 0,
+        concluidoHoje: false
+      };
+      appState.habitos.push(newHabit);
+      fsSet("habitos", id, newHabit);
+
+      nameInput.value = "";
+      renderAll();
+      showToast(`Hábito "${name}" criado com sucesso.`);
+    }
+
+    function deleteHabit(habitId) {
+      const nId = Number(habitId);
+      const habit = appState.habitos.find(item => item.id === nId);
+      if (!habit) return;
+      if (!confirm(`Apagar "${habit.nome}"? Esta ação não pode ser desfeita.`)) return;
+      appState.habitos = appState.habitos.filter(item => item.id !== nId);
+      fsDelete("habitos", habitId);
+      renderAll();
+      showToast(`Hábito "${habit.nome}" apagado.`);
+    }
+
+    function deleteEvent(eventId) {
+      const nId = Number(eventId);
+      const event = appState.eventos.find(e => e.id === nId);
+      if (!event) return;
+      if (!confirm(`Apagar "${event.titulo}"? Esta ação não pode ser desfeita.`)) return;
+      appState.eventos = appState.eventos.filter(e => e.id !== nId);
+      fsDelete("eventos", eventId);
+      renderAll();
+      showToast(`Evento "${event.titulo}" apagado.`);
+    }
+
+    function completeTask(taskId) {
+      const nId = Number(taskId);
+      const task = appState.tarefas.find(item => item.id === nId);
+      if (!task) return;
+      if (task.status === "concluida") {
+        task.status = "pendente";
+        fsUpdate("tarefas", taskId, { status: "pendente" });
+        renderAll();
+        showToast(`"${task.titulo}" marcada como pendente.`);
+      } else {
+        task.status = "concluida";
+        fsUpdate("tarefas", taskId, { status: "concluida" });
+        renderAll();
+        showToast(`Excelente! "${task.titulo}" foi concluída.`);
+      }
+    }
+
+    function deleteTask(taskId) {
+      const nId = Number(taskId);
+      const task = appState.tarefas.find(item => item.id === nId);
+      if (!task) return;
+      if (!confirm(`Apagar "${task.titulo}"? Esta ação não pode ser desfeita.`)) return;
+      appState.tarefas = appState.tarefas.filter(item => item.id !== nId);
+      fsDelete("tarefas", taskId);
+      renderAll();
+      showToast(`Tarefa "${task.titulo}" apagada.`);
+    }
+
+    function openEditModal(taskId) {
+      const task = appState.tarefas.find(item => item.id === Number(taskId));
+      if (!task) return;
+
+      const prazoDate = task.prazo.split("T")[0] || appState.today;
+      const prazoTime = task.prazo.split("T")[1] ? task.prazo.split("T")[1].slice(0, 5) : "18:00";
+
+      document.getElementById("edit-task-id").value = task.id;
+      document.getElementById("edit-task-title").value = task.titulo;
+      document.getElementById("edit-task-desc").value = task.descricao;
+      document.getElementById("edit-task-priority").value = task.prioridade;
+      document.getElementById("edit-task-category").value = task.categoria;
+      document.getElementById("edit-task-date").value = prazoDate;
+      document.getElementById("edit-task-time").value = prazoTime;
+
+      document.getElementById("edit-modal").classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      document.getElementById("edit-modal").classList.add("hidden");
+    }
+
+    function saveEditTask() {
+      const id = Number(document.getElementById("edit-task-id").value);
+      const task = appState.tarefas.find(item => item.id === id);
+      if (!task) return;
+
+      const title = document.getElementById("edit-task-title").value.trim();
+      if (!title) {
+        showToast("O título não pode estar vazio.");
+        return;
+      }
+
+      task.titulo = title;
+      task.descricao = document.getElementById("edit-task-desc").value.trim();
+      task.prioridade = document.getElementById("edit-task-priority").value;
+      task.categoria = document.getElementById("edit-task-category").value;
+      const date = document.getElementById("edit-task-date").value || appState.today;
+      const time = document.getElementById("edit-task-time").value || "18:00";
+      task.prazo = `${date}T${time}`;
+
+      fsSet("tarefas", id, task);
+      closeEditModal();
+      renderAll();
+      showToast(`Tarefa "${task.titulo}" atualizada.`);
+    }
+
+    function completeHabit(habitId) {
+      const nId = Number(habitId);
+      const habit = appState.habitos.find(item => item.id === nId);
+      if (!habit || habit.concluidoHoje) return;
+      habit.concluidoHoje = true;
+      habit.streak += 1;
+      habit.progresso = Math.min(100, habit.progresso + 12);
+      fsUpdate("habitos", habitId, {
+        concluidoHoje: habit.concluidoHoje,
+        streak: habit.streak,
+        progresso: habit.progresso
+      });
+      renderAll();
+      showToast(`Streak atualizado: ${habit.nome} agora está em ${habit.streak} dias.`);
+    }
+
+    // ---- Voice recognition ----
+    let _voiceRecognizer = null;
+    let _voiceListening = false;
+
+    function bindVoiceBtn() {
+      const btn = document.getElementById("voice-task-btn");
+      if (!btn) return;
+
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        btn.style.display = "none";
+        return;
+      }
+
+      btn.onclick = () => {
+        if (_voiceListening) {
+          if (_voiceRecognizer) _voiceRecognizer.stop();
+          return;
+        }
+
+        _voiceRecognizer = new SR();
+        _voiceRecognizer.lang = "pt-PT";
+        _voiceRecognizer.interimResults = false;
+        _voiceRecognizer.maxAlternatives = 1;
+        _voiceRecognizer.continuous = false;
+
+        _voiceRecognizer.onstart = () => {
+          _voiceListening = true;
+          btn.classList.add("recording");
+          showToast("A ouvir...");
+        };
+
+        _voiceRecognizer.onresult = (e) => {
+          const transcript = e.results[0][0].transcript;
+          const titleInput = document.getElementById("quick-task-title");
+          if (titleInput) {
+            titleInput.value = transcript;
+            titleInput.focus();
+          }
+        };
+
+        _voiceRecognizer.onend = () => {
+          _voiceListening = false;
+          const b = document.getElementById("voice-task-btn");
+          if (b) b.classList.remove("recording");
+        };
+
+        _voiceRecognizer.onerror = (e) => {
+          _voiceListening = false;
+          const b = document.getElementById("voice-task-btn");
+          if (b) b.classList.remove("recording");
+          if (e.error !== "no-speech" && e.error !== "aborted") {
+            showToast("Não foi possível captar voz. Tente novamente.");
+          }
+        };
+
+        _voiceRecognizer.start();
+      };
+    }
+    // ---- End voice recognition ----
+
+    function showToast(message) {
+      const wrap = document.getElementById("toast-wrap");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      wrap.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(12px)";
+      }, 2600);
+      setTimeout(() => toast.remove(), 3200);
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("[data-view]").forEach(button => {
+        button.onclick = () => switchView(button.dataset.view);
+      });
+
+      document.querySelectorAll("[data-agenda-mode]").forEach(button => {
+        button.onclick = () => {
+          appState.agendaMode = button.dataset.agendaMode;
+          renderAll();
+        };
+      });
+
+      document.querySelectorAll("[data-task-filter]").forEach(button => {
+        button.onclick = () => {
+          appState.taskFilter = button.dataset.taskFilter;
+          renderAll();
+        };
+      });
+
+      document.querySelectorAll("[data-priority-filter]").forEach(button => {
+        button.onclick = () => {
+          appState.priorityFilter = button.dataset.priorityFilter;
+          renderAll();
+        };
+      });
+
+      document.querySelectorAll("[data-complete-task]").forEach(button => {
+        button.onclick = () => completeTask(button.dataset.completeTask);
+      });
+
+      document.querySelectorAll("[data-edit-task]").forEach(button => {
+        button.onclick = () => openEditModal(button.dataset.editTask);
+      });
+
+      document.querySelectorAll("[data-delete-task]").forEach(button => {
+        button.onclick = () => deleteTask(button.dataset.deleteTask);
+      });
+
+      document.querySelectorAll("[data-complete-habit]").forEach(button => {
+        button.onclick = () => completeHabit(button.dataset.completeHabit);
+      });
+
+      document.querySelectorAll("[data-delete-habit]").forEach(button => {
+        button.onclick = () => deleteHabit(button.dataset.deleteHabit);
+      });
+
+      document.querySelectorAll("[data-delete-event]").forEach(button => {
+        button.onclick = () => deleteEvent(button.dataset.deleteEvent);
+      });
+
+      document.querySelectorAll("[data-hist-categ]").forEach(button => {
+        button.onclick = () => {
+          appState.historicoCategFilter = button.dataset.histCateg;
+          renderAll();
+        };
+      });
+
+      document.querySelectorAll("[data-hist-status]").forEach(button => {
+        button.onclick = () => {
+          appState.historicoStatusFilter = button.dataset.histStatus;
+          renderAll();
+        };
+      });
+
+      const histDateInicio = document.getElementById("hist-date-inicio");
+      if (histDateInicio) {
+        histDateInicio.onchange = () => {
+          appState.historicoDateInicio = histDateInicio.value;
+          renderAll();
+        };
+      }
+
+      const histDateFim = document.getElementById("hist-date-fim");
+      if (histDateFim) {
+        histDateFim.onchange = () => {
+          appState.historicoDateFim = histDateFim.value;
+          renderAll();
+        };
+      }
+
+      const histClearDates = document.getElementById("hist-clear-dates");
+      if (histClearDates) {
+        histClearDates.onclick = () => {
+          appState.historicoDateInicio = "";
+          appState.historicoDateFim = "";
+          renderAll();
+        };
+      }
+
+      const exportWordHistBtn = document.getElementById("export-word-hist-btn");
+      if (exportWordHistBtn) {
+        exportWordHistBtn.onclick = () => {
+          const di = appState.historicoDateInicio;
+          const df = appState.historicoDateFim;
+          const cat = appState.historicoCategFilter;
+          const st = appState.historicoStatusFilter;
+          const toExport = appState.tarefas.filter(task => {
+            const td = task.prazo.slice(0, 10);
+            return (!di || td >= di) && (!df || td <= df) && (cat === "todas" || task.categoria === cat) && (st === "todas" || task.status === st);
+          });
+          exportToWord(toExport);
+        };
+      }
+
+      const exportWordTasksBtn = document.getElementById("export-word-tasks-btn");
+      if (exportWordTasksBtn) {
+        exportWordTasksBtn.onclick = () => exportToWord(appState.tarefas);
+      }
+
+      const quickTaskSubmit = document.getElementById("quick-task-submit");
+      if (quickTaskSubmit) {
+        quickTaskSubmit.onclick = addQuickTask;
+      }
+
+      const quickTaskTitle = document.getElementById("quick-task-title");
+      if (quickTaskTitle) {
+        quickTaskTitle.onkeydown = (event) => {
+          if (event.key === "Enter") addQuickTask();
+        };
+      }
+
+      const quickHabitSubmit = document.getElementById("quick-habit-submit");
+      if (quickHabitSubmit) {
+        quickHabitSubmit.onclick = addQuickHabit;
+      }
+
+      const quickHabitName = document.getElementById("quick-habit-name");
+      if (quickHabitName) {
+        quickHabitName.onkeydown = (event) => {
+          if (event.key === "Enter") addQuickHabit();
+        };
+      }
+
+      bindVoiceBtn();
+
+      // Set default date/time to now
+      const dateInput = document.getElementById("quick-task-date");
+      const timeInput = document.getElementById("quick-task-time");
+      if (dateInput && !dateInput.value) {
+        dateInput.value = appState.today;
+      }
+      if (timeInput && !timeInput.value) {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mm = String(now.getMinutes()).padStart(2, "0");
+        timeInput.value = `${hh}:${mm}`;
+      }
+    }
+
+    // Mostrar ecrã de login enquanto aguarda o estado auth
+    showLoginScreen();
+
+    // Modal buttons (bound once, outside renderAll cycle)
+    document.getElementById("modal-close-btn").onclick = closeEditModal;
+    document.getElementById("modal-cancel-btn").onclick = closeEditModal;
+    document.getElementById("modal-save-btn").onclick = saveEditTask;
+    document.getElementById("edit-modal").onclick = function(e) {
+      if (e.target === this) closeEditModal();
+    };
+
+    // Register Service Worker
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+          .then((reg) => console.log("[SW] Registado:", reg.scope))
+          .catch((err) => console.warn("[SW] Falha no registo:", err));
+      });
+    }
+
+    // ---- Firebase Auth ----
+    document.getElementById("google-signin-btn").addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      auth.signInWithPopup(provider)
+        .catch(err => {
+          console.error("[Auth] Erro:", err);
+          showToast("Erro ao iniciar sessão. Tenta novamente.");
+        });
+    });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        updateSidebarUser(user);
+        await loadUserData(user.uid);
+        showApp(user);
+      } else {
+        currentUser = null;
+        _firestoreUnsubs.forEach(fn => fn());
+        _firestoreUnsubs = [];
+        appState.tarefas = [];
+        appState.habitos = [];
+        appState.eventos = [];
+        showLoginScreen();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("#logout-btn")) {
+        _firestoreUnsubs.forEach(fn => fn());
+        _firestoreUnsubs = [];
+        auth.signOut();
+      }
+    });
+    // ---- End Firebase Auth ----
+
+    // ---- Kairo AI Chat ----
+    function _escapeHTML(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    const kairoChat = {
+      isOpen: false,
+      hasOpened: false,
+
+      open() {
+        document.getElementById("kairo-chat-panel").classList.add("open");
+        this.isOpen = true;
+        if (!this.hasOpened) {
+          this.hasOpened = true;
+          setTimeout(() => this._sendWelcome(), 650);
+        }
+        setTimeout(() => {
+          const inp = document.getElementById("chat-input");
+          if (inp) inp.focus();
+        }, 320);
+      },
+
+      close() {
+        document.getElementById("kairo-chat-panel").classList.remove("open");
+        this.isOpen = false;
+      },
+
+      toggle() {
+        if (this.isOpen) this.close(); else this.open();
+      },
+
+      _now() {
+        const d = new Date();
+        return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+      },
+
+      _appendMsg(text, from) {
+        const container = document.getElementById("chat-messages");
+        if (!container) return;
+        const ts = this._now();
+        const wrap = document.createElement("div");
+        wrap.className = "chat-msg " + from;
+        if (from === "ai") {
+          wrap.innerHTML = `<div class="chat-msg-avatar"><i data-lucide="bot"></i></div><div><div class="chat-bubble">${_escapeHTML(text)}</div><div class="chat-timestamp">${ts}</div></div>`;
+        } else {
+          wrap.innerHTML = `<div><div class="chat-bubble">${_escapeHTML(text)}</div><div class="chat-timestamp">${ts}</div></div>`;
+        }
+        container.appendChild(wrap);
+        container.scrollTop = container.scrollHeight;
+        lucide.createIcons();
+      },
+
+      _showTyping() {
+        const container = document.getElementById("chat-messages");
+        if (!container || document.getElementById("chat-typing-indicator")) return;
+        const wrap = document.createElement("div");
+        wrap.id = "chat-typing-indicator";
+        wrap.className = "chat-typing-wrap";
+        wrap.innerHTML = `<div class="chat-msg-avatar"><i data-lucide="bot"></i></div><div class="chat-typing"><span></span><span></span><span></span></div>`;
+        container.appendChild(wrap);
+        container.scrollTop = container.scrollHeight;
+        lucide.createIcons();
+      },
+
+      _hideTyping() {
+        const el = document.getElementById("chat-typing-indicator");
+        if (el) el.remove();
+      },
+
+      _sendWelcome() {
+        const pending = appState.tarefas.filter(t => t.status !== "concluida");
+        const pendingH = getPendingHabits();
+        const overdue = getOverdueTasks();
+        const topTask = appState.tarefas
+          .filter(t => t.status !== "concluida" && t.prioridade === "alta")
+          .sort((a, b) => new Date(a.prazo) - new Date(b.prazo))[0];
+
+        let msg = `Olá, ${appState.user.nome}! Tens ${pending.length} tarefa${pending.length !== 1 ? "s" : ""} pendente${pending.length !== 1 ? "s" : ""} e ${pendingH.length} hábito${pendingH.length !== 1 ? "s" : ""} por completar hoje.`;
+        if (topTask) msg += ` Recomendo começar pela tarefa de alta prioridade: "${topTask.titulo}".`;
+        if (overdue.length) msg += `\nAtenção: tens ${overdue.length} tarefa${overdue.length !== 1 ? "s" : ""} atrasada${overdue.length !== 1 ? "s" : ""}!`;
+
+        this._showTyping();
+        setTimeout(() => {
+          this._hideTyping();
+          this._appendMsg(msg, "ai");
+        }, 700);
+      },
+
+      _getResponse(text) {
+        const q = text.toLowerCase().trim();
+
+        // saudações
+        if (/\b(bom dia|boa tarde|boa noite|ol[aá]|oi)\b/.test(q)) {
+          const h = new Date().getHours();
+          const gr = h < 12 ? "Bom dia" : h < 19 ? "Boa tarde" : "Boa noite";
+          const p = appState.tarefas.filter(t => t.status !== "concluida").length;
+          const ev = getTodayEvents().length;
+          return `${gr}, ${appState.user.nome}! Tens ${p} tarefa${p !== 1 ? "s" : ""} em aberto e ${ev} compromisso${ev !== 1 ? "s" : ""} hoje. Como posso ajudar-te?`;
+        }
+
+        // ajuda
+        if (/\b(ajuda|help)\b/.test(q)) {
+          return `Podes perguntar-me sobre:\n• Tarefas pendentes e prioridades\n• Estado dos teus hábitos e streaks\n• Compromissos e agenda do dia\n• Produtividade e progresso\n• Tarefas atrasadas\n• Sugestões e dicas personalizadas\n\nExemplos: "o que tenho hoje?", "qual é a minha prioridade?", "como estão os meus hábitos?"`;
+        }
+
+        // resumo do dia
+        if (/\b(resumo|dia)\b/.test(q)) {
+          const p = appState.tarefas.filter(t => t.status !== "concluida").length;
+          const ev = getTodayEvents().length;
+          const ph = getPendingHabits().length;
+          const sc = getProductivityScore();
+          const ov = getOverdueTasks().length;
+          let msg = `Resumo do teu dia:\n• ${ev} compromisso${ev !== 1 ? "s" : ""} agendado${ev !== 1 ? "s" : ""}\n• ${p} tarefa${p !== 1 ? "s" : ""} em aberto\n• ${ph} hábito${ph !== 1 ? "s" : ""} por completar\n• Produtividade: ${sc}%`;
+          if (ov) msg += `\n• ${ov} tarefa${ov !== 1 ? "s" : ""} atrasada${ov !== 1 ? "s" : ""}`;
+          return msg;
+        }
+
+        // tarefas pendentes
+        if (/tarefa|o que tenho|pendente/.test(q)) {
+          const pendentes = appState.tarefas.filter(t => t.status !== "concluida");
+          if (!pendentes.length) return "Parabéns! Não tens tarefas pendentes. Estás em dia com tudo!";
+          const list = pendentes.slice(0, 5).map(t => `• ${t.titulo} (${t.prioridade})`).join("\n");
+          return `Tens ${pendentes.length} tarefa${pendentes.length !== 1 ? "s" : ""} em aberto:\n${list}${pendentes.length > 5 ? `\n…e mais ${pendentes.length - 5}.` : ""}`;
+        }
+
+        // prioridade
+        if (/prioridade|importante|urgente/.test(q)) {
+          const alta = appState.tarefas.filter(t => t.status !== "concluida" && t.prioridade === "alta");
+          if (!alta.length) return "Não tens tarefas de alta prioridade em aberto. Bom trabalho!";
+          const top = alta.sort((a, b) => new Date(a.prazo) - new Date(b.prazo))[0];
+          return `A tua prioridade mais urgente é "${top.titulo}" — prazo: ${new Date(top.prazo).toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}.\nTens ${alta.length} tarefa${alta.length !== 1 ? "s" : ""} de alta prioridade no total.`;
+        }
+
+        // hábitos / streak
+        if (/h[aá]bito|streak/.test(q)) {
+          const ph = getPendingHabits();
+          const dh = getCompletedHabitsToday();
+          const best = Math.max(...appState.habitos.map(h => h.streak), 0);
+          let resp = `Hábitos: ${dh.length} concluído${dh.length !== 1 ? "s" : ""} hoje, ${ph.length} por completar.`;
+          if (ph.length) resp += `\nPendentes: ${ph.map(h => h.nome).join(", ")}.`;
+          resp += `\nMelhor streak actual: ${best} dias.`;
+          return resp;
+        }
+
+        // agenda / eventos
+        if (/agenda|compromisso|evento/.test(q)) {
+          const ev = getTodayEvents();
+          if (!ev.length) return "Não tens compromissos agendados para hoje.";
+          const list = ev.map(e => `• ${e.horario} — ${e.titulo}`).join("\n");
+          return `Tens ${ev.length} compromisso${ev.length !== 1 ? "s" : ""} hoje:\n${list}`;
+        }
+
+        // produtividade / progresso
+        if (/produtividade|progresso/.test(q)) {
+          const sc = getProductivityScore();
+          const done = getCompletedTasks().length;
+          const total = appState.tarefas.length;
+          const msg2 = sc >= 70 ? "Excelente ritmo!" : sc >= 40 ? "Estás no bom caminho, continua!" : "Ainda há espaço para evoluir hoje.";
+          return `A tua produtividade está em ${sc}%. Concluíste ${done} de ${total} tarefas. ${msg2}`;
+        }
+
+        // atrasadas
+        if (/atrasad|atraso/.test(q)) {
+          const ov = getOverdueTasks();
+          if (!ov.length) return "Óptimas notícias! Não tens tarefas atrasadas.";
+          const list = ov.map(t => `• ${t.titulo}`).join("\n");
+          return `Tens ${ov.length} tarefa${ov.length !== 1 ? "s" : ""} atrasada${ov.length !== 1 ? "s" : ""}:\n${list}\nRecomendo tratar destas antes de começar algo novo.`;
+        }
+
+        // sugestão / conselho / dica
+        if (/sugest[aã]o|conselho|dica/.test(q)) {
+          const ov = getOverdueTasks().length;
+          const ph = getPendingHabits();
+          const alta = appState.tarefas.filter(t => t.status !== "concluida" && t.prioridade === "alta");
+          if (ov) return `Dica: Tens ${ov} tarefa${ov !== 1 ? "s" : ""} atrasada${ov !== 1 ? "s" : ""}. Dedica os próximos 30 minutos a fechar essas pendências antes de iniciares algo novo.`;
+          if (alta.length) return `Dica: Começa pelo mais difícil primeiro. A tua tarefa de maior prioridade é "${alta[0].titulo}". Bloqueia 90 minutos sem interrupções para a concluir.`;
+          if (ph.length) return `Dica: Aproveita um momento tranquilo para completar rapidamente "${ph[0].nome}" — vai reforçar o teu streak de ${ph[0].streak} dias.`;
+          return "Dica: Estás bem encaminhado hoje! Aproveita para planear amanhã antes das 22h — vai reduzir a carga cognitiva matinal.";
+        }
+
+        // resposta genérica
+        return "Posso ajudar-te com tarefas, hábitos, agenda e produtividade. Experimenta perguntar sobre o teu dia, as tuas prioridades ou o estado dos teus hábitos!";
+      },
+
+      handleSend() {
+        const inp = document.getElementById("chat-input");
+        if (!inp) return;
+        const text = inp.value.trim();
+        if (!text) return;
+        this._appendMsg(text, "user");
+        inp.value = "";
+        this._showTyping();
+        const delay = 520 + Math.floor(Math.random() * 280);
+        setTimeout(() => {
+          this._hideTyping();
+          this._appendMsg(this._getResponse(text), "ai");
+        }, delay);
+      }
+    };
+
+    document.getElementById("kairo-chat-btn").addEventListener("click", () => kairoChat.toggle());
+    document.getElementById("kairo-chat-close").addEventListener("click", () => kairoChat.close());
+    document.getElementById("chat-send-btn").addEventListener("click", () => kairoChat.handleSend());
+    document.getElementById("chat-input").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") kairoChat.handleSend();
+    });
+    // ---- End Kairo AI Chat ----
+  </script>
+</body>
+</html>
