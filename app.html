@@ -3900,7 +3900,7 @@
       btn.disabled = true;
       btn.textContent = 'A processar…';
       try {
-        const fns = firebase.functions();
+        const fns = firebase.app().functions('us-central1');
         const createSession = fns.httpsCallable('createCheckoutSession');
         const result = await createSession({ priceId: STRIPE_PRICE_ID });
         window.location.href = result.data.url;
@@ -3921,7 +3921,7 @@
       feedback.style.color = 'var(--muted)';
       feedback.textContent = 'A validar…';
       try {
-        const fns = firebase.functions();
+        const fns = firebase.app().functions('us-central1');
         const redeemFn = fns.httpsCallable('redeemVoucher');
         await redeemFn({ code });
         feedback.style.color = 'var(--success)';
@@ -3942,7 +3942,7 @@
       btn.disabled = true;
       btn.innerHTML = '<i data-lucide="loader"></i> A abrir…';
       try {
-        const fns = firebase.functions();
+        const fns = firebase.app().functions('us-central1');
         const portalFn = fns.httpsCallable('createCustomerPortalSession');
         const result = await portalFn({});
         window.location.href = result.data.url;
