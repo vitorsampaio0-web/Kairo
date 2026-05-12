@@ -1,3 +1,4 @@
+
 # Kairo
 
 App inteligente de organizacao pessoal — Progressive Web App.
