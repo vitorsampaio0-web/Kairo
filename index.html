@@ -1699,6 +1699,7 @@
   </div>
 
   <script>
+    // Nota: O app usa a hora local do browser. Para Portugal/Lisboa, o browser deve estar em Europe/Lisbon
     // ---- Firebase Initialization ----
     const firebaseConfig = {
       apiKey: 'AIzaSyAjkpXMcKg7651b0DIRbeMk0QDmx7a5JGM',
@@ -2089,7 +2090,12 @@
       const insights = generateKairoInsights();
       const dashboard = document.getElementById("dashboard-view");
 
+      const _overdueCount = getOverdueTasks().length;
+      const _overdueBar = _overdueCount > 0
+        ? `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(255,107,138,0.18),rgba(255,107,138,0.06)),var(--panel);border:1px solid rgba(255,107,138,0.35);display:flex;align-items:center;gap:12px;"><i data-lucide="alert-triangle" style="color:var(--danger);flex-shrink:0;"></i><strong style="color:var(--danger);font-size:0.95rem;">${_overdueCount} tarefa${_overdueCount > 1 ? "s" : ""} atrasada${_overdueCount > 1 ? "s" : ""}</strong></div>`
+        : `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);background:rgba(49,208,170,0.08);border:1px solid rgba(49,208,170,0.25);display:flex;align-items:center;gap:12px;"><i data-lucide="check-circle-2" style="color:var(--success);flex-shrink:0;"></i><strong style="color:var(--success);font-size:0.95rem;">Tudo em dia</strong></div>`;
       dashboard.innerHTML = `
+        ${_overdueBar}
         <div class="hero-card">
           <div class="hero-content">
             <div class="hero-copy">
@@ -2226,18 +2232,25 @@
       const todayTasks = getTodayTasks();
 
       // Combinar eventos e tarefas do dia, ordenados por hora
+      const _agendaOverdueIds = new Set(getOverdueTasks().map(t => t.id));
       const combinedToday = [
-        ...todayEvents.map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria })),
+        ...todayEvents.map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria, _overdue: false })),
         ...todayTasks.map(t => ({
           _type: "task",
+          id: t.id,
           horario: t.prazo.split("T")[1] ? t.prazo.split("T")[1].slice(0, 5) : "00:00",
           titulo: t.titulo,
           descricao: t.descricao,
           categoria: t.categoria,
           status: t.status,
-          prioridade: t.prioridade
+          prioridade: t.prioridade,
+          _overdue: _agendaOverdueIds.has(t.id)
         }))
-      ].sort((a, b) => a.horario.localeCompare(b.horario));
+      ].sort((a, b) => {
+        if (a._overdue && !b._overdue) return -1;
+        if (!a._overdue && b._overdue) return 1;
+        return a.horario.localeCompare(b.horario);
+      });
 
       const weekDates = ["2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15"];
       // Para a vista semanal, combinar eventos e tarefas por data — lendo sempre de appState.tarefas
@@ -2860,11 +2873,18 @@
     function completeTask(taskId) {
       const nId = Number(taskId);
       const task = appState.tarefas.find(item => item.id === nId);
-      if (!task || task.status === "concluida") return;
-      task.status = "concluida";
-      fsUpdate("tarefas", taskId, { status: "concluida" });
-      renderAll();
-      showToast(`Excelente! "${task.titulo}" foi concluída.`);
+      if (!task) return;
+      if (task.status === "concluida") {
+        task.status = "pendente";
+        fsUpdate("tarefas", taskId, { status: "pendente" });
+        renderAll();
+        showToast(`"${task.titulo}" marcada como pendente.`);
+      } else {
+        task.status = "concluida";
+        fsUpdate("tarefas", taskId, { status: "concluida" });
+        renderAll();
+        showToast(`Excelente! "${task.titulo}" foi concluída.`);
+      }
     }
 
     function deleteTask(taskId) {
