@@ -631,7 +631,29 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const fns = firebase.functions();
+    const fns = firebase.app().functions('us-central1');
+
+    const FUNCTIONS_BASE = 'https://us-central1-kairo-3a7e4.cloudfunctions.net';
+
+    // Helper: chamar Cloud Function com auth token
+    async function callAdminFn(fnName, body = {}) {
+      const user = auth.currentUser;
+      if (!user) throw new Error('Nao autenticado');
+      const token = await user.getIdToken();
+      const resp = await fetch(`${FUNCTIONS_BASE}/${fnName}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ data: body }),
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error((err.error && err.error.message) || `Erro ${resp.status}`);
+      }
+      return resp.json();
+    }
 
     // ─── Toast ───
     function showToast(msg, type) {
@@ -715,25 +737,23 @@
     // ─── Load users ───
     async function loadUsers() {
       try {
-        const getUsers = fns.httpsCallable('adminGetUsers');
-        const res = await getUsers({});
-        allUsers = res.data.users || [];
+        const res = await callAdminFn('adminGetUsers');
+        allUsers = (res.result && res.result.users) || [];
         renderUsers();
         updateMetrics();
       } catch (err) {
         console.error('[Admin] loadUsers:', err);
-        showToast('Erro ao carregar utilizadores.', 'error');
+        showToast('Erro ao carregar utilizadores: ' + (err.code || '') + ' ' + (err.message || ''), 'error');
         document.getElementById('users-tbody').innerHTML =
-          '<tr><td colspan="6" class="empty-msg">Erro ao carregar dados.</td></tr>';
+          '<tr><td colspan="6" class="empty-msg">Erro ao carregar dados. Abre a consola (F12) para detalhes.</td></tr>';
       }
     }
 
     // ─── Load vouchers ───
     async function loadVouchers() {
       try {
-        const getVouchers = fns.httpsCallable('adminGetVouchers');
-        const res = await getVouchers({});
-        const vouchers = res.data.vouchers || [];
+        const res = await callAdminFn('adminGetVouchers');
+        const vouchers = (res.result && res.result.vouchers) || [];
         document.getElementById('m-vouchers').textContent = vouchers.length;
         const tbody = document.getElementById('vouchers-tbody');
         if (!vouchers.length) {
@@ -778,9 +798,8 @@
       resultEl.innerHTML = '';
 
       try {
-        const createVoucher = fns.httpsCallable('adminCreateVoucher');
-        const res = await createVoucher({ durationDays: days, maxUses, code: code || undefined });
-        const generatedCode = res.data.code;
+        const res = await callAdminFn('adminCreateVoucher', { durationDays: days, maxUses, code: code || undefined });
+        const generatedCode = res.result.code;
         resultEl.innerHTML = `
           <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(49,208,170,0.08);border:1px solid rgba(49,208,170,0.2);border-radius:var(--radius-sm);">
             <span style="color:var(--success);font-size:0.85rem;">Voucher criado:</span>
