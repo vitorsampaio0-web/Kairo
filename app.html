@@ -1848,14 +1848,6 @@
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
       <div class="sidebar-footer">
-        <div class="ai-card-header">
-          <div class="ai-mark"><i data-lucide="bot"></i></div>
-          <div>
-            <strong>Kairo AI</strong>
-            <p class="subtle">Assistente interno</p>
-          </div>
-        </div>
-        <p class="subtle" id="sidebar-ai-copy"></p>
         <div class="sidebar-user" id="sidebar-user" style="display:none;">
           <div id="sidebar-user-avatar"></div>
           <div class="sidebar-user-info" id="sidebar-user-info">
@@ -1881,13 +1873,14 @@
           <img src="./logo-kairo.png" alt="Kairo" style="height:44px;width:auto;object-fit:contain;border-radius:12px;flex-shrink:0;" />
           <div>
             <h1>Kairo</h1>
-            <p>Seu centro de execução diária</p>
+            <p>O teu centro de execução diária</p>
           </div>
         </div>
         <div class="topbar-meta">
           <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
           <div class="pill"><i data-lucide="zap"></i><span id="topbar-focus"></span></div>
           <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
+          <span id="topbar-plan-badge" class="plan-badge free" style="display:none;">FREE</span>
           <button id="topbar-user-btn" class="topbar-user-btn" onclick="document.getElementById('topbar-user-menu').classList.toggle('hidden')">
             <img id="topbar-avatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;display:none;" />
             <i data-lucide="user" id="topbar-avatar-icon"></i>
@@ -2069,7 +2062,7 @@
       historicoDateFim: "",
       historicoCategFilter: "todas",
       historicoStatusFilter: "todas",
-      today: new Date().toISOString().slice(0, 10),
+      today: new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Lisbon' }),
       user: { nome: "Utilizador" },
       tarefas: [],
       eventos: [],
@@ -2233,7 +2226,7 @@
 
     function formatDateLong(dateString) {
       const date = new Date(dateString + "T12:00:00");
-      return new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "2-digit", month: "long" }).format(date);
+      return new Intl.DateTimeFormat("pt-PT", { weekday: "long", day: "2-digit", month: "long", timeZone: "Europe/Lisbon" }).format(date);
     }
 
     function getTodayTasks() {
@@ -2291,12 +2284,12 @@
       const eventCount = getTodayEvents().length;
       const taskCount = getTodayTasks().filter(task => task.status !== "concluida").length;
       if (eventCount >= 4 && taskCount >= 3) {
-        return "Sua agenda está intensa após o almoço. Proteja um bloco de foco entre 10h e 11h30.";
+        return "A tua agenda está intensa após o almoço. Protege um bloco de foco entre as 10h e as 11h30.";
       }
       if (getOverdueTasks().length) {
-        return "Há tarefas atrasadas no radar. Feche as pendências críticas antes de iniciar novas demandas.";
+        return "Há tarefas atrasadas. Fecha as pendências críticas antes de iniciar novas tarefas.";
       }
-      return "Seu dia está equilibrado. Mantenha os blocos de foco e preserve a rotina de hábitos.";
+      return "O teu dia está equilibrado. Mantém os blocos de foco e preserva a rotina de hábitos.";
     }
 
     function generateKairoInsights() {
@@ -2315,8 +2308,8 @@
       insights.push({
         id: "dynamic-summary",
         tipo: "resumo",
-        mensagem: `Bom dia! Você tem ${events} compromissos, ${tasks} tarefas e ${habits} hábitos hoje.`,
-        acaoRecomendada: highPriorityTask ? `Priorize "${highPriorityTask.titulo}" no próximo bloco disponível.` : "Seu ritmo está sob controle hoje."
+        mensagem: `Bom dia! Tens ${events} compromissos, ${tasks} tarefas e ${habits} hábitos hoje.`,
+        acaoRecomendada: highPriorityTask ? `Dá prioridade a "${highPriorityTask.titulo}" no próximo bloco disponível.` : "O teu ritmo está sob controlo hoje."
       });
 
       if (overdue) {
@@ -2987,7 +2980,7 @@
 
     function exportToWord(tasks) {
       const now = new Date();
-      const dateStr = now.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+      const dateStr = now.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric", timeZone: "Europe/Lisbon" });
 
       const concluded = tasks.filter(t => t.status === "concluida");
       const inProgress = tasks.filter(t => t.status === "andamento");
@@ -3074,7 +3067,8 @@
       document.getElementById("today-label").textContent = formatDateLong(appState.today);
       document.getElementById("topbar-focus").textContent = `${getImportantTodayCount()} prioridades críticas`;
       const dynamicInsights = generateKairoInsights();
-      document.getElementById("sidebar-ai-copy").textContent = dynamicInsights[0].acaoRecomendada;
+      const aiCopyEl = document.getElementById("sidebar-ai-copy");
+      if (aiCopyEl) aiCopyEl.textContent = dynamicInsights[0].acaoRecomendada;
 
       renderNav();
       renderDashboard();
@@ -3556,6 +3550,9 @@
           tAvatar.style.display = 'block';
           if (tIcon) tIcon.style.display = 'none';
         }
+        // Show topbar badge on login
+        const tBadge = document.getElementById('topbar-plan-badge');
+        if (tBadge) tBadge.style.display = 'inline-flex';
         await loadUserData(user.uid);
         showApp(user);
         // Carregar subscription (onSnapshot em tempo real)
@@ -3928,6 +3925,16 @@
       const topbarUpgradeBtn = document.getElementById('topbar-upgrade-btn');
       if (topbarUpgradeBtn) {
         topbarUpgradeBtn.style.display = isPro() ? 'none' : 'inline-block';
+      }
+      const topbarBadge = document.getElementById('topbar-plan-badge');
+      if (topbarBadge) {
+        if (isPro()) {
+          topbarBadge.textContent = 'PRO';
+          topbarBadge.className = 'plan-badge pro';
+          topbarBadge.style.display = 'inline-flex';
+        } else {
+          topbarBadge.style.display = 'none';
+        }
       }
 
       if (lockSpan) {
