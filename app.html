@@ -923,6 +923,66 @@
       border: 1px solid rgba(0, 194, 255, 0.25);
     }
 
+    /* ---- Sidebar Bottom Card ---- */
+    .sidebar-bottom-card {
+      margin: auto 16px 16px 16px;
+      padding: 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(45,127,249,0.08), rgba(0,194,255,0.04), transparent 70%);
+      border: 1px solid rgba(45,127,249,0.12);
+    }
+    .sbc-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .sbc-stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sbc-stat-row .sbc-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .sbc-stat-row .sbc-value {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .sbc-stat-row .sbc-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      margin: 0 10px;
+      overflow: hidden;
+    }
+    .sbc-stat-row .sbc-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+    .sbc-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .sbc-brand img {
+      height: 28px;
+      width: auto;
+      border-radius: 8px;
+      opacity: 0.8;
+    }
+    .sbc-brand span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
     /* ---- Topbar User/Upgrade (mobile) ---- */
     .topbar-upgrade-btn {
       padding: 6px 12px;
@@ -1847,6 +1907,15 @@
         </div>
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
+
+      <div class="sidebar-bottom-card" id="sidebar-bottom-card">
+        <div class="sbc-stats" id="sbc-stats"></div>
+        <div class="sbc-brand">
+          <img src="./logo-kairo.png" alt="Kairo" />
+          <span>Kairo Elite · v1.0</span>
+        </div>
+      </div>
+
       <button id="manage-sub-btn" class="manage-sub-btn" style="display:none;margin:12px 16px;" title="Gerir subscrição">
         <i data-lucide="credit-card"></i> Gerir Subscrição
       </button>
@@ -3075,6 +3144,34 @@
       showToast("Relatório exportado com sucesso.");
     }
 
+    function updateSidebarCard() {
+      const el = document.getElementById('sbc-stats');
+      if (!el) return;
+      const total = appState.tarefas.length || 1;
+      const done = appState.tarefas.filter(t => t.status === 'concluida').length;
+      const habits = appState.habitos.length || 1;
+      const habitsDone = getCompletedHabitsToday().length;
+      const taskPct = Math.round((done / total) * 100);
+      const habitPct = Math.round((habitsDone / habits) * 100);
+      el.innerHTML = `
+        <div class="sbc-stat-row">
+          <span class="sbc-label">Tarefas</span>
+          <div class="sbc-bar"><div class="sbc-bar-fill" style="width:${taskPct}%;background:var(--primary-2);"></div></div>
+          <span class="sbc-value">${done}/${appState.tarefas.length}</span>
+        </div>
+        <div class="sbc-stat-row">
+          <span class="sbc-label">Hábitos</span>
+          <div class="sbc-bar"><div class="sbc-bar-fill" style="width:${habitPct}%;background:var(--success);"></div></div>
+          <span class="sbc-value">${habitsDone}/${appState.habitos.length}</span>
+        </div>
+        <div class="sbc-stat-row">
+          <span class="sbc-label">Atrasadas</span>
+          <div class="sbc-bar"><div class="sbc-bar-fill" style="width:${Math.min(getOverdueTasks().length * 15, 100)}%;background:var(--danger);"></div></div>
+          <span class="sbc-value" style="${getOverdueTasks().length > 0 ? 'color:var(--danger)' : ''}">${getOverdueTasks().length}</span>
+        </div>
+      `;
+    }
+
     function renderAll() {
       document.getElementById("today-label").textContent = formatDateLong(appState.today);
       document.getElementById("topbar-focus").textContent = `${getImportantTodayCount()} prioridades críticas`;
@@ -3094,6 +3191,7 @@
       });
 
       bindEvents();
+      updateSidebarCard();
       lucide.createIcons();
     }
 
