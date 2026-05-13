@@ -541,6 +541,40 @@
         </div>
       </div>
 
+      <!-- Create User -->
+      <div class="panel">
+        <div class="panel-title">
+          <i data-lucide="user-plus" style="width:18px;height:18px;"></i>
+          Criar Utilizador
+        </div>
+        <div class="form-grid" id="create-user-form">
+          <div class="form-field">
+            <label>Nome</label>
+            <input type="text" id="new-user-name" placeholder="Nome completo" />
+          </div>
+          <div class="form-field">
+            <label>Email</label>
+            <input type="email" id="new-user-email" placeholder="email@exemplo.com" />
+          </div>
+          <div class="form-field">
+            <label>Password</label>
+            <input type="text" id="new-user-password" placeholder="Min. 6 caracteres" />
+          </div>
+          <div class="form-field">
+            <label>Plano</label>
+            <select id="new-user-plan">
+              <option value="free">Free</option>
+              <option value="pro">Pro</option>
+            </select>
+          </div>
+        </div>
+        <div id="create-user-result" style="margin-top:12px;"></div>
+        <button class="primary-btn" id="create-user-btn" style="margin-top:14px;width:100%;">
+          <i data-lucide="user-plus" style="width:15px;height:15px;vertical-align:middle;margin-right:6px;"></i>
+          Criar Utilizador
+        </button>
+      </div>
+
       <!-- Create Voucher -->
       <div class="panel">
         <div class="panel-title">
@@ -831,6 +865,59 @@
 
     // ─── Refresh vouchers ───
     document.getElementById('refresh-vouchers-btn').addEventListener('click', loadVouchers);
+
+    // ─── Create User ───
+    document.getElementById('create-user-btn').addEventListener('click', async () => {
+      const nameInput = document.getElementById('new-user-name');
+      const emailInput = document.getElementById('new-user-email');
+      const passwordInput = document.getElementById('new-user-password');
+      const planInput = document.getElementById('new-user-plan');
+      const resultEl = document.getElementById('create-user-result');
+      const btn = document.getElementById('create-user-btn');
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const displayName = nameInput.value.trim();
+      const plan = planInput.value;
+
+      if (!email || !password) {
+        showToast('Email e password são obrigatórios.', 'error');
+        return;
+      }
+      if (password.length < 6) {
+        showToast('A password deve ter pelo menos 6 caracteres.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'A criar…';
+      resultEl.innerHTML = '';
+
+      try {
+        const res = await callAdminFn('adminCreateUser', { email, password, displayName, plan });
+        const user = res.result;
+        resultEl.innerHTML = `
+          <div style="background:rgba(54,211,153,0.1);border:1px solid rgba(54,211,153,0.3);border-radius:10px;padding:14px;font-size:0.85rem;">
+            <strong style="color:var(--success);">✓ Utilizador criado!</strong><br>
+            <span style="color:var(--muted);">Email:</span> ${user.email}<br>
+            <span style="color:var(--muted);">Plano:</span> ${user.plan.toUpperCase()}<br>
+            <span style="color:var(--muted);">UID:</span> <code style="font-size:0.75rem;">${user.uid}</code>
+          </div>`;
+        showToast('Utilizador criado com sucesso!', 'success');
+        nameInput.value = '';
+        emailInput.value = '';
+        passwordInput.value = '';
+        planInput.value = 'free';
+        await loadUsers();
+      } catch (err) {
+        resultEl.innerHTML = `<p style="color:var(--danger);font-size:0.85rem;">${err.message || 'Erro ao criar utilizador.'}</p>`;
+        showToast('Erro ao criar utilizador.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="user-plus" style="width:15px;height:15px;vertical-align:middle;margin-right:6px;"></i> Criar Utilizador';
+        lucide.createIcons();
+      }
+    });
 
     // ─── Logout ───
     document.getElementById('admin-logout-btn').addEventListener('click', () => auth.signOut());
