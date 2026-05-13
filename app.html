@@ -2444,10 +2444,10 @@
               <p class="subtle">${getBusyDayInsight()}</p>
             </div>
             <div class="hero-grid">
-              <div class="metric-card" style="${_overdueCount > 0 ? 'border-color:rgba(255,107,138,0.35);background:linear-gradient(135deg,rgba(255,107,138,0.12),transparent 60%)' : ''}">
+              <div class="metric-card" style="${_overdueCount > 0 ? 'border-color:rgba(255,107,138,0.35);background:linear-gradient(135deg,rgba(255,107,138,0.12),transparent 60%);cursor:pointer;' : ''}" ${_overdueCount > 0 ? 'onclick="appState.taskFilter=\'atrasadas\'; switchView(\'tarefas\');"' : ''}>
                 <small>Tarefas atrasadas</small>
                 <strong style="${_overdueCount > 0 ? 'color:var(--danger)' : 'color:var(--success)'}">${_overdueCount}</strong>
-                <span class="label">${_overdueCount > 0 ? 'Requer atenção' : 'Tudo em dia ✓'}</span>
+                <span class="label">${_overdueCount > 0 ? 'Clica para ver →' : 'Tudo em dia ✓'}</span>
               </div>
               <div class="metric-card">
                 <small>Tarefas importantes</small>
@@ -2745,8 +2745,11 @@
     }
 
     function filteredTasks() {
+      const overdueSet = new Set(getOverdueTasks().map(t => t.id));
       return appState.tarefas.filter(task => {
-        const taskMatches = appState.taskFilter === "todas" || task.status === appState.taskFilter;
+        const taskMatches = appState.taskFilter === "todas" ? true
+          : appState.taskFilter === "atrasadas" ? overdueSet.has(task.id)
+          : task.status === appState.taskFilter;
         const priorityMatches = appState.priorityFilter === "todas" || task.prioridade === appState.priorityFilter;
         return taskMatches && priorityMatches;
       }).sort((a, b) => new Date(a.prazo) - new Date(b.prazo));
@@ -2802,6 +2805,7 @@
               <button class="chip ${appState.taskFilter === "pendente" ? "active" : ""}" data-task-filter="pendente">Pendentes</button>
               <button class="chip ${appState.taskFilter === "andamento" ? "active" : ""}" data-task-filter="andamento">Em andamento</button>
               <button class="chip ${appState.taskFilter === "concluida" ? "active" : ""}" data-task-filter="concluida">Concluídas</button>
+              <button class="chip ${appState.taskFilter === "atrasadas" ? "active" : ""}" data-task-filter="atrasadas" style="color:var(--danger);border-color:${appState.taskFilter === "atrasadas" ? "var(--danger)" : ""};">Atrasadas</button>
             </div>
             <div class="filters">
               <button class="chip ${appState.priorityFilter === "todas" ? "active" : ""}" data-priority-filter="todas">Todas prioridades</button>
