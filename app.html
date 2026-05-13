@@ -1871,6 +1871,108 @@
       background: rgba(255, 107, 138, 0.1);
       border-color: rgba(255, 107, 138, 0.25);
     }
+    /* ---- Login Email Form ---- */
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .login-email-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .login-input {
+      width: 100%;
+      border-radius: 14px;
+      padding: 13px 16px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(154, 170, 196, 0.18);
+      color: white;
+      font: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.22s ease;
+    }
+
+    .login-input::placeholder {
+      color: var(--muted);
+    }
+
+    .login-input:focus {
+      border-color: rgba(124, 92, 255, 0.5);
+    }
+
+    .email-login-btn {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #5d89ff);
+      color: white;
+      font-size: 0.96rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(124, 92, 255, 0.28);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .email-login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(124, 92, 255, 0.4);
+    }
+
+    .email-login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-error-msg {
+      color: var(--danger);
+      font-size: 0.84rem;
+      text-align: center;
+      min-height: 18px;
+      margin-top: -4px;
+    }
+
+    .login-toggle-link {
+      display: block;
+      margin-top: 6px;
+      text-align: center;
+      font-size: 0.83rem;
+      color: var(--muted);
+    }
+
+    .login-toggle-link a {
+      color: var(--primary-2);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-toggle-link a:hover {
+      text-decoration: underline;
+    }
+
+    .login-field-hidden {
+      display: none;
+    }
+    /* ---- End Login Email Form ---- */
+
     /* ---- End Login Screen ---- */
   </style>
 </head>
@@ -1894,9 +1996,13 @@
       <div class="login-divider"><span>ou</span></div>
 
       <div class="login-email-form">
-        <input type="email" id="login-email" placeholder="Email" class="login-input" />
-        <input type="password" id="login-password" placeholder="Password" class="login-input" />
+        <input type="text" id="login-name" placeholder="Nome" class="login-input login-field-hidden" autocomplete="name" />
+        <input type="email" id="login-email" placeholder="Email" class="login-input" autocomplete="email" />
+        <input type="password" id="login-password" placeholder="Password" class="login-input" autocomplete="current-password" />
+        <input type="password" id="login-confirm-password" placeholder="Confirmar Password" class="login-input login-field-hidden" autocomplete="new-password" />
+        <p id="login-error-msg" class="login-error-msg"></p>
         <button id="email-signin-btn" class="email-login-btn">Entrar com Email</button>
+        <p class="login-toggle-link" id="login-toggle-text">Não tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Criar conta</a></p>
       </div>
       <p class="login-footer">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -3658,6 +3764,93 @@
           showToast("Erro ao iniciar sessão. Tenta novamente.");
         });
     });
+
+    // ---- Email Auth (Login / Registo) ----
+    let _loginMode = "login"; // "login" | "register"
+
+    function toggleLoginMode() {
+      _loginMode = _loginMode === "login" ? "register" : "login";
+
+      const nameField = document.getElementById("login-name");
+      const confirmField = document.getElementById("login-confirm-password");
+      const btn = document.getElementById("email-signin-btn");
+      const toggleText = document.getElementById("login-toggle-text");
+      const errorMsg = document.getElementById("login-error-msg");
+      const passwordInput = document.getElementById("login-password");
+
+      errorMsg.textContent = "";
+
+      if (_loginMode === "register") {
+        nameField.classList.remove("login-field-hidden");
+        confirmField.classList.remove("login-field-hidden");
+        btn.textContent = "Criar Conta";
+        passwordInput.placeholder = "Password (mín. 6 caracteres)";
+        passwordInput.setAttribute("autocomplete", "new-password");
+        toggleText.innerHTML = 'Já tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Entrar</a>';
+      } else {
+        nameField.classList.add("login-field-hidden");
+        confirmField.classList.add("login-field-hidden");
+        btn.textContent = "Entrar com Email";
+        passwordInput.placeholder = "Password";
+        passwordInput.setAttribute("autocomplete", "current-password");
+        toggleText.innerHTML = 'Não tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Criar conta</a>';
+      }
+    }
+
+    function _getAuthErrorMessage(code) {
+      const msgs = {
+        "auth/email-already-in-use": "Este email já está registado.",
+        "auth/weak-password": "A password deve ter pelo menos 6 caracteres.",
+        "auth/invalid-email": "Email inválido.",
+        "auth/user-not-found": "Conta não encontrada.",
+        "auth/wrong-password": "Password incorreta.",
+        "auth/invalid-credential": "Email ou password incorretos.",
+        "auth/too-many-requests": "Demasiadas tentativas. Tenta mais tarde."
+      };
+      return msgs[code] || "Ocorreu um erro. Tenta novamente.";
+    }
+
+    document.getElementById("email-signin-btn").addEventListener("click", async () => {
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      const errorEl = document.getElementById("login-error-msg");
+      errorEl.textContent = "";
+
+      if (!email || !password) {
+        errorEl.textContent = "Por favor preenche o email e a password.";
+        return;
+      }
+
+      if (_loginMode === "register") {
+        const name = document.getElementById("login-name").value.trim();
+        const confirmPassword = document.getElementById("login-confirm-password").value;
+
+        if (!name) {
+          errorEl.textContent = "Por favor indica o teu nome.";
+          return;
+        }
+        if (password !== confirmPassword) {
+          errorEl.textContent = "As passwords não coincidem.";
+          return;
+        }
+
+        try {
+          const cred = await auth.createUserWithEmailAndPassword(email, password);
+          await cred.user.updateProfile({ displayName: name });
+        } catch (err) {
+          console.error("[Auth] Erro no registo:", err);
+          errorEl.textContent = _getAuthErrorMessage(err.code);
+        }
+      } else {
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+        } catch (err) {
+          console.error("[Auth] Erro no login:", err);
+          errorEl.textContent = _getAuthErrorMessage(err.code);
+        }
+      }
+    });
+    // ---- End Email Auth ----
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
