@@ -1,11 +1,11 @@
-const CACHE_NAME = "kairo-v1";
+const CACHE_NAME = "kairo-v2";
 const ASSETS = [
   "./index.html",
   "./app.html",
+  "./admin.html",
+  "./guide.html",
   "./manifest.json",
-  "./logo-kairo.png",
-  "./icon-192.png",
-  "./icon-512.png"
+  "./logo-kairo.png"
 ];
 
 self.addEventListener("install", (event) => {
@@ -45,7 +45,7 @@ self.addEventListener("fetch", (event) => {
         return response;
       }).catch(() => {
         if (event.request.mode === "navigate") {
-          return caches.match("./index.html");
+          return caches.match("./app.html");
         }
       });
     })
