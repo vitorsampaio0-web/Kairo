@@ -1820,7 +1820,7 @@
     <div class="login-box">
       <img src="./logo-kairo.png" alt="Kairo" class="login-logo" />
       <h1 class="login-title">KAIRO</h1>
-      <p class="login-subtitle">O teu centro de produtividade de alto nível</p>
+      <p class="login-subtitle">Produtividade de Elite</p>
       <button id="google-signin-btn" class="google-btn">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -1843,24 +1843,11 @@
         <img src="./logo-kairo.png" alt="Kairo" style="height:44px;width:auto;object-fit:contain;border-radius:12px;flex-shrink:0;" />
         <div>
           <h1>Kairo</h1>
-          <p>Produtividade de alto nível</p>
+          <p>Produtividade de Elite</p>
         </div>
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
       <div class="sidebar-footer">
-        <div class="sidebar-user" id="sidebar-user" style="display:none;">
-          <div id="sidebar-user-avatar"></div>
-          <div class="sidebar-user-info" id="sidebar-user-info">
-            <strong id="sidebar-user-name"></strong>
-            <span>Conta Google <span id="sidebar-plan-badge" class="plan-badge free">FREE</span></span>
-          </div>
-          <button id="sidebar-upgrade-btn" class="sidebar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">
-            ⚡ Upgrade Pro
-          </button>
-          <button id="logout-btn" class="logout-btn" title="Terminar sessão">
-            <i data-lucide="log-out"></i>
-          </button>
-        </div>
         <button id="manage-sub-btn" class="manage-sub-btn" style="display:none;" title="Gerir subscrição">
           <i data-lucide="credit-card"></i> Gerir Subscrição
         </button>
@@ -1873,7 +1860,7 @@
           <img src="./logo-kairo.png" alt="Kairo" style="height:44px;width:auto;object-fit:contain;border-radius:12px;flex-shrink:0;" />
           <div>
             <h1>Kairo</h1>
-            <p>O teu centro de execução diária</p>
+            <p>Kairo - Performance Diária</p>
           </div>
         </div>
         <div class="topbar-meta">
@@ -2087,14 +2074,15 @@
     }
 
     function updateSidebarUser(user) {
+      const displayName = user.displayName || user.email || "Utilizador";
+      const firstName = displayName.split(" ")[0];
+      appState.user.nome = firstName;
+
       const sidebarUser = document.getElementById("sidebar-user");
       const avatarEl = document.getElementById("sidebar-user-avatar");
       const nameEl = document.getElementById("sidebar-user-name");
       if (!sidebarUser || !avatarEl || !nameEl) return;
 
-      const displayName = user.displayName || user.email || "Utilizador";
-      const firstName = displayName.split(" ")[0];
-      appState.user.nome = firstName;
       nameEl.textContent = displayName;
 
       avatarEl.innerHTML = "";
@@ -2316,8 +2304,8 @@
         insights.push({
           id: "dynamic-overdue",
           tipo: "alerta",
-          mensagem: `Você tem ${overdue} tarefa${overdue > 1 ? "s" : ""} atrasada${overdue > 1 ? "s" : ""}.`,
-          acaoRecomendada: "Realoque itens de baixa prioridade e feche as pendências mais antigas antes das 11h."
+          mensagem: `Tens ${overdue} tarefa${overdue > 1 ? "s" : ""} atrasada${overdue > 1 ? "s" : ""}.`,
+          acaoRecomendada: "Reorganiza os itens de baixa prioridade e fecha as pendências mais antigas antes das 11h."
         });
       }
 
@@ -2325,8 +2313,8 @@
         insights.push({
           id: "dynamic-load",
           tipo: "carga",
-          mensagem: "Seu dia está denso com reuniões e blocos de execução.",
-          acaoRecomendada: "Mantenha uma pausa curta entre 15h e 16h para preservar energia cognitiva."
+          mensagem: "O teu dia está denso com reuniões e blocos de execução.",
+          acaoRecomendada: "Mantém uma pausa curta entre as 15h e as 16h para preservar energia cognitiva."
         });
       }
 
@@ -2334,8 +2322,8 @@
         insights.push({
           id: "dynamic-habit",
           tipo: "habito",
-          mensagem: "Você pode fortalecer sua consistência hoje com um hábito rápido.",
-          acaoRecomendada: "Marque leitura ou alongamento logo após seu próximo compromisso."
+          mensagem: "Podes reforçar a tua consistência hoje com um hábito rápido.",
+          acaoRecomendada: "Marca leitura ou alongamento logo após o teu próximo compromisso."
         });
       }
 
@@ -2455,7 +2443,7 @@
             <div class="panel-header">
               <div>
                 <h3>Produtividade e Kairo AI</h3>
-                <p>Indicadores inteligentes do seu dia</p>
+                <p>Indicadores inteligentes do teu dia</p>
               </div>
             </div>
             <div class="progress-ring" style="--value:${productivity}">
@@ -2565,15 +2553,15 @@
           destaquesCards.push({ h: "Alta prioridade em aberto", p: `${_highPriToday.length} tarefa${_highPriToday.length > 1 ? "s" : ""} de alta prioridade hoje: ${_highPriToday.slice(0, 2).map(t => '"' + t.titulo + '"').join(", ")}.` });
         }
         if (_overdueNow.length) {
-          destaquesCards.push({ h: "Tarefas atrasadas", p: `${_overdueNow.length} tarefa${_overdueNow.length > 1 ? "s" : ""} atrasada${_overdueNow.length > 1 ? "s" : ""}. Feche as pendências críticas antes de iniciar novas demandas.` });
+          destaquesCards.push({ h: "Tarefas atrasadas", p: `${_overdueNow.length} tarefa${_overdueNow.length > 1 ? "s" : ""} atrasada${_overdueNow.length > 1 ? "s" : ""}. Fecha as pendências críticas antes de iniciar novas tarefas.` });
         } else if (todayEvents.length >= 3) {
-          destaquesCards.push({ h: "Dia cheio detectado", p: `${todayEvents.length} compromissos hoje. Proteja blocos de foco entre reuniões para manter a produtividade.` });
+          destaquesCards.push({ h: "Dia cheio detectado", p: `${todayEvents.length} compromissos hoje. Protege blocos de foco entre reuniões para manter a produtividade.` });
         }
         if (_pendingHabitsNow.length >= 2) {
-          destaquesCards.push({ h: "Recomendação Kairo AI", p: `${_pendingHabitsNow.length} hábito${_pendingHabitsNow.length > 1 ? "s" : ""} pendente${_pendingHabitsNow.length > 1 ? "s" : ""} hoje. Aproveite as pausas entre compromissos para mantê-los.` });
+          destaquesCards.push({ h: "Recomendação Kairo AI", p: `${_pendingHabitsNow.length} hábito${_pendingHabitsNow.length > 1 ? "s" : ""} pendente${_pendingHabitsNow.length > 1 ? "s" : ""} hoje. Aproveita as pausas entre compromissos para os manter.` });
         }
         if (!destaquesCards.length) {
-          destaquesCards.push({ h: "Ritmo equilibrado", p: "Seu dia está bem distribuído. Mantenha os blocos de foco e preserve a rotina de hábitos." });
+          destaquesCards.push({ h: "Ritmo equilibrado", p: "O teu dia está bem distribuído. Mantém os blocos de foco e preserva a rotina de hábitos." });
         }
       }
 
@@ -2672,7 +2660,7 @@
               <div class="section-heading">
                 <div>
                   <h3>Destaques</h3>
-                  <p>Leitura rápida para sua execução</p>
+                  <p>Leitura rápida para a tua execução</p>
                 </div>
               </div>
               <div class="list-stack">
@@ -2787,7 +2775,7 @@
                 </div>
               </div>
             `).join("")}
-            ${!tasks.length ? `<div class="empty-state">Nenhuma tarefa nesse filtro.</div>` : ""}
+            ${!tasks.length ? `<div class="empty-state">Nenhuma tarefa com esse filtro.</div>` : ""}
           </div>
         </div>
       `;
@@ -2843,7 +2831,7 @@
                   </div>
                 </div>
               `).join("")}
-              ${!appState.habitos.length ? `<div class="empty-state">Nenhum hábito criado ainda. Adicione o primeiro acima.</div>` : ""}
+              ${!appState.habitos.length ? `<div class="empty-state">Nenhum hábito criado ainda. Adiciona o primeiro acima.</div>` : ""}
             </div>
           </div>
 
@@ -2860,15 +2848,15 @@
             <div class="list-stack">
               <div class="suggestion-card">
                 <h4>Feedback do dia</h4>
-                <p>${getCompletedHabitsToday().length >= 2 ? "Ótimo ritmo. Sua rotina já começou forte hoje." : "Você ainda pode elevar sua consistência com hábitos rápidos nas próximas horas."}</p>
+                <p>${getCompletedHabitsToday().length >= 2 ? "Ótimo ritmo. A tua rotina já começou forte hoje." : "Ainda podes elevar a tua consistência com hábitos rápidos nas próximas horas."}</p>
               </div>
               <div class="suggestion-card">
                 <h4>Recomendação Kairo AI</h4>
-                <p>Associe leitura ao pós-almoço e alongamento ao fim da última reunião para facilitar aderência.</p>
+                <p>Associa leitura ao pós-almoço e alongamento ao fim da última reunião para facilitar a adesão.</p>
               </div>
               <div class="suggestion-card">
                 <h4>Automação</h4>
-                <p>Quando você conclui um hábito, o streak e o progresso semanal são atualizados instantaneamente para reforçar motivação.</p>
+                <p>Quando concluis um hábito, o streak e o progresso semanal são atualizados instantaneamente para reforçar a motivação.</p>
               </div>
             </div>
           </div>
@@ -3099,7 +3087,7 @@
       if (!titleInput) return;
       const title = titleInput.value.trim();
       if (!title) {
-        showToast("Digite um título para criar a tarefa.");
+        showToast("Escreve um título para criar a tarefa.");
         return;
       }
 
@@ -3116,7 +3104,7 @@
       const newTask = {
         id,
         titulo: title,
-        descricao: "Tarefa criada rapidamente para manter o fluxo de execução.",
+        descricao: "Tarefa criada rapidamente para manter o fluxo de trabalho.",
         prioridade: priorityInput.value,
         status: "pendente",
         prazo: `${taskDate}T${taskTime}`,
@@ -3137,7 +3125,7 @@
       if (!nameInput) return;
       const name = nameInput.value.trim();
       if (!name) {
-        showToast("Digite um nome para o hábito.");
+        showToast("Escreve um nome para o hábito.");
         return;
       }
 
