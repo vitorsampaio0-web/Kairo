@@ -2293,7 +2293,7 @@
     }
 
     function getOverdueTasks() {
-      const now = new Date(appState.today + "T12:00:00");
+      const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Lisbon" }));
       return appState.tarefas.filter(task => task.status !== "concluida" && new Date(task.prazo) < now);
     }
 
