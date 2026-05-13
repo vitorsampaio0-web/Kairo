@@ -460,6 +460,35 @@
       font-size: 0.9rem;
     }
 
+    /* ─── Admin toggle button ─── */
+    .admin-toggle-btn {
+      border: 0;
+      border-radius: var(--radius-sm);
+      padding: 5px 12px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .admin-toggle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .admin-toggle-btn.set-admin {
+      background: linear-gradient(90deg, var(--primary), var(--primary-2));
+      color: #fff;
+    }
+
+    .admin-toggle-btn.set-admin:hover:not(:disabled) { opacity: 0.82; }
+
+    .admin-toggle-btn.remove-admin {
+      background: rgba(255,107,138,0.15);
+      border: 1px solid rgba(255,107,138,0.3);
+      color: var(--danger);
+    }
+
+    .admin-toggle-btn.remove-admin:hover:not(:disabled) { background: rgba(255,107,138,0.25); }
+
     /* ─── Admin Login Screen ─── */
     .admin-login-screen {
       position: fixed;
@@ -709,10 +738,11 @@
                 <th>Estado</th>
                 <th>Renova</th>
                 <th>Registo</th>
+                <th>Admin</th>
               </tr>
             </thead>
             <tbody id="users-tbody">
-              <tr><td colspan="6" class="empty-msg">A carregar utilizadores…</td></tr>
+              <tr><td colspan="7" class="empty-msg">A carregar utilizadores…</td></tr>
             </tbody>
           </table>
         </div>
@@ -934,6 +964,7 @@
 
     // ─── State ───
     let allUsers = [];
+    let adminUids = new Set();
     let currentFilter = 'all';
 
     // ─── Render users table ───
@@ -945,7 +976,7 @@
 
       const tbody = document.getElementById('users-tbody');
       if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">Nenhum utilizador encontrado.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Nenhum utilizador encontrado.</td></tr>';
         return;
       }
 
@@ -954,6 +985,10 @@
         const avatarHtml = u.photoURL
           ? `<img src="${u.photoURL}" class="user-avatar" onerror="this.style.display='none'" />`
           : `<div class="user-avatar-placeholder">${initials}</div>`;
+        const isAdmin = adminUids.has(u.uid);
+        const adminBtnHtml = isAdmin
+          ? `<button class="admin-toggle-btn remove-admin" onclick="toggleAdmin('${u.uid}', false, this)">Remover Admin</button>`
+          : `<button class="admin-toggle-btn set-admin" onclick="toggleAdmin('${u.uid}', true, this)">Tornar Admin</button>`;
         return `
           <tr>
             <td>
@@ -970,23 +1005,51 @@
             <td>${statusBadge(u.status)}</td>
             <td style="font-size:0.82rem;color:var(--muted)">${fmtDate(u.currentPeriodEnd || u.expiresAt)}</td>
             <td style="font-size:0.82rem;color:var(--muted)">${u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-PT') : '—'}</td>
+            <td>${adminBtnHtml}</td>
           </tr>
         `;
       }).join('');
     }
 
+    // ─── Toggle admin ───
+    async function toggleAdmin(uid, makeAdmin, btn) {
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = 'A processar…';
+      try {
+        if (makeAdmin) {
+          await callAdminFn('adminSetAdmin', { uid });
+          adminUids.add(uid);
+          showToast('Utilizador promovido a administrador.', 'success');
+        } else {
+          await callAdminFn('adminRemoveAdmin', { uid });
+          adminUids.delete(uid);
+          showToast('Privilégios de administrador removidos.', 'success');
+        }
+        renderUsers();
+      } catch (err) {
+        showToast('Erro: ' + (err.message || 'Operação falhou.'), 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
     // ─── Load users ───
     async function loadUsers() {
       try {
-        const res = await callAdminFn('adminGetUsers');
+        const [res, adminsSnap] = await Promise.all([
+          callAdminFn('adminGetUsers'),
+          db.collection('admins').get(),
+        ]);
         allUsers = (res.result && res.result.users) || [];
+        adminUids = new Set(adminsSnap.docs.map(d => d.id));
         renderUsers();
         updateMetrics();
       } catch (err) {
         console.error('[Admin] loadUsers:', err);
         showToast('Erro ao carregar utilizadores: ' + (err.code || '') + ' ' + (err.message || ''), 'error');
         document.getElementById('users-tbody').innerHTML =
-          '<tr><td colspan="6" class="empty-msg">Erro ao carregar dados. Abre a consola (F12) para detalhes.</td></tr>';
+          '<tr><td colspan="7" class="empty-msg">Erro ao carregar dados. Abre a consola (F12) para detalhes.</td></tr>';
       }
     }
 
