@@ -1,24 +1,46 @@
 {
-  "name": "Kairo",
+  "name": "Kairo Elite",
   "short_name": "Kairo",
-  "description": "Kairo - Elite Productivity",
-  "start_url": "./index.html",
+  "description": "Produtividade de Elite — Tarefas, Hábitos, Agenda e AI",
+  "start_url": "./app.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#07111f",
-  "theme_color": "#7c5cff",
+  "background_color": "#0b0f1a",
+  "theme_color": "#2d7ff9",
   "orientation": "any",
+  "lang": "pt-PT",
+  "categories": ["productivity", "business"],
   "icons": [
     {
       "src": "./logo-kairo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "./logo-kairo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./logo-kairo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "./app.html#dashboard",
+      "icons": [{ "src": "./logo-kairo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tarefas",
+      "url": "./app.html#tarefas",
+      "icons": [{ "src": "./logo-kairo.png", "sizes": "192x192" }]
     }
   ]
 }
