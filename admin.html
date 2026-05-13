@@ -853,7 +853,8 @@
       <div class="icon">🔒</div>
       <h2>Acesso Restrito</h2>
       <p>Não tens permissão para aceder ao painel de administração do Kairo.</p>
-      <a href="./app.html" style="color:var(--primary-2);font-size:0.9rem;margin-top:8px;">← Voltar à app</a>
+      <button onclick="firebase.auth().signOut()" style="margin-top:14px;padding:10px 28px;background:var(--primary-2);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;">Entrar com outra conta</button>
+      <a href="./app.html" style="color:var(--muted);font-size:0.85rem;margin-top:10px;">← Voltar à app</a>
     </div>
   </div>
 
