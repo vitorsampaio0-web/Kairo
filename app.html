@@ -2046,7 +2046,7 @@
         </div>
         <div class="topbar-meta">
           <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
-          <div class="pill"><i data-lucide="zap"></i><span id="topbar-focus"></span></div>
+
           <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
           <span id="topbar-plan-badge" class="plan-badge free" style="display:none;">FREE</span>
           <button id="topbar-user-btn" class="topbar-user-btn" onclick="document.getElementById('topbar-user-menu').classList.toggle('hidden')">
@@ -3291,7 +3291,7 @@
 
     function renderAll() {
       document.getElementById("today-label").textContent = formatDateLong(appState.today);
-      document.getElementById("topbar-focus").textContent = `${getImportantTodayCount()} prioridades críticas`;
+
       const dynamicInsights = generateKairoInsights();
       const aiCopyEl = document.getElementById("sidebar-ai-copy");
       if (aiCopyEl) aiCopyEl.textContent = dynamicInsights[0].acaoRecomendada;
