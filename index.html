@@ -294,24 +294,44 @@
     .hero-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
+      grid-template-rows: auto auto;
+      gap: 40px 80px;
       width: 100%;
       position: relative;
       z-index: 1;
     }
 
-    .hero-content { max-width: 560px; }
+    .hero-video-col {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-content {
+      grid-column: 2;
+      grid-row: 1;
+      max-width: 560px;
+    }
+
+    .hero-mockup-col {
+      grid-column: 2;
+      grid-row: 2;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
 
     .hero-eyebrow { margin-bottom: 32px; }
 
     .hero-logo-large {
-      display: block;
-      width: 340px;
-      height: 340px;
+      width: 100%;
+      max-width: 480px;
+      height: auto;
+      aspect-ratio: 1;
       object-fit: cover;
       border-radius: 0;
-      margin-bottom: 28px;
       mix-blend-mode: screen;
       filter: none;
     }
@@ -1307,8 +1327,11 @@
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 1024px) {
-      .hero-grid { grid-template-columns: 1fr; gap: 60px; }
-      .hero-content { max-width: 100%; }
+      .hero-grid { grid-template-columns: 1fr; grid-template-rows: auto; gap: 40px; }
+      .hero-video-col { grid-column: 1; grid-row: 1; }
+      .hero-content { grid-column: 1; grid-row: 2; max-width: 100%; }
+      .hero-mockup-col { grid-column: 1; grid-row: 3; }
+      .hero-logo-large { max-width: 320px; }
       .hero-headline { font-size: clamp(3rem, 8vw, 4.5rem); }
       .feature-block { grid-template-columns: 1fr; gap: 48px; }
       .feature-block.reverse { direction: ltr; }
@@ -1319,6 +1342,7 @@
       .section { padding: 80px 0; }
       .nav-links, .nav-cta { display: none; }
       .hamburger { display: flex; }
+      .hero-logo-large { max-width: 260px; }
       .hero-headline { font-size: clamp(2.8rem, 10vw, 4rem); }
       .problem-grid { grid-template-columns: 1fr; }
       .metrics-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1344,7 +1368,6 @@
   <nav id="navbar">
     <div class="nav-inner">
       <a href="#" class="nav-logo">
-        <img src="./logo-kairo.png" alt="Kairo" onerror="this.style.display='none'" />
         <span class="nav-logo-text">Kairo</span>
       </a>
       <ul class="nav-links">
@@ -1383,7 +1406,7 @@
     </div>
     <div class="container">
       <div class="hero-grid">
-        <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
+        <div class="hero-video-col" data-aos="fade-right" data-aos-duration="1000">
           <video
             class="hero-logo-large"
             src="./d_e_c_a_e_f_b_mp_.mp4"
@@ -1392,6 +1415,9 @@
             muted
             playsinline
           ></video>
+        </div>
+
+        <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
           <div class="hero-eyebrow">
             <span class="eyebrow"><span class="eyebrow-dot"></span>Usado por mais de 2.000 líderes em todo o mundo</span>
           </div>
@@ -1416,7 +1442,7 @@
           </div>
         </div>
 
-        <div class="hero-mockup" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+        <div class="hero-mockup-col" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
           <div class="mockup-frame">
             <div class="mockup-titlebar">
               <div class="mockup-dot mockup-dot-r"></div>
