@@ -307,10 +307,12 @@
 
     .hero-logo-large {
       display: block;
-      height: 180px;
-      width: auto;
-      margin-bottom: 24px;
-      filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.5));
+      width: 300px;
+      height: 300px;
+      object-fit: cover;
+      border-radius: var(--radius-xl);
+      margin-bottom: 28px;
+      filter: drop-shadow(0 0 32px rgba(124, 92, 255, 0.6)) drop-shadow(0 0 10px rgba(124, 92, 255, 0.4));
     }
 
     .hero-headline {
@@ -1381,7 +1383,14 @@
     <div class="container">
       <div class="hero-grid">
         <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
-          <img src="./logo-kairo.png" alt="Kairo" class="hero-logo-large" onerror="this.style.display='none'" />
+          <video
+            class="hero-logo-large"
+            src="./d_e_c_a_e_f_b_mp_.mp4"
+            autoplay
+            loop
+            muted
+            playsinline
+          ></video>
           <div class="hero-eyebrow">
             <span class="eyebrow"><span class="eyebrow-dot"></span>Usado por mais de 2.000 líderes em todo o mundo</span>
           </div>
