@@ -17,6 +17,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
   <style>
     :root {
@@ -1212,6 +1213,16 @@
     .cal-popup-item p  { margin: 0; font-size: 0.75rem; color: #666; }
     .cal-popup-empty   { text-align: center; color: #555; font-size: 0.85rem; padding: 20px 0; }
 
+    /* ---- Notifications Modal ---- */
+    .notif-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 600; padding: 3px 10px;
+      border-radius: 100px; margin-bottom: 20px;
+    }
+    .notif-badge.granted { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+    .notif-badge.denied  { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+    .notif-badge.default { background: rgba(124,92,255,0.1); color: #9b85ff; border: 1px solid rgba(124,92,255,0.2); }
+
     /* ---- Digest Modal ---- */    .digest-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.7);
       display: flex; align-items: center; justify-content: center;
@@ -2281,6 +2292,7 @@
           </button>
           <div id="topbar-user-menu" class="topbar-user-menu hidden">
             <button onclick="openDigestModal()"><i data-lucide="mail"></i> Email Diário</button>
+            <button onclick="openNotifModal()"><i data-lucide="bell"></i> Notificações</button>
             <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
           </div>
         </div>
@@ -2296,6 +2308,40 @@
 
   <nav class="bottom-nav" id="bottom-nav"></nav>
   <div class="toast-wrap" id="toast-wrap"></div>
+
+  <!-- Notifications Modal -->
+  <div class="digest-overlay hidden" id="notif-modal">
+    <div class="digest-card">
+      <button class="digest-close" onclick="closeNotifModal()"><i data-lucide="x"></i></button>
+      <div class="digest-icon"><i data-lucide="bell"></i></div>
+      <h2>Notificações Push</h2>
+      <p>Recebe um aviso antes das tuas tarefas, mesmo com o app fechado.</p>
+      <div id="notif-permission-badge" class="notif-badge default"><i data-lucide="circle" style="width:8px;height:8px;"></i> A verificar...</div>
+      <div class="digest-toggle-row">
+        <span>Ativar notificações</span>
+        <label class="digest-switch">
+          <input type="checkbox" id="notif-enabled" onchange="toggleNotifFields()">
+          <span class="digest-slider"></span>
+        </label>
+      </div>
+      <div class="digest-fields" id="notif-fields" style="display:none;">
+        <div class="digest-field">
+          <label>Avisar antes da tarefa</label>
+          <select id="notif-minutos" class="digest-input">
+            <option value="5">5 minutos antes</option>
+            <option value="10">10 minutos antes</option>
+            <option value="15" selected>15 minutos antes</option>
+            <option value="30">30 minutos antes</option>
+            <option value="60">1 hora antes</option>
+          </select>
+        </div>
+      </div>
+      <button class="digest-save-btn" onclick="saveNotifSettings()">
+        <i data-lucide="check"></i> Guardar
+      </button>
+      <p class="digest-note" id="notif-note"></p>
+    </div>
+  </div>
 
   <!-- Focus / Pomodoro Widget -->
   <div class="focus-widget hidden" id="focus-widget">
@@ -4819,6 +4865,110 @@
       if (e.target === this) closeEditHabitModal();
     });
 
+    // ---- Push Notifications ----
+    const VAPID_KEY = 'BIEqaxpTd4CceTJxcbzkxZOp1S5s8m9Xfv1lzktM84qT7dp2g9aTvZfBaH-NNdvYrHXjxNfct6D_TcSMFOfzv7g';
+    let messagingInstance = null;
+
+    async function initMessaging() {
+      if (!('serviceWorker' in navigator) || !firebase.messaging) return;
+      try {
+        const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        messagingInstance = firebase.messaging();
+        messagingInstance.onMessage((payload) => {
+          const { title, body } = payload.notification || {};
+          showToast(`🔔 ${title}: ${body}`);
+        });
+        console.log('[FCM] Messaging iniciado');
+      } catch (e) {
+        console.warn('[FCM] Erro ao iniciar messaging:', e);
+      }
+    }
+
+    async function getFcmToken() {
+      if (!messagingInstance) return null;
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        return await messagingInstance.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+      } catch (e) {
+        console.warn('[FCM] Erro ao obter token:', e);
+        return null;
+      }
+    }
+
+    async function openNotifModal() {
+      document.getElementById('topbar-user-menu').classList.add('hidden');
+      const modal = document.getElementById('notif-modal');
+      const badge = document.getElementById('notif-permission-badge');
+      const perm = Notification.permission;
+      badge.className = `notif-badge ${perm}`;
+      badge.innerHTML = perm === 'granted' ? '<i data-lucide="check-circle" style="width:12px;height:12px;"></i> Permissão concedida'
+        : perm === 'denied' ? '<i data-lucide="x-circle" style="width:12px;height:12px;"></i> Bloqueadas pelo browser'
+        : '<i data-lucide="bell" style="width:12px;height:12px;"></i> Permissão necessária';
+
+      const user = firebase.auth().currentUser;
+      if (user) {
+        const snap = await db.doc(`users/${user.uid}`).get();
+        const notif = snap.exists && snap.data().notificacoes ? snap.data().notificacoes : {};
+        document.getElementById('notif-enabled').checked = notif.enabled || false;
+        document.getElementById('notif-minutos').value = String(notif.minutos || 15);
+        document.getElementById('notif-fields').style.display = notif.enabled ? 'flex' : 'none';
+      }
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeNotifModal() {
+      document.getElementById('notif-modal').classList.add('hidden');
+    }
+
+    function toggleNotifFields() {
+      const enabled = document.getElementById('notif-enabled').checked;
+      document.getElementById('notif-fields').style.display = enabled ? 'flex' : 'none';
+    }
+
+    async function saveNotifSettings() {
+      const note = document.getElementById('notif-note');
+      const enabled = document.getElementById('notif-enabled').checked;
+      const minutos = parseInt(document.getElementById('notif-minutos').value, 10);
+      note.textContent = ''; note.className = 'digest-note';
+
+      if (enabled) {
+        if (Notification.permission === 'denied') {
+          note.textContent = 'Notificações bloqueadas. Ativa-as nas definições do browser.';
+          note.className = 'digest-note err'; return;
+        }
+        if (Notification.permission !== 'granted') {
+          const perm = await Notification.requestPermission();
+          if (perm !== 'granted') {
+            note.textContent = 'Permissão recusada. Sem notificações.';
+            note.className = 'digest-note err'; return;
+          }
+        }
+      }
+
+      const token = enabled ? await getFcmToken() : null;
+      const user = firebase.auth().currentUser;
+      await db.doc(`users/${user.uid}`).set(
+        { notificacoes: { enabled, minutos, fcmToken: token || '' } },
+        { merge: true }
+      );
+
+      note.textContent = enabled ? `Notificações ativas! Avisamos ${minutos} min antes.` : 'Notificações desativadas.';
+      note.className = 'digest-note ok';
+      setTimeout(closeNotifModal, 1800);
+    }
+
+    document.getElementById('notif-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeNotifModal();
+    });
+
+    // Init messaging quando o utilizador faz login
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) initMessaging();
+    });
+    // ---- End Push Notifications ----
+
     // ---- Focus / Pomodoro ----
     const CIRCUMFERENCE = 2 * Math.PI * 52; // 326.7
     const focusState = {
@@ -5153,6 +5303,123 @@
       if (e.target === this) closeDigestModal();
     });
     // ---- End Email Digest ----
+
+    // ============================================================
+    // PUSH NOTIFICATIONS — FCM Web
+    // ============================================================
+    const VAPID_KEY = "BIEqaxpTd4CceTJxcbzkxZOp1S5s8m9Xfv1lzktM84qT7dp2g9aTvZfBaH-NNdvYrHXjxNfct6D_TcSMFOfzv7g";
+    let _messaging = null;
+
+    function getMessaging() {
+      if (_messaging) return _messaging;
+      try {
+        _messaging = firebase.messaging();
+      } catch (e) {
+        console.warn("[FCM] messaging() não disponível:", e.message);
+      }
+      return _messaging;
+    }
+
+    function openNotifModal() {
+      const modal = document.getElementById("notif-modal");
+      modal.classList.remove("hidden");
+
+      // Mostrar estado actual da permissão
+      const badge = document.getElementById("notif-permission-badge");
+      const perm = Notification.permission;
+      badge.className = "notif-badge " + (perm === "granted" ? "granted" : perm === "denied" ? "denied" : "default");
+      badge.innerHTML = perm === "granted"
+        ? '<i data-lucide="check-circle" style="width:14px;height:14px;"></i> Notificações ativas'
+        : perm === "denied"
+        ? '<i data-lucide="x-circle" style="width:14px;height:14px;"></i> Bloqueadas no browser'
+        : '<i data-lucide="circle" style="width:8px;height:8px;"></i> Ainda não autorizadas';
+
+      // Carregar definições guardadas
+      if (currentUser) {
+        db.doc(`users/${currentUser.uid}`).get().then(snap => {
+          const data = snap.data() || {};
+          const ns = data.notificacoes || {};
+          const toggle = document.getElementById("notif-enabled");
+          toggle.checked = !!ns.enabled;
+          if (ns.minutos) document.getElementById("notif-minutos").value = ns.minutos;
+          document.getElementById("notif-fields").style.display = toggle.checked ? "block" : "none";
+        });
+      }
+      lucide.createIcons();
+    }
+
+    function closeNotifModal() {
+      document.getElementById("notif-modal").classList.add("hidden");
+    }
+
+    function toggleNotifFields() {
+      const enabled = document.getElementById("notif-enabled").checked;
+      document.getElementById("notif-fields").style.display = enabled ? "block" : "none";
+    }
+
+    async function saveNotifSettings() {
+      const note = document.getElementById("notif-note");
+      const enabled = document.getElementById("notif-enabled").checked;
+      const minutos = parseInt(document.getElementById("notif-minutos").value, 10);
+
+      if (!currentUser) { note.textContent = "Sessão expirada. Faz login novamente."; return; }
+
+      note.textContent = "";
+
+      if (!enabled) {
+        // Desativar
+        await db.doc(`users/${currentUser.uid}`).set({ notificacoes: { enabled: false } }, { merge: true });
+        note.textContent = "Notificações desativadas.";
+        setTimeout(closeNotifModal, 1500);
+        return;
+      }
+
+      // Pedir permissão se ainda não foi concedida
+      let perm = Notification.permission;
+      if (perm === "denied") {
+        note.textContent = "Notificações bloqueadas no browser. Permite nas definições do browser e tenta de novo.";
+        return;
+      }
+      if (perm !== "granted") {
+        note.textContent = "A pedir permissão...";
+        perm = await Notification.requestPermission();
+        if (perm !== "granted") {
+          note.textContent = "Permissão negada. Não é possível enviar notificações.";
+          return;
+        }
+      }
+
+      // Obter FCM token
+      note.textContent = "A registar dispositivo...";
+      try {
+        const messaging = getMessaging();
+        if (!messaging) throw new Error("FCM não disponível neste browser.");
+        const token = await messaging.getToken({ vapidKey: VAPID_KEY });
+        if (!token) throw new Error("Não foi possível obter o token FCM.");
+
+        await db.doc(`users/${currentUser.uid}`).set({
+          notificacoes: { enabled: true, minutos, fcmToken: token }
+        }, { merge: true });
+
+        note.textContent = "Notificações ativadas! Recebes avisos " + minutos + " min antes das tarefas.";
+        setTimeout(closeNotifModal, 2000);
+      } catch (err) {
+        console.error("[FCM]", err);
+        note.textContent = "Erro: " + err.message;
+      }
+    }
+
+    document.getElementById("notif-modal").addEventListener("click", function(e) {
+      if (e.target === this) closeNotifModal();
+    });
+
+    // Registar service worker FCM ao carregar
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/firebase-messaging-sw.js")
+        .then(reg => console.log("[FCM SW] Registado:", reg.scope))
+        .catch(err => console.warn("[FCM SW] Falhou:", err.message));
+    }
+    // ---- End Push Notifications ----
   </script>
 </body>
 </html>
