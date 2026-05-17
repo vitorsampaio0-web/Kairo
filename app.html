@@ -1049,6 +1049,70 @@
       transform: translateY(-1px);
     }
 
+    /* ---- Digest Modal ---- */
+    .digest-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1100; backdrop-filter: blur(6px);
+    }
+    .digest-overlay.hidden { display: none; }
+    .digest-card {
+      background: #141422; border: 1px solid #2a2a42; border-radius: 20px;
+      padding: 40px 36px; width: 100%; max-width: 420px; position: relative;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+    .digest-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: #666; cursor: pointer;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; transition: background 0.2s;
+    }
+    .digest-close:hover { background: rgba(255,255,255,0.06); color: #aaa; }
+    .digest-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: rgba(124,92,255,0.12); border: 1px solid rgba(124,92,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      color: #7c5cff; margin-bottom: 20px;
+    }
+    .digest-card h2 { margin: 0 0 8px; font-size: 1.4rem; color: #f0f0f8; }
+    .digest-card > p { margin: 0 0 28px; font-size: 0.88rem; color: #666; line-height: 1.5; }
+    .digest-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #1a1a2e; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
+    }
+    .digest-toggle-row span { font-size: 0.9rem; color: #c0c0d8; }
+    .digest-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .digest-switch input { opacity: 0; width: 0; height: 0; }
+    .digest-slider {
+      position: absolute; inset: 0; background: #2a2a40; border-radius: 100px;
+      cursor: pointer; transition: 0.25s;
+    }
+    .digest-slider::before {
+      content: ""; position: absolute; width: 18px; height: 18px;
+      left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.25s;
+    }
+    .digest-switch input:checked + .digest-slider { background: #7c5cff; }
+    .digest-switch input:checked + .digest-slider::before { transform: translateX(20px); }
+    .digest-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+    .digest-field label { display: block; font-size: 0.78rem; color: #777; margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .digest-input {
+      width: 100%; box-sizing: border-box; background: #1a1a2e; border: 1px solid #2a2a40;
+      border-radius: 10px; padding: 11px 14px; color: #e0e0f0; font-size: 0.9rem;
+      outline: none; transition: border-color 0.2s; appearance: none;
+    }
+    .digest-input:focus { border-color: #7c5cff; }
+    .digest-save-btn {
+      width: 100%; padding: 13px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, #7c5cff, #4ea8ff); color: #fff;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s;
+    }
+    .digest-save-btn:hover { opacity: 0.88; }
+    .digest-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .digest-note { margin: 12px 0 0; font-size: 0.82rem; text-align: center; min-height: 18px; }
+    .digest-note.ok { color: #4ade80; }
+    .digest-note.err { color: #f87171; }
+
     /* ---- Upgrade Modal ---- */
     .upgrade-overlay {
       position: fixed;
@@ -2054,6 +2118,7 @@
             <i data-lucide="user" id="topbar-avatar-icon"></i>
           </button>
           <div id="topbar-user-menu" class="topbar-user-menu hidden">
+            <button onclick="openDigestModal()"><i data-lucide="mail"></i> Digest de Email</button>
             <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
           </div>
         </div>
@@ -2069,6 +2134,59 @@
 
   <nav class="bottom-nav" id="bottom-nav"></nav>
   <div class="toast-wrap" id="toast-wrap"></div>
+
+  <!-- Digest Modal -->
+  <div class="digest-overlay hidden" id="digest-modal">
+    <div class="digest-card">
+      <button class="digest-close" onclick="closeDigestModal()"><i data-lucide="x"></i></button>
+      <div class="digest-icon"><i data-lucide="mail"></i></div>
+      <h2>Digest Diário</h2>
+      <p>Recebe as tuas tarefas por email todos os dias à hora que escolheres.</p>
+
+      <div class="digest-toggle-row">
+        <span>Ativar digest diário</span>
+        <label class="digest-switch">
+          <input type="checkbox" id="digest-enabled" onchange="toggleDigestHour()">
+          <span class="digest-slider"></span>
+        </label>
+      </div>
+
+      <div class="digest-fields" id="digest-fields" style="display:none;">
+        <div class="digest-field">
+          <label>Email de destino</label>
+          <input type="email" id="digest-email" placeholder="o-teu@email.com" class="digest-input" />
+        </div>
+        <div class="digest-field">
+          <label>Hora de envio</label>
+          <select id="digest-hour" class="digest-input">
+            <option value="5">05:00</option>
+            <option value="6">06:00</option>
+            <option value="7">07:00</option>
+            <option value="8" selected>08:00</option>
+            <option value="9">09:00</option>
+            <option value="10">10:00</option>
+            <option value="11">11:00</option>
+            <option value="12">12:00</option>
+            <option value="13">13:00</option>
+            <option value="14">14:00</option>
+            <option value="15">15:00</option>
+            <option value="16">16:00</option>
+            <option value="17">17:00</option>
+            <option value="18">18:00</option>
+            <option value="19">19:00</option>
+            <option value="20">20:00</option>
+            <option value="21">21:00</option>
+            <option value="22">22:00</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="digest-save-btn" id="digest-save-btn" onclick="saveDigest()">
+        <i data-lucide="check"></i> Guardar
+      </button>
+      <p class="digest-note" id="digest-note"></p>
+    </div>
+  </div>
 
   <!-- Edit Task Modal -->
   <div class="modal-overlay hidden" id="edit-modal">
@@ -4357,6 +4475,88 @@
     });
 
     // ---- End Upgrade Modal + Subscription System ----
+
+    // ---- Email Digest ----
+    const DIGEST_URL = 'https://us-central1-kairo-3a7e4.cloudfunctions.net/saveEmailDigest';
+
+    async function openDigestModal() {
+      document.getElementById('topbar-user-menu').classList.add('hidden');
+      const modal = document.getElementById('digest-modal');
+      const note = document.getElementById('digest-note');
+      note.textContent = '';
+      note.className = 'digest-note';
+
+      // Pré-preencher com dados guardados
+      const user = firebase.auth().currentUser;
+      if (user) {
+        const snap = await db.doc(`users/${user.uid}`).get();
+        const digest = snap.exists && snap.data().emailDigest ? snap.data().emailDigest : {};
+        const enabled = digest.enabled || false;
+        document.getElementById('digest-enabled').checked = enabled;
+        document.getElementById('digest-email').value = digest.email || user.email || '';
+        const hourSel = document.getElementById('digest-hour');
+        if (digest.hour !== undefined) hourSel.value = String(digest.hour);
+        document.getElementById('digest-fields').style.display = enabled ? 'flex' : 'none';
+      }
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDigestModal() {
+      document.getElementById('digest-modal').classList.add('hidden');
+    }
+
+    function toggleDigestHour() {
+      const enabled = document.getElementById('digest-enabled').checked;
+      document.getElementById('digest-fields').style.display = enabled ? 'flex' : 'none';
+    }
+
+    async function saveDigest() {
+      const btn = document.getElementById('digest-save-btn');
+      const note = document.getElementById('digest-note');
+      const enabled = document.getElementById('digest-enabled').checked;
+      const email = document.getElementById('digest-email').value.trim();
+      const hour = parseInt(document.getElementById('digest-hour').value, 10);
+
+      if (enabled && (!email || !email.includes('@'))) {
+        note.textContent = 'Introduz um email válido.';
+        note.className = 'digest-note err';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'A guardar...';
+      note.textContent = '';
+
+      try {
+        const token = await firebase.auth().currentUser.getIdToken();
+        const resp = await fetch(DIGEST_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ enabled, hour, email })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error?.message || 'Erro ' + resp.status);
+        note.textContent = enabled
+          ? `Digest ativado! Receberás um email às ${String(hour).padStart(2,'0')}:00.`
+          : 'Digest desativado.';
+        note.className = 'digest-note ok';
+        setTimeout(closeDigestModal, 1800);
+      } catch (err) {
+        note.textContent = err.message || 'Erro ao guardar. Tenta novamente.';
+        note.className = 'digest-note err';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check"></i> Guardar';
+        lucide.createIcons();
+      }
+    }
+
+    document.getElementById('digest-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeDigestModal();
+    });
+    // ---- End Email Digest ----
   </script>
 </body>
 </html>
