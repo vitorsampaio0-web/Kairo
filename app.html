@@ -2118,7 +2118,7 @@
             <i data-lucide="user" id="topbar-avatar-icon"></i>
           </button>
           <div id="topbar-user-menu" class="topbar-user-menu hidden">
-            <button onclick="openDigestModal()"><i data-lucide="mail"></i> Digest de Email</button>
+            <button onclick="openDigestModal()"><i data-lucide="mail"></i> Email Diário</button>
             <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
           </div>
         </div>
@@ -2140,11 +2140,11 @@
     <div class="digest-card">
       <button class="digest-close" onclick="closeDigestModal()"><i data-lucide="x"></i></button>
       <div class="digest-icon"><i data-lucide="mail"></i></div>
-      <h2>Digest Diário</h2>
+      <h2>Email Diário</h2>
       <p>Recebe as tuas tarefas por email todos os dias à hora que escolheres.</p>
 
       <div class="digest-toggle-row">
-        <span>Ativar digest diário</span>
+        <span>Ativar email diário</span>
         <label class="digest-switch">
           <input type="checkbox" id="digest-enabled" onchange="toggleDigestHour()">
           <span class="digest-slider"></span>
