@@ -1049,8 +1049,80 @@
       transform: translateY(-1px);
     }
 
-    /* ---- Digest Modal ---- */
-    .digest-overlay {
+    /* ---- Mini Calendar ---- */
+    .mini-cal { margin-top: 24px; }
+    .mini-cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .mini-cal-header span { font-size: 0.9rem; font-weight: 600; color: #e0e0f0; text-transform: capitalize; }
+    .mini-cal-nav {
+      background: none; border: none; color: #666; cursor: pointer;
+      width: 28px; height: 28px; border-radius: 8px; display: flex;
+      align-items: center; justify-content: center; transition: background 0.2s, color 0.2s;
+    }
+    .mini-cal-nav:hover { background: rgba(124,92,255,0.12); color: #9b85ff; }
+    .mini-cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+    }
+    .mini-cal-dow {
+      text-align: center; font-size: 0.68rem; color: #555;
+      font-weight: 600; letter-spacing: 0.04em; padding: 4px 0;
+      text-transform: uppercase;
+    }
+    .mini-cal-day {
+      position: relative; text-align: center; font-size: 0.8rem;
+      color: #aaa; padding: 7px 2px; border-radius: 8px; cursor: pointer;
+      transition: background 0.15s, color 0.15s; user-select: none;
+    }
+    .mini-cal-day:hover { background: rgba(124,92,255,0.12); color: #e0e0f0; }
+    .mini-cal-day.today {
+      background: rgba(124,92,255,0.18); color: #9b85ff; font-weight: 700;
+    }
+    .mini-cal-day.empty { cursor: default; pointer-events: none; }
+    .mini-cal-day.has-tasks::after {
+      content: ""; position: absolute; bottom: 3px; left: 50%;
+      transform: translateX(-50%); width: 5px; height: 5px;
+      border-radius: 50%; background: #7c5cff;
+    }
+    .mini-cal-day.today.has-tasks::after { background: #9b85ff; }
+
+    /* ---- Calendar Day Popup ---- */
+    .cal-popup-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1200; backdrop-filter: blur(5px);
+    }
+    .cal-popup-overlay.hidden { display: none; }
+    .cal-popup-box {
+      background: #141422; border: 1px solid #2a2a42; border-radius: 18px;
+      padding: 28px; width: 100%; max-width: 400px; max-height: 80vh;
+      overflow-y: auto; position: relative;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+    .cal-popup-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+    }
+    .cal-popup-header h3 { font-size: 1rem; color: #e0e0f0; margin: 0; text-transform: capitalize; }
+    .cal-popup-close {
+      background: none; border: none; color: #666; cursor: pointer;
+      width: 30px; height: 30px; border-radius: 8px; display: flex;
+      align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .cal-popup-close:hover { background: rgba(255,255,255,0.06); color: #aaa; }
+    .cal-popup-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid #1e1e30;
+    }
+    .cal-popup-item:last-child { border-bottom: none; }
+    .cal-popup-dot {
+      width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+    }
+    .cal-popup-item h4 { margin: 0 0 3px; font-size: 0.88rem; color: #e0e0f0; }
+    .cal-popup-item p  { margin: 0; font-size: 0.75rem; color: #666; }
+    .cal-popup-empty   { text-align: center; color: #555; font-size: 0.85rem; padding: 20px 0; }
+
+    /* ---- Digest Modal ---- */    .digest-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.7);
       display: flex; align-items: center; justify-content: center;
       z-index: 1100; backdrop-filter: blur(6px);
@@ -2135,6 +2207,17 @@
   <nav class="bottom-nav" id="bottom-nav"></nav>
   <div class="toast-wrap" id="toast-wrap"></div>
 
+  <!-- Calendar Day Popup -->
+  <div class="cal-popup-overlay hidden" id="cal-day-popup">
+    <div class="cal-popup-box">
+      <div class="cal-popup-header">
+        <h3 id="cal-popup-title"></h3>
+        <button class="cal-popup-close" onclick="closeDayPopup()"><i data-lucide="x"></i></button>
+      </div>
+      <div id="cal-popup-body"></div>
+    </div>
+  </div>
+
   <!-- Edit Habit Modal -->
   <div class="modal-overlay hidden" id="edit-habit-modal">
     <div class="modal-box">
@@ -3010,6 +3093,15 @@
                   </div>
                 `).join("")}
               </div>
+
+              <div class="mini-cal" id="mini-cal-container">
+                <div class="mini-cal-header">
+                  <button class="mini-cal-nav" id="cal-prev"><i data-lucide="chevron-left"></i></button>
+                  <span id="cal-month-label"></span>
+                  <button class="mini-cal-nav" id="cal-next"><i data-lucide="chevron-right"></i></button>
+                </div>
+                <div class="mini-cal-grid" id="mini-cal-grid"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -3470,6 +3562,7 @@
       renderTarefas();
       renderHabitos();
       renderHistorico();
+      renderMiniCalendar();
 
       Object.entries(viewIds).forEach(([key, id]) => {
         document.getElementById(id).classList.toggle("active", key === appState.currentView);
@@ -4588,6 +4681,103 @@
     document.getElementById("edit-habit-modal").addEventListener("click", function(e) {
       if (e.target === this) closeEditHabitModal();
     });
+
+    // ---- Mini Calendar ----
+    const calState = { year: new Date().getFullYear(), month: new Date().getMonth() };
+    const MONTHS_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    const PRIO_COLOR = { alta: "#ff6b6b", media: "#ffa94d", baixa: "#74c0fc" };
+
+    function renderMiniCalendar() {
+      const grid = document.getElementById("mini-cal-grid");
+      const label = document.getElementById("cal-month-label");
+      if (!grid || !label) return;
+
+      const { year, month } = calState;
+      label.textContent = `${MONTHS_PT[month]} ${year}`;
+
+      const today = new Date();
+      const todayStr = today.toISOString().split("T")[0];
+      const firstDay = new Date(year, month, 1).getDay(); // 0=Dom
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const startOffset = (firstDay + 6) % 7; // Seg=0
+
+      // Dias com tarefas
+      const taskDays = new Set();
+      (appState.tarefas || []).forEach(t => {
+        if (t.prazo) taskDays.add(t.prazo.split("T")[0]);
+      });
+
+      let html = ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"]
+        .map(d => `<div class="mini-cal-dow">${d}</div>`).join("");
+
+      for (let i = 0; i < startOffset; i++) html += `<div class="mini-cal-day empty"></div>`;
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        const isToday = dateStr === todayStr;
+        const hasTasks = taskDays.has(dateStr);
+        html += `<div class="mini-cal-day${isToday ? " today" : ""}${hasTasks ? " has-tasks" : ""}" data-cal-day="${dateStr}">${d}</div>`;
+      }
+
+      grid.innerHTML = html;
+
+      grid.querySelectorAll("[data-cal-day]").forEach(el => {
+        el.addEventListener("click", () => openDayPopup(el.dataset.calDay));
+      });
+
+      lucide.createIcons();
+    }
+
+    function openDayPopup(dateStr) {
+      const tasks = (appState.tarefas || []).filter(t => t.prazo && t.prazo.startsWith(dateStr));
+      const d = new Date(dateStr + "T12:00:00");
+      const label = d.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" });
+
+      document.getElementById("cal-popup-title").textContent = label;
+
+      const body = document.getElementById("cal-popup-body");
+      if (tasks.length === 0) {
+        body.innerHTML = `<p class="cal-popup-empty">Sem tarefas para este dia.</p>`;
+      } else {
+        body.innerHTML = tasks
+          .sort((a, b) => (a.prazo > b.prazo ? 1 : -1))
+          .map(t => `
+            <div class="cal-popup-item">
+              <div class="cal-popup-dot" style="background:${PRIO_COLOR[t.prioridade] || "#7c5cff"}"></div>
+              <div>
+                <h4 style="${t.status === "concluida" ? "text-decoration:line-through;color:#555;" : ""}">${t.titulo}</h4>
+                <p>${t.prazo.substring(11,16)}h · ${t.categoria || ""}${t.status === "concluida" ? " · Concluída" : ""}</p>
+              </div>
+            </div>`).join("");
+      }
+
+      document.getElementById("cal-day-popup").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function closeDayPopup() {
+      document.getElementById("cal-day-popup").classList.add("hidden");
+    }
+
+    document.getElementById("cal-day-popup").addEventListener("click", function(e) {
+      if (e.target === this) closeDayPopup();
+    });
+
+    document.addEventListener("click", function(e) {
+      const prev = e.target.closest("#cal-prev");
+      const next = e.target.closest("#cal-next");
+      if (prev) {
+        calState.month--;
+        if (calState.month < 0) { calState.month = 11; calState.year--; }
+        renderMiniCalendar();
+      }
+      if (next) {
+        calState.month++;
+        if (calState.month > 11) { calState.month = 0; calState.year++; }
+        renderMiniCalendar();
+      }
+    });
+    // ---- End Mini Calendar ----
 
     // ---- Email Digest ----
     const DIGEST_URL = 'https://us-central1-kairo-3a7e4.cloudfunctions.net/saveEmailDigest';
