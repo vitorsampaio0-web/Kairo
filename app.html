@@ -2135,7 +2135,33 @@
   <nav class="bottom-nav" id="bottom-nav"></nav>
   <div class="toast-wrap" id="toast-wrap"></div>
 
-  <!-- Digest Modal -->
+  <!-- Edit Habit Modal -->
+  <div class="modal-overlay hidden" id="edit-habit-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Editar Hábito</h3>
+        <button class="modal-close" onclick="closeEditHabitModal()"><i data-lucide="x"></i></button>
+      </div>
+      <input type="hidden" id="edit-habit-id" />
+      <div class="modal-field">
+        <label>Nome</label>
+        <input id="edit-habit-name" class="task-input" type="text" placeholder="Nome do hábito" />
+      </div>
+      <div class="modal-field">
+        <label>Frequência</label>
+        <select id="edit-habit-freq" class="task-select">
+          <option value="Diário">Diário</option>
+          <option value="Semanal">Semanal</option>
+          <option value="Seg-Sex">Seg-Sex</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="secondary-btn" onclick="closeEditHabitModal()">Cancelar</button>
+        <button class="primary-btn" onclick="saveEditHabit()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="digest-overlay hidden" id="digest-modal">
     <div class="digest-card">
       <button class="digest-close" onclick="closeDigestModal()"><i data-lucide="x"></i></button>
@@ -2464,7 +2490,12 @@
       }, err => console.error("[Firestore] tarefas onSnapshot:", err));
 
       const unsub2 = db.collection(`users/${uid}/habitos`).onSnapshot(snap => {
-        appState.habitos = snap.docs.map(d => ({ ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) }));
+        const today = new Date().toISOString().split('T')[0];
+        appState.habitos = snap.docs.map(d => {
+          const h = { ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) };
+          h.concluidoHoje = h.ultimaValidacao === today;
+          return h;
+        });
         renderAll();
       }, err => console.error("[Firestore] habitos onSnapshot:", err));
 
@@ -3119,6 +3150,9 @@
                       <button class="habit-action" data-complete-habit="${habit.id}" ${habit.concluidoHoje ? "disabled" : ""}>
                         ${habit.concluidoHoje ? "Feito hoje" : "Marcar como feito"}
                       </button>
+                      <button class="task-action-btn" data-edit-habit="${habit.id}" title="Editar hábito">
+                        <i data-lucide="pencil"></i>
+                      </button>
                       <button class="task-action-btn danger" data-delete-habit="${habit.id}" title="Apagar hábito">
                         <i data-lucide="trash-2"></i>
                       </button>
@@ -3610,11 +3644,13 @@
       const nId = Number(habitId);
       const habit = appState.habitos.find(item => item.id === nId);
       if (!habit || habit.concluidoHoje) return;
+      const today = new Date().toISOString().split('T')[0];
       habit.concluidoHoje = true;
+      habit.ultimaValidacao = today;
       habit.streak += 1;
       habit.progresso = Math.min(100, habit.progresso + 12);
       fsUpdate("habitos", habitId, {
-        concluidoHoje: habit.concluidoHoje,
+        ultimaValidacao: today,
         streak: habit.streak,
         progresso: habit.progresso
       });
@@ -3739,6 +3775,10 @@
 
       document.querySelectorAll("[data-complete-habit]").forEach(button => {
         button.onclick = () => completeHabit(button.dataset.completeHabit);
+      });
+
+      document.querySelectorAll("[data-edit-habit]").forEach(button => {
+        button.onclick = () => openEditHabitModal(button.dataset.editHabit);
       });
 
       document.querySelectorAll("[data-delete-habit]").forEach(button => {
@@ -4475,6 +4515,40 @@
     });
 
     // ---- End Upgrade Modal + Subscription System ----
+
+    function openEditHabitModal(habitId) {
+      const nId = Number(habitId);
+      const habit = appState.habitos.find(h => h.id === nId);
+      if (!habit) return;
+      document.getElementById("edit-habit-id").value = habitId;
+      document.getElementById("edit-habit-name").value = habit.nome;
+      document.getElementById("edit-habit-freq").value = habit.frequencia;
+      document.getElementById("edit-habit-modal").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function closeEditHabitModal() {
+      document.getElementById("edit-habit-modal").classList.add("hidden");
+    }
+
+    function saveEditHabit() {
+      const id = Number(document.getElementById("edit-habit-id").value);
+      const nome = document.getElementById("edit-habit-name").value.trim();
+      const frequencia = document.getElementById("edit-habit-freq").value;
+      if (!nome) { showToast("O nome não pode estar vazio."); return; }
+      const habit = appState.habitos.find(h => h.id === id);
+      if (!habit) return;
+      habit.nome = nome;
+      habit.frequencia = frequencia;
+      fsUpdate("habitos", id, { nome, frequencia });
+      closeEditHabitModal();
+      renderAll();
+      showToast(`Hábito "${nome}" atualizado.`);
+    }
+
+    document.getElementById("edit-habit-modal").addEventListener("click", function(e) {
+      if (e.target === this) closeEditHabitModal();
+    });
 
     // ---- Email Digest ----
     const DIGEST_URL = 'https://us-central1-kairo-3a7e4.cloudfunctions.net/saveEmailDigest';
