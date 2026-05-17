@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kairo — O teu dia. Projetado.</title>
+  <meta name="description" content="O centro de comando para líderes que executam. O Kairo é a app de produtividade com IA criada para CEOs, fundadores e executivos C-level." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:      #0d1117;
+      --surface:    #161b22;
+      --surface-2:  #1c2128;
+      --surface-3:  #1A1A1A;
+      --border:     #2d333b;
+      --border-2:   #2A2A2A;
+      --gold:       #2d7ff9;
+      --gold-light: #60a5fa;
+      --gold-dim:   #1d6ce0;
+      --accent:     #4ea8ff;
+      --indigo:     #6B77C0;
+      --indigo-dim: #3D4580;
+      --white:      #F4F2ED;
+      --off-white:  #C8C5BC;
+      --muted:      #6A6A6A;
+      --muted-2:    #444444;
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'DM Sans', system-ui, sans-serif;
+
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 32px;
+
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NOISE GRAIN OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.022;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+    /* ─── SELECTION ─── */
+    ::selection { background: var(--gold); color: var(--black); }
+
+    /* ─── TYPOGRAPHY ─── */
+    h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; }
+    p { color: var(--off-white); }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      padding: 6px 14px;
+      border-radius: 100px;
+    }
+
+    .eyebrow-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse-dot 2s ease infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    .text-gold { color: var(--gold); }
+    .text-muted { color: var(--muted); }
+    .text-center { text-align: center; }
+
+    /* ─── LAYOUT ─── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section { padding: 120px 0; }
+    .section-sm { padding: 80px 0; }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--black);
+    }
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--off-white);
+      border: 1px solid var(--border-2);
+    }
+    .btn-ghost:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .btn-lg {
+      padding: 18px 40px;
+      font-size: 0.94rem;
+      border-radius: var(--radius-lg);
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 24px;
+      transition: var(--transition);
+    }
+
+    nav.scrolled {
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo img {
+      height: 52px;
+      width: auto;
+    }
+
+    .nav-logo-text {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta { display: flex; align-items: center; gap: 12px; }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--off-white); transition: var(--transition); }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 72px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.12;
+    }
+
+    .hero-orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+      animation: float-orb 12s ease-in-out infinite;
+    }
+
+    .hero-orb-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--indigo) 0%, transparent 70%);
+      bottom: 0;
+      left: -100px;
+      animation: float-orb 16s ease-in-out infinite reverse;
+    }
+
+    .hero-orb-3 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+      top: 40%;
+      left: 30%;
+      animation: float-orb 20s ease-in-out infinite;
+    }
+
+    @keyframes float-orb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -20px) scale(1.05); }
+      66% { transform: translate(-20px, 30px) scale(0.95); }
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-content { max-width: 560px; }
+
+    .hero-eyebrow { margin-bottom: 32px; }
+
+    .hero-logo-large {
+      display: block;
+      height: 180px;
+      width: auto;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.5));
+    }
+
+    .hero-headline {
+      font-size: clamp(3.5rem, 6vw, 6.5rem);
+      line-height: 1.0;
+      margin-bottom: 8px;
+      color: var(--white);
+    }
+
+    .hero-headline em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub-headline {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 2vw, 1.6rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--off-white);
+      margin-bottom: 24px;
+      opacity: 0.8;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 460px;
+      margin-bottom: 40px;
+      line-height: 1.8;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .hero-social-proof {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar-stack {
+      display: flex;
+    }
+
+    .avatar-stack .av {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--black);
+      background: var(--surface-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: var(--gold);
+      margin-left: -8px;
+    }
+
+    .avatar-stack .av:first-child { margin-left: 0; }
+
+    .social-proof-text {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .social-proof-text strong {
+      color: var(--off-white);
+      font-weight: 500;
+    }
+
+    /* ─── APP MOCKUP ─── */
+    .hero-mockup {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .mockup-frame {
+      width: 100%;
+      max-width: 520px;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(59, 130, 246, 0.06),
+        0 40px 120px rgba(0, 0, 0, 0.8),
+        0 0 80px rgba(59, 130, 246, 0.04);
+      animation: mockup-float 6s ease-in-out infinite;
+    }
+
+    @keyframes mockup-float {
+      0%, 100% { transform: translateY(0) rotateX(2deg) rotateY(-3deg); }
+      50% { transform: translateY(-16px) rotateX(1deg) rotateY(-2deg); }
+    }
+
+    .mockup-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-dot-r { background: #FF5F57; }
+    .mockup-dot-y { background: #FEBC2E; }
+    .mockup-dot-g { background: #28C840; }
+
+    .mockup-titlebar-text {
+      margin-left: auto;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+    }
+
+    .mockup-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+    .mock-greeting {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 300;
+      color: var(--off-white);
+    }
+
+    .mock-greeting span { color: var(--gold); font-style: italic; }
+
+    .mock-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .mock-stat {
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    .mock-stat-val {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .mock-stat-label { font-size: 0.65rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.04em; }
+
+    .mock-task-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .mock-task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 0.76rem;
+      color: var(--off-white);
+      transition: var(--transition);
+    }
+
+    .mock-task-item:hover { border-color: var(--gold-dim); }
+
+    .mock-check {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .mock-check-done { background: var(--gold); }
+    .mock-check-done::after {
+      content: '✓';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--black);
+      font-size: 9px;
+      height: 100%;
+    }
+    .mock-check-open { background: transparent; border: 1px solid var(--border-2); }
+
+    .mock-task-done { text-decoration: line-through; opacity: 0.4; }
+
+    .mock-ai-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(107,119,192,0.12), rgba(59,130,246,0.08));
+      border: 1px solid rgba(107,119,192,0.25);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+
+    .mock-ai-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--indigo), var(--gold-dim));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .mock-ai-text { font-size: 0.72rem; color: var(--off-white); }
+    .mock-ai-text strong { color: var(--gold-light); font-weight: 500; }
+
+    .mock-habit-row { display: flex; gap: 6px; align-items: center; }
+
+    .mock-habit-label { font-size: 0.7rem; color: var(--muted); min-width: 70px; }
+
+    .mock-habit-dots { display: flex; gap: 3px; }
+
+    .mock-habit-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--border-2);
+    }
+
+    .mock-habit-dot.filled { background: var(--gold); }
+    .mock-habit-dot.filled-2 { background: var(--indigo); }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-2), transparent);
+    }
+
+    /* ─── SECTION HEADER ─── */
+    .section-header {
+      margin-bottom: 72px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(2.4rem, 4vw, 4rem);
+      margin-top: 16px;
+      max-width: 700px;
+    }
+
+    .section-header p {
+      margin-top: 20px;
+      max-width: 560px;
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .section-header.centered { text-align: center; }
+    .section-header.centered h2, .section-header.centered p { margin-left: auto; margin-right: auto; }
+
+    /* ─── PROBLEM SECTION ─── */
+    #problem {
+      background: var(--surface);
+      position: relative;
+    }
+
+    #problem::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-2), transparent);
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .problem-card {
+      background: var(--surface);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .problem-card:hover {
+      background: var(--surface-2);
+    }
+
+    .problem-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .problem-card:hover::after { opacity: 1; }
+
+    .problem-number {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      font-weight: 300;
+      color: var(--border-2);
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .problem-card h3 {
+      font-size: 1.5rem;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .problem-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
+    /* ─── FEATURES ─── */
+    #features { background: var(--black); }
+
+    .feature-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 100px;
+      align-items: center;
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature-block:last-child { border-bottom: none; }
+    .feature-block.reverse { direction: rtl; }
+    .feature-block.reverse > * { direction: ltr; }
+
+    .feature-icon-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.18);
+      margin-bottom: 24px;
+      color: var(--gold);
+    }
+
+    .feature-content h3 {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+      color: var(--white);
+    }
+
+    .feature-content p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 24px;
+      max-width: 420px;
+    }
+
+    .feature-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .feature-tag {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      background: rgba(59, 130, 246, 0.06);
+      border: 1px solid rgba(59, 130, 246, 0.12);
+      padding: 5px 12px;
+      border-radius: 100px;
+    }
+
+    /* ─── Feature Illustrations (CSS) ─── */
+    .feat-visual {
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      overflow: hidden;
+      padding: 32px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      position: relative;
+    }
+
+    .feat-visual::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59,130,246,0.07), transparent 70%);
+    }
+
+    .feat-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+    }
+
+    .feat-row-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .feat-row-icon.gold { background: rgba(59,130,246,0.15); color: var(--gold); }
+    .feat-row-icon.indigo { background: rgba(107,119,192,0.15); color: var(--indigo); }
+    .feat-row-icon.green { background: rgba(40,200,130,0.15); color: #28C882; }
+
+    .feat-row-label { font-size: 0.78rem; color: var(--off-white); flex: 1; }
+    .feat-row-value { font-size: 0.72rem; color: var(--gold); font-weight: 500; }
+
+    .feat-bar-wrap { margin-top: 6px; }
+    .feat-bar-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.04em; }
+    .feat-bar-bg { height: 4px; background: var(--border-2); border-radius: 2px; overflow: hidden; }
+    .feat-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+
+    .feat-ai-bubble {
+      background: linear-gradient(135deg, rgba(107,119,192,0.12), rgba(59,130,246,0.06));
+      border: 1px solid rgba(107,119,192,0.2);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 0.78rem;
+      color: var(--off-white);
+      line-height: 1.6;
+    }
+
+    .feat-ai-bubble strong { color: var(--gold-light); }
+
+    .feat-ai-label {
+      font-size: 0.62rem;
+      color: var(--indigo);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .feat-habit-grid { display: grid; gap: 10px; }
+
+    .feat-habit-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.74rem;
+      color: var(--off-white);
+    }
+
+    .feat-habit-label { min-width: 80px; }
+
+    .feat-habit-streak {
+      display: flex;
+      gap: 3px;
+    }
+
+    .fhs {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .fhs-on { background: var(--gold); }
+    .fhs-off { background: var(--border-2); }
+    .fhs-ind { background: var(--indigo); opacity: 0.7; }
+
+    .feat-streak-badge {
+      margin-left: auto;
+      font-size: 0.65rem;
+      color: var(--gold);
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.15);
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    .feat-device-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .feat-device-card {
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feat-device-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.74rem;
+      color: var(--off-white);
+      font-weight: 500;
+    }
+
+    .feat-device-status {
+      font-size: 0.62rem;
+      color: #28C882;
+      background: rgba(40,200,130,0.1);
+      padding: 2px 8px;
+      border-radius: 100px;
+      margin-left: auto;
+    }
+
+    .feat-device-sync { font-size: 0.65rem; color: var(--muted); }
+
+    /* ─── METRICS STRIP ─── */
+    #metrics {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .metric-item {
+      background: var(--surface);
+      padding: 48px 40px;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-family: var(--font-display);
+      font-size: 3.2rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ─── TESTIMONIALS ─── */
+    #testimonials { background: var(--black); }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .testimonial-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold-dim), var(--accent));
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .testimonial-card:hover { border-color: var(--border-2); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .testimonial-card:hover::before { opacity: 1; }
+
+    .testimonial-stars { display: flex; gap: 3px; }
+    .star { color: var(--gold); font-size: 0.85rem; }
+
+    .testimonial-quote {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--off-white);
+      line-height: 1.6;
+    }
+
+    .testimonial-author { display: flex; align-items: center; gap: 14px; }
+
+    .testimonial-av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      font-family: var(--font-display);
+    }
+
+    .av-gold { background: rgba(59,130,246,0.15); color: var(--gold); border: 1px solid rgba(59,130,246,0.25); }
+    .av-indigo { background: rgba(107,119,192,0.15); color: var(--indigo); border: 1px solid rgba(107,119,192,0.25); }
+    .av-green { background: rgba(40,200,130,0.1); color: #28C882; border: 1px solid rgba(40,200,130,0.2); }
+
+    .testimonial-name { font-size: 0.85rem; color: var(--white); font-weight: 500; }
+    .testimonial-role { font-size: 0.74rem; color: var(--muted); }
+
+    /* ─── PROOF BADGES ─── */
+    .proof-strip {
+      margin-top: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .proof-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      font-size: 0.78rem;
+      color: var(--off-white);
+    }
+
+    .proof-badge-icon { color: var(--gold); font-size: 1rem; }
+
+    /* ─── PRICING ─── */
+    #pricing { background: var(--surface); }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: var(--black);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+
+    .pricing-card.featured {
+      border-color: var(--gold);
+      background: linear-gradient(180deg, rgba(59,130,246,0.04) 0%, var(--black) 100%);
+      box-shadow: 0 0 0 1px rgba(59,130,246,0.1), 0 20px 60px rgba(59,130,246,0.08);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--gold);
+      padding: 4px 16px;
+      border-radius: 100px;
+    }
+
+    .pricing-tier {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .pricing-price {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .pricing-currency {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--off-white);
+      margin-top: 8px;
+    }
+
+    .pricing-amount {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .pricing-amount.custom {
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      height: 56px;
+    }
+
+    .pricing-period { font-size: 0.78rem; color: var(--muted); align-self: flex-end; padding-bottom: 6px; }
+
+    .pricing-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    .pricing-features { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+    .pricing-feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.84rem;
+      color: var(--off-white);
+    }
+
+    .pricing-feature-icon { color: var(--gold); flex-shrink: 0; }
+    .pricing-feature-icon.muted { color: var(--muted-2); }
+
+    .pricing-cta { margin-top: auto; }
+
+    .btn-pricing {
+      width: 100%;
+      justify-content: center;
+      padding: 14px;
+      font-size: 0.88rem;
+    }
+
+    .btn-pricing-outline {
+      background: transparent;
+      color: var(--off-white);
+      border: 1px solid var(--border-2);
+    }
+
+    .btn-pricing-outline:hover { border-color: var(--gold-dim); color: var(--gold); transform: none; }
+
+    /* ─── FINAL CTA ─── */
+    #cta {
+      background: var(--black);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cta::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(59,130,246,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-headline {
+      font-size: clamp(2.4rem, 5vw, 5rem);
+      max-width: 800px;
+      margin: 24px auto 16px;
+      color: var(--white);
+    }
+
+    .cta-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 48px;
+    }
+
+    .cta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .store-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .store-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      text-decoration: none;
+      color: var(--off-white);
+      font-size: 0.82rem;
+      transition: var(--transition);
+    }
+
+    .store-badge:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+    .store-badge-icon { font-size: 1.2rem; }
+
+    .store-badge-label { display: flex; flex-direction: column; gap: 1px; }
+    .store-badge-small { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.04em; }
+    .store-badge-name { font-weight: 500; font-size: 0.84rem; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 60px 0 36px;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 56px;
+    }
+
+    .footer-brand { display: flex; flex-direction: column; gap: 16px; }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .footer-logo img { height: 28px; width: auto; }
+
+    .footer-logo-text {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+
+    .footer-tagline { font-size: 0.84rem; color: var(--muted); max-width: 240px; line-height: 1.6; }
+
+    .footer-socials { display: flex; gap: 12px; margin-top: 4px; }
+
+    .footer-social {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer-social:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+    .footer-col h5 {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      margin-bottom: 20px;
+    }
+
+    .footer-links { display: flex; flex-direction: column; gap: 12px; list-style: none; }
+
+    .footer-links a {
+      font-size: 0.84rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover { color: var(--off-white); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-copy { font-size: 0.78rem; color: var(--muted); }
+    .footer-legal { display: flex; gap: 24px; }
+    .footer-legal a { font-size: 0.78rem; color: var(--muted); text-decoration: none; }
+    .footer-legal a:hover { color: var(--off-white); }
+
+    /* ─── MOBILE MENU ─── */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: rgba(13,17,23,0.98);
+      backdrop-filter: blur(20px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--off-white);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .mobile-menu a:hover { color: var(--gold); }
+
+    .mobile-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 60px; }
+      .hero-content { max-width: 100%; }
+      .hero-headline { font-size: clamp(3rem, 8vw, 4.5rem); }
+      .feature-block { grid-template-columns: 1fr; gap: 48px; }
+      .feature-block.reverse { direction: ltr; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+    }
+
+    @media (max-width: 768px) {
+      .section { padding: 80px 0; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .hero-headline { font-size: clamp(2.8rem, 10vw, 4rem); }
+      .problem-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+      .footer-top { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .section-header h2 { font-size: clamp(2rem, 7vw, 3rem); }
+      .feature-block { padding: 48px 0; }
+      .feat-device-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .hero-ctas { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <img src="./logo-kairo.png" alt="Kairo" onerror="this.style.display='none'" />
+        <span class="nav-logo-text">Kairo</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Funcionalidades</a></li>
+        <li><a href="#testimonials">Testemunhos</a></li>
+        <li><a href="#pricing">Preços</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary">Obter Kairo</a>
+      </div>
+      <div class="hamburger" id="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" id="mobileClose" aria-label="Close menu">✕</button>
+    <a href="#features" onclick="closeMobileMenu()">Funcionalidades</a>
+    <a href="#testimonials" onclick="closeMobileMenu()">Testemunhos</a>
+    <a href="#pricing" onclick="closeMobileMenu()">Preços</a>
+    <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-lg">Obter Kairo</a>
+  </div>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+    </div>
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
+          <img src="./logo-kairo.png" alt="Kairo" class="hero-logo-large" onerror="this.style.display='none'" />
+          <div class="hero-eyebrow">
+            <span class="eyebrow"><span class="eyebrow-dot"></span>Usado por mais de 2.000 líderes em todo o mundo</span>
+          </div>
+          <p class="hero-sub-headline">Execução acima de intenção.</p>
+          <p class="hero-desc">Para de gerir. Começa a executar. O Kairo é o centro de comando com IA criado para os líderes que entregam — não para os que planeiam entregar.</p>
+          <div class="hero-ctas">
+            <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-lg">
+              Começar Grátis
+              <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+            </a>
+            <a href="#features" class="btn btn-ghost btn-lg">Ver em ação</a>
+          </div>
+          <div class="hero-social-proof">
+            <div class="avatar-stack">
+              <div class="av">MH</div>
+              <div class="av">PN</div>
+              <div class="av">JO</div>
+              <div class="av">AK</div>
+              <div class="av">SR</div>
+            </div>
+            <p class="social-proof-text"><strong>4.9 ★</strong> · Adorado por fundadores e executivos em mais de 60 países</p>
+          </div>
+        </div>
+
+        <div class="hero-mockup" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+          <div class="mockup-frame">
+            <div class="mockup-titlebar">
+              <div class="mockup-dot mockup-dot-r"></div>
+              <div class="mockup-dot mockup-dot-y"></div>
+              <div class="mockup-dot mockup-dot-g"></div>
+              <span class="mockup-titlebar-text">Kairo — Dashboard</span>
+            </div>
+            <div class="mockup-body">
+              <div class="mock-greeting">Bom dia, <span>Marcus</span></div>
+              <div class="mock-stats">
+                <div class="mock-stat">
+                  <div class="mock-stat-val">8</div>
+                  <div class="mock-stat-label">Tarefas hoje</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat-val">3</div>
+                  <div class="mock-stat-label">Em foco</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat-val">14</div>
+                  <div class="mock-stat-label">Dias seguidos</div>
+                </div>
+              </div>
+              <div class="mock-task-list">
+                <div class="mock-task-item">
+                  <div class="mock-check mock-check-done"></div>
+                  <span class="mock-task-done">Revisão do deck do conselho</span>
+                </div>
+                <div class="mock-task-item">
+                  <div class="mock-check mock-check-done"></div>
+                  <span class="mock-task-done">Call de alinhamento OKR Q3</span>
+                </div>
+                <div class="mock-task-item">
+                  <div class="mock-check mock-check-open"></div>
+                  <span>Revisão do term sheet Série B</span>
+                </div>
+                <div class="mock-task-item">
+                  <div class="mock-check mock-check-open"></div>
+                  <span>1-on-1 com o CPO</span>
+                </div>
+              </div>
+              <div class="mock-ai-chip">
+                <div class="mock-ai-icon">✦</div>
+                <div class="mock-ai-text"><strong>Kairo AI:</strong> Tens 2 prioridades em conflito amanhã. Queres que reorganize o teu horário?</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="mock-habit-row">
+                  <span class="mock-habit-label" style="font-size:0.68rem;color:var(--muted);">Deep Work</span>
+                  <div class="mock-habit-dots">
+                    <div class="mock-habit-dot filled"></div>
+                    <div class="mock-habit-dot filled"></div>
+                    <div class="mock-habit-dot filled"></div>
+                    <div class="mock-habit-dot filled"></div>
+                    <div class="mock-habit-dot filled"></div>
+                    <div class="mock-habit-dot filled"></div>
+                    <div class="mock-habit-dot"></div>
+                  </div>
+                </div>
+                <div class="mock-habit-row">
+                  <span class="mock-habit-label" style="font-size:0.68rem;color:var(--muted);">Leitura</span>
+                  <div class="mock-habit-dots">
+                    <div class="mock-habit-dot filled-2"></div>
+                    <div class="mock-habit-dot filled-2"></div>
+                    <div class="mock-habit-dot filled-2"></div>
+                    <div class="mock-habit-dot filled-2"></div>
+                    <div class="mock-habit-dot"></div>
+                    <div class="mock-habit-dot"></div>
+                    <div class="mock-habit-dot"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROBLEM -->
+  <section id="problem" class="section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="eyebrow">O problema</span>
+        <h2>Cada ferramenta promete clareza.<br>A maioria entrega ruído.</h2>
+        <p>Estás a trabalhar com um conjunto fragmentado de apps que não comunicam entre si. O teu foco dispersa antes mesmo do standup da manhã terminar.</p>
+      </div>
+      <div class="problem-grid" data-aos="fade-up" data-aos-delay="100">
+        <div class="problem-card">
+          <div class="problem-number">01</div>
+          <h3>12 apps. Zero foco.</h3>
+          <p>Demasiadas ferramentas. Nenhuma visão clara. Perdes horas a organizar em vez de executar.</p>
+          <p>Slack, Notion, Todoist, Calendário, email, notas — cada sistema é uma decisão separada. A troca de contexto custa-te mais do que pensas.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-number">02</div>
+          <h3>As prioridades mudam. Nada acompanha.</h3>
+          <p>O que era urgente às 9h é irrelevante ao meio-dia. A maioria das ferramentas congela as tuas prioridades. O Kairo adapta-se contigo.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-number">03</div>
+          <h3>Horas a organizar. Minutos a executar.</h3>
+          <p>A ironia cruel das apps de produtividade: tornam a produtividade no teu trabalho a tempo inteiro. Os líderes devem decidir, não arquivar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="section" style="background: var(--black);">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="eyebrow">Funcionalidades</span>
+        <h2>Construído para a forma<br>como realmente lideras.</h2>
+      </div>
+
+      <!-- Feature 1: Dashboard -->
+      <div class="feature-block" data-aos="fade-up">
+        <div class="feature-content">
+          <div class="feature-icon-wrap">
+            <i data-lucide="layout-dashboard" style="width:22px;height:22px;"></i>
+          </div>
+          <h3>Dashboard Inteligente</h3>
+          <p>Tudo o que precisas. Nada a mais. O teu dia inteiro visível num relance.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Vista global</span>
+            <span class="feature-tag">Clareza diária</span>
+            <span class="feature-tag">Zero ruído</span>
+          </div>
+        </div>
+        <div class="feat-visual">
+          <div class="feat-row">
+            <div class="feat-row-icon gold"><i data-lucide="check-circle" style="width:14px;height:14px;"></i></div>
+            <span class="feat-row-label">Tarefas concluídas hoje</span>
+            <span class="feat-row-value">6 / 8</span>
+          </div>
+          <div class="feat-row">
+            <div class="feat-row-icon indigo"><i data-lucide="calendar" style="width:14px;height:14px;"></i></div>
+            <span class="feat-row-label">Próxima reunião</span>
+            <span class="feat-row-value">2:30 PM</span>
+          </div>
+          <div class="feat-row">
+            <div class="feat-row-icon green"><i data-lucide="trending-up" style="width:14px;height:14px;"></i></div>
+            <span class="feat-row-label">Pontuação de foco</span>
+            <span class="feat-row-value">92%</span>
+          </div>
+          <div style="margin-top:8px;">
+            <div class="feat-bar-wrap">
+              <div class="feat-bar-label">Progresso diário</div>
+              <div class="feat-bar-bg"><div class="feat-bar-fill" style="width:75%;"></div></div>
+            </div>
+            <div class="feat-bar-wrap" style="margin-top:10px;">
+              <div class="feat-bar-label">Sequência semanal</div>
+              <div class="feat-bar-bg"><div class="feat-bar-fill" style="width:86%;background:linear-gradient(90deg, var(--indigo-dim), var(--indigo));"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: AI -->
+      <div class="feature-block reverse" data-aos="fade-up">
+        <div class="feature-content">
+          <div class="feature-icon-wrap" style="background:rgba(107,119,192,0.1);border-color:rgba(107,119,192,0.2);color:var(--indigo);">
+            <i data-lucide="sparkles" style="width:22px;height:22px;"></i>
+          </div>
+          <h3>Kairo AI</h3>
+          <p>Um assistente que conversa contigo. Analisa tarefas, sugere prioridades, responde em tempo real.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Sugestão de prioridades</span>
+            <span class="feature-tag">Agendamento inteligente</span>
+            <span class="feature-tag">Insights contextuais</span>
+          </div>
+        </div>
+        <div class="feat-visual" style="background:linear-gradient(135deg,var(--surface),rgba(107,119,192,0.04));">
+          <div class="feat-ai-label">✦ Kairo AI</div>
+          <div class="feat-ai-bubble"><strong>Tens 3 blocos de trabalho profundo amanhã mas 5 calls em conflito.</strong> Movi a call menos urgente para quinta e protegi o teu bloco das 9–11h. Queres que notifique a equipa?</div>
+          <div class="feat-ai-bubble" style="margin-top:4px;"><strong>A revisão Série B é para sexta.</strong> Com base no teu ritmo, recomendo bloquear 2h hoje e 3h na quarta.</div>
+          <div class="feat-row" style="margin-top:8px;">
+            <div class="feat-row-icon indigo"><i data-lucide="brain" style="width:14px;height:14px;"></i></div>
+            <span class="feat-row-label">Confiança da IA</span>
+            <span class="feat-row-value" style="color:var(--indigo);">98.2%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Tarefas Inteligentes -->
+      <div class="feature-block" data-aos="fade-up">
+        <div class="feature-content">
+          <div class="feature-icon-wrap" style="background:rgba(40,200,130,0.08);border-color:rgba(40,200,130,0.18);color:#28C882;">
+            <i data-lucide="trending-up" style="width:22px;height:22px;"></i>
+          </div>
+          <h3>Tarefas Inteligentes</h3>
+          <p>Cria por voz ou texto. Prioridade, data, edição, histórico e exportação para Word.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Criação por voz</span>
+            <span class="feature-tag">Histórico completo</span>
+            <span class="feature-tag">Export para Word</span>
+          </div>
+        </div>
+        <div class="feat-visual">
+          <div class="feat-habit-grid">
+            <div class="feat-habit-row">
+              <span class="feat-habit-label">Deep Work</span>
+              <div class="feat-habit-streak">
+                <div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-off"></div>
+              </div>
+              <span class="feat-streak-badge">6d seguidos</span>
+            </div>
+            <div class="feat-habit-row">
+              <span class="feat-habit-label">Leitura</span>
+              <div class="feat-habit-streak">
+                <div class="fhs fhs-ind"></div><div class="fhs fhs-ind"></div><div class="fhs fhs-ind"></div><div class="fhs fhs-ind"></div><div class="fhs fhs-off"></div><div class="fhs fhs-off"></div><div class="fhs fhs-off"></div>
+              </div>
+              <span class="feat-streak-badge" style="color:var(--indigo);background:rgba(107,119,192,0.08);border-color:rgba(107,119,192,0.15);">4d seguidos</span>
+            </div>
+            <div class="feat-habit-row">
+              <span class="feat-habit-label">Exercício</span>
+              <div class="feat-habit-streak">
+                <div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div>
+              </div>
+              <span class="feat-streak-badge">7d seguidos 🔥</span>
+            </div>
+            <div class="feat-habit-row">
+              <span class="feat-habit-label">Diário</span>
+              <div class="feat-habit-streak">
+                <div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-off"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-on"></div><div class="fhs fhs-off"></div>
+              </div>
+              <span class="feat-streak-badge">5d seguidos</span>
+            </div>
+          </div>
+          <div class="feat-bar-wrap" style="margin-top:12px;">
+            <div class="feat-bar-label">Este mês — taxa de consistência</div>
+            <div class="feat-bar-bg"><div class="feat-bar-fill" style="width:82%;background:linear-gradient(90deg, #1a6640, #28C882);"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 4: Sync -->
+      <div class="feature-block reverse" data-aos="fade-up">
+        <div class="feature-content">
+          <div class="feature-icon-wrap">
+            <i data-lucide="layers" style="width:22px;height:22px;"></i>
+          </div>
+          <h3>Sincronização entre Dispositivos</h3>
+          <p>Da sala de reuniões ao quarto. O Kairo move-se contigo, instantaneamente. O suporte offline garante que o teu fluxo nunca para — com ou sem ligação.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Sincronização em tempo real</span>
+            <span class="feature-tag">Funciona offline</span>
+            <span class="feature-tag">Login com Google</span>
+          </div>
+        </div>
+        <div class="feat-visual">
+          <div class="feat-device-grid">
+            <div class="feat-device-card">
+              <div class="feat-device-header">
+                <i data-lucide="monitor" style="width:14px;height:14px;color:var(--gold);"></i>
+                Desktop
+                <span class="feat-device-status">Ativo</span>
+              </div>
+              <div class="feat-device-sync">Última sincronização: agora mesmo</div>
+            </div>
+            <div class="feat-device-card">
+              <div class="feat-device-header">
+                <i data-lucide="smartphone" style="width:14px;height:14px;color:var(--indigo);"></i>
+                iPhone 15 Pro
+                <span class="feat-device-status">Ativo</span>
+              </div>
+              <div class="feat-device-sync">Última sincronização: há 2s</div>
+            </div>
+            <div class="feat-device-card">
+              <div class="feat-device-header">
+                <i data-lucide="tablet" style="width:14px;height:14px;color:#28C882;"></i>
+                iPad Pro
+                <span class="feat-device-status">Ativo</span>
+              </div>
+              <div class="feat-device-sync">Última sincronização: há 5s</div>
+            </div>
+            <div class="feat-device-card">
+              <div class="feat-device-header">
+                <i data-lucide="wifi-off" style="width:14px;height:14px;color:var(--gold);"></i>
+                Modo offline
+                <span class="feat-device-status" style="color:var(--gold);background:rgba(59,130,246,0.1);">Pronto</span>
+              </div>
+              <div class="feat-device-sync">Sem ligação necessária</div>
+            </div>
+          </div>
+          <div class="feat-row" style="margin-top:8px;">
+            <div class="feat-row-icon gold"><i data-lucide="shield-check" style="width:14px;height:14px;"></i></div>
+            <span class="feat-row-label">Sincronização encriptada ponta a ponta</span>
+            <span class="feat-row-value">Sempre ativo</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- METRICS -->
+  <section id="metrics" class="section-sm">
+    <div class="container">
+      <div class="metrics-grid" data-aos="fade-up">
+        <div class="metric-item">
+          <div class="metric-val">12K+</div>
+          <div class="metric-label">Tarefas concluídas diariamente</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-val">98%</div>
+          <div class="metric-label">Taxa de retenção de utilizadores</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-val">4.9 ★</div>
+          <div class="metric-label">Classificação média da app</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-val">2K+</div>
+          <div class="metric-label">Líderes a bordo</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials" class="section">
+    <div class="container">
+      <div class="section-header centered" data-aos="fade-up">
+        <span class="eyebrow">Testemunhos</span>
+        <h2>O que os líderes<br>realmente dizem.</h2>
+        <p>Sem marketing. Sem linguagem corporativa. Apenas pessoas que usam o Kairo todos os dias.</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="testimonial-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="testimonial-quote">"O Kairo substituiu quatro apps numa semana. Não voltei atrás. As minhas manhãs são estruturadas, a minha equipa está alinhada e saio mesmo do escritório às 6h."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-av av-gold">MH</div>
+            <div>
+              <div class="testimonial-name">Marcus Holt</div>
+              <div class="testimonial-role">CEO, Veridian Capital</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="testimonial-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="testimonial-quote">"As sugestões da IA por si só valem a subscrição. É como ter um chefe de gabinete no bolso que realmente percebe como penso."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-av av-indigo">PN</div>
+            <div>
+              <div class="testimonial-name">Priya Nair</div>
+              <div class="testimonial-role">Co-Founder, Nura Health</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="testimonial-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="testimonial-quote">"Simples. Rápido. Sem peso. Finalmente uma app criada para pessoas que realmente gerem coisas — e não para quem gosta de organizar os seus sistemas de organização."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-av av-green">JO</div>
+            <div>
+              <div class="testimonial-name">James Okafor</div>
+              <div class="testimonial-role">CTO, Axiom Labs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-strip" data-aos="fade-up" data-aos-delay="100">
+        <div class="proof-badge">
+          <span class="proof-badge-icon">🏆</span>
+          Destacado no Product Hunt
+        </div>
+        <div class="proof-badge">
+          <span class="proof-badge-icon">⭐</span>
+          4.9 estrelas — App Store
+        </div>
+        <div class="proof-badge">
+          <span class="proof-badge-icon">🌍</span>
+          60+ países
+        </div>
+        <div class="proof-badge">
+          <span class="proof-badge-icon">🔒</span>
+          SOC 2 Type II certificado
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="section">
+    <div class="container">
+      <div class="section-header centered" data-aos="fade-up">
+        <span class="eyebrow">Preços</span>
+        <h2>Investe na tua clareza.</h2>
+        <p>Uma subscrição. Acesso total. Menos que o teu café da manhã, a compor diariamente.</p>
+      </div>
+      <div class="pricing-grid" data-aos="fade-up" data-aos-delay="100">
+
+        <!-- Free -->
+        <div class="pricing-card">
+          <div>
+            <div class="pricing-tier">Grátis</div>
+            <div class="pricing-price">
+              <span class="pricing-currency">€</span>
+              <span class="pricing-amount">0</span>
+              <span class="pricing-period">/mês</span>
+            </div>
+            <p class="pricing-desc">Começa a criar melhores hábitos. Grátis para sempre, sem cartão necessário.</p>
+          </div>
+          <div class="pricing-features">
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Gestão de tarefas
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Seguimento básico de hábitos
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Dashboard diário
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Login com Google
+            </div>
+            <div class="pricing-feature" style="opacity:0.35;">
+              <i data-lucide="x" class="pricing-feature-icon muted" style="width:15px;height:15px;"></i>
+              Kairo AI
+            </div>
+            <div class="pricing-feature" style="opacity:0.35;">
+              <i data-lucide="x" class="pricing-feature-icon muted" style="width:15px;height:15px;"></i>
+              Sincronização entre dispositivos
+            </div>
+          </div>
+          <div class="pricing-cta">
+            <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-pricing btn-pricing-outline">Começar grátis</a>
+          </div>
+        </div>
+
+        <!-- Pro -->
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Mais Popular</div>
+          <div>
+            <div class="pricing-tier" style="color:var(--gold);">Pro</div>
+            <div class="pricing-price">
+              <span class="pricing-currency">€</span>
+              <span class="pricing-amount">9</span>
+              <span class="pricing-currency" style="margin-top:14px;">.99</span>
+              <span class="pricing-period">/mês</span>
+            </div>
+            <p class="pricing-desc">Todo o poder do Kairo. Para líderes que não cedem.</p>
+          </div>
+          <div class="pricing-features">
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Tudo do Grátis
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="sparkles" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              <strong>Kairo AI — acesso total</strong>
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Sincronização entre dispositivos
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Histórico completo e analíticas
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Modo offline
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Suporte prioritário
+            </div>
+          </div>
+          <div class="pricing-cta">
+            <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-pricing">Começar Pro →</a>
+          </div>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="pricing-card">
+          <div>
+            <div class="pricing-tier">Enterprise</div>
+            <div class="pricing-price">
+              <span class="pricing-amount custom">Custom</span>
+            </div>
+            <p class="pricing-desc">Para organizações que funcionam com excelência. Adaptado à tua equipa.</p>
+          </div>
+          <div class="pricing-features">
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Tudo do Pro
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Dashboards de equipa
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              SSO e controlos de administrador
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Onboarding dedicado
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              SLA e conformidade
+            </div>
+            <div class="pricing-feature">
+              <i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>
+              Integrações personalizadas
+            </div>
+          </div>
+          <div class="pricing-cta">
+            <a href="mailto:hello@kairo.app" class="btn btn-pricing btn-pricing-outline">Contactar vendas →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="cta" class="section">
+    <div class="container" style="position:relative;z-index:1;">
+      <div data-aos="fade-up">
+        <span class="eyebrow">Começar</span>
+        <h2 class="cta-headline">"Os melhores líderes não trabalham mais arduamente.<br>Trabalham com <em style="font-style:italic;color:var(--gold);">ferramentas mais precisas.</em>"</h2>
+        <p class="cta-sub">Sem configuração. Sem curva de aprendizagem. Abre o Kairo, e o teu dia está organizado.</p>
+        <div class="cta-actions">
+          <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-lg">
+            Começar Grátis
+            <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+          </a>
+          <a href="#pricing" class="btn btn-ghost btn-lg">Ver preços</a>
+        </div>
+        <div class="store-badges">
+          <a href="#" class="store-badge" aria-label="App Store (coming soon)">
+            <span class="store-badge-icon"></span>
+            <div class="store-badge-label">
+              <span class="store-badge-small">Descarregar no</span>
+              <span class="store-badge-name">App Store</span>
+            </div>
+          </a>
+          <a href="#" class="store-badge" aria-label="Google Play (coming soon)">
+            <span class="store-badge-icon">▶</span>
+            <div class="store-badge-label">
+              <span class="store-badge-small">Disponível no</span>
+              <span class="store-badge-name">Google Play</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="footer-logo">
+            <img src="./logo-kairo.png" alt="Kairo" onerror="this.style.display='none'" />
+            <span class="footer-logo-text">Kairo</span>
+          </a>
+          <p class="footer-tagline">O centro de comando para líderes que executam. Construído para a clareza, projetado para a execução.</p>
+          <div class="footer-socials">
+            <a href="#" class="footer-social" aria-label="X / Twitter">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25z"/></svg>
+            </a>
+            <a href="#" class="footer-social" aria-label="LinkedIn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="#" class="footer-social" aria-label="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h5>Produto</h5>
+          <ul class="footer-links">
+            <li><a href="#features">Funcionalidades</a></li>
+            <li><a href="#pricing">Preços</a></li>
+            <li><a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank">Abrir App</a></li>
+            <li><a href="#">Novidades</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Empresa</h5>
+          <ul class="footer-links">
+            <li><a href="#">Sobre</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Carreiras</a></li>
+            <li><a href="mailto:hello@kairo.app">Contacto</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <ul class="footer-links">
+            <li><a href="#">Política de Privacidade</a></li>
+            <li><a href="#">Termos de Serviço</a></li>
+            <li><a href="#">Política de Cookies</a></li>
+            <li><a href="#">Segurança</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 Kairo. Todos os direitos reservados.</p>
+        <div class="footer-legal">
+          <a href="#">Privacidade</a>
+          <a href="#">Termos</a>
+          <a href="mailto:hello@kairo.app">Contacto</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    // Init AOS
+    AOS.init({
+      once: true,
+      duration: 700,
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      offset: 60
+    });
+
+    // Init Lucide icons
+    lucide.createIcons();
+
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 24);
+    }, { passive: true });
+
+    // Mobile menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileClose = document.getElementById('mobileClose');
+
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+
+    mobileClose.addEventListener('click', closeMobileMenu);
+
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', e => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Animate numbers in metrics on scroll
+    const metricVals = document.querySelectorAll('.metric-val');
+    const metricObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          metricObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    metricVals.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      metricObserver.observe(el);
+    });
+  </script>
+</body>
+</html>
