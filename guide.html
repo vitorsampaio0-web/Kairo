@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kairo Elite — Como Funciona</title>
+  <link rel="icon" href="./logo-kairo.png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0f1a;
+      --panel: rgba(17, 22, 38, 0.82);
+      --panel-strong: #151b2e;
+      --border: rgba(255, 255, 255, 0.06);
+      --text: #e8ecf4;
+      --muted: #9aaac4;
+      --primary: #2d7ff9;
+      --primary-2: #00c2ff;
+      --success: #36d399;
+      --warning: #fbbd23;
+      --danger: #ff466a;
+      --accent-glow: rgba(45, 127, 249, 0.15);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 60px;
+      background: linear-gradient(180deg, rgba(45,127,249,0.08) 0%, transparent 70%);
+      position: relative;
+    }
+    .hero img {
+      height: 80px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 28px;
+    }
+    .hero-badges {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-badges span {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(45,127,249,0.12);
+      color: var(--primary-2);
+      border: 1px solid rgba(45,127,249,0.2);
+    }
+
+    /* ─── Container ─── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ─── Section ─── */
+    .section {
+      margin-bottom: 48px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 1.35rem;
+      font-weight: 650;
+    }
+    .section-header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(20px);
+    }
+    .card + .card {
+      margin-top: 16px;
+    }
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .card p, .card li {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .card ul li {
+      padding: 6px 0;
+      padding-left: 22px;
+      position: relative;
+    }
+    .card ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--primary-2);
+      font-weight: 600;
+    }
+
+    /* ─── Feature Grid ─── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      border-color: rgba(45,127,249,0.3);
+      transform: translateY(-2px);
+    }
+    .feature-card .fc-icon {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+    .feature-card h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .feature-card p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ─── Plans Table ─── */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .plan-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .plan-card.pro {
+      border-color: rgba(45,127,249,0.4);
+      background: linear-gradient(135deg, rgba(45,127,249,0.08), rgba(0,194,255,0.04), transparent 60%);
+    }
+    .plan-card .plan-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .plan-card.pro .plan-name {
+      color: var(--primary-2);
+    }
+    .plan-card .plan-price {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .plan-card .plan-period {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .plan-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .plan-card ul li {
+      padding: 5px 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .plan-card ul li .check {
+      color: var(--success);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .plan-card ul li .cross {
+      color: rgba(255,255,255,0.2);
+      flex-shrink: 0;
+    }
+
+    /* ─── Steps ─── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .step {
+      display: flex;
+      gap: 20px;
+      position: relative;
+    }
+    .step-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+    .step-line {
+      width: 2px;
+      flex: 1;
+      background: rgba(45,127,249,0.15);
+      min-height: 30px;
+    }
+    .step:last-child .step-line { display: none; }
+    .step-content {
+      padding-bottom: 28px;
+    }
+    .step-content h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .step-content p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      text-align: center;
+      padding: 48px 28px;
+      background: linear-gradient(135deg, rgba(45,127,249,0.1), rgba(0,194,255,0.06), transparent 60%);
+      border: 1px solid rgba(45,127,249,0.15);
+      border-radius: 20px;
+      margin-top: 48px;
+    }
+    .cta-section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .cta-section p {
+      color: var(--muted);
+      margin-bottom: 24px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 14px 32px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(45,127,249,0.3);
+    }
+    .btn-secondary {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--primary-2);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      border: 1px solid rgba(45,127,249,0.3);
+      margin-left: 12px;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover {
+      background: rgba(45,127,249,0.08);
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 640px) {
+      .hero { padding: 48px 20px 40px; }
+      .hero h1 { font-size: 1.8rem; }
+      .container { padding: 0 16px 60px; }
+      .plans-grid { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Hero ─── -->
+  <div class="hero">
+    <img src="./logo-kairo.png" alt="Kairo" />
+    <h1>Como funciona o <span>Kairo Elite</span></h1>
+    <p>A tua plataforma de produtividade de elite. Organiza, executa e evolui — tudo num só lugar.</p>
+    <div class="hero-badges">
+      <span>📊 Dashboard Inteligente</span>
+      <span>🤖 Kairo AI</span>
+      <span>📱 PWA — Funciona Offline</span>
+      <span>🔒 Dados Seguros</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- ─── Começar ─── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(45,127,249,0.12);">🚀</div>
+        <div>
+          <h2>Começar em 4 passos</h2>
+          <p>Do registo à primeira tarefa em menos de 2 minutos</p>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-marker"><div class="step-number">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <h4>Cria a tua conta</h4>
+            <p>Acede a <strong>kairoelite.app</strong> e clica em <strong>"Entrar com Google"</strong>. É instantâneo — sem formulários, sem passwords.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-marker"><div class="step-number">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <h4>Explora o Dashboard</h4>
+            <p>O Dashboard mostra-te tudo de relance: tarefas atrasadas, hábitos pendentes, produtividade e sugestões da Kairo AI.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-marker"><div class="step-number">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <h4>Cria tarefas e hábitos</h4>
+            <p>Usa a criação rápida para adicionar tarefas com prioridade, categoria e prazo. Adiciona hábitos diários para construir rotinas.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-marker"><div class="step-number">4</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <h4>Acompanha o teu progresso</h4>
+            <p>Marca tarefas como concluídas, mantém os streaks dos hábitos e vê a tua produtividade subir em tempo real.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Funcionalidades ─── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(0,194,255,0.12);">⚡</div>
+        <div>
+          <h2>Funcionalidades principais</h2>
+          <p>Tudo o que precisas para dominar o teu dia</p>
+        </div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">📊</div>
+          <h4>Dashboard Inteligente</h4>
+          <p>Visão completa do teu dia com métricas em tempo real: tarefas, hábitos, compromissos e produtividade geral.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">📅</div>
+          <h4>Agenda</h4>
+          <p>Visualiza compromissos por dia ou semana. Cria eventos com horário, categoria e notas para organizar a tua agenda.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">✅</div>
+          <h4>Tarefas</h4>
+          <p>Cria, organiza e filtra tarefas por prioridade, categoria e estado. Criação rápida para não perder o fluxo.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">🔄</div>
+          <h4>Hábitos</h4>
+          <p>Acompanha hábitos diários com streaks e progresso semanal. Vê a tua consistência crescer dia após dia.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">🤖</div>
+          <h4>Kairo AI</h4>
+          <p>Assistente inteligente que analisa o teu dia e sugere ações. Pergunta sobre tarefas, hábitos ou produtividade.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">📱</div>
+          <h4>PWA — Instala no Telemóvel</h4>
+          <p>Funciona como app nativa. Instala no telemóvel ou computador e acede mesmo sem internet.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">☁️</div>
+          <h4>Sincronização Cloud</h4>
+          <p>Os teus dados sincronizam automaticamente em todos os dispositivos via Firebase. Nunca perdes nada.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">📈</div>
+          <h4>Histórico e Exportação</h4>
+          <p>Acede ao registo completo de tarefas com filtros avançados. Exporta relatórios em formato Word.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Como usar cada secção ─── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(54,211,153,0.12);">📖</div>
+        <div>
+          <h2>Guia por secção</h2>
+          <p>Explicação detalhada de cada área da app</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📊 Dashboard</h3>
+        <p>O Dashboard é a tua página principal. Ao abrir o Kairo, vês imediatamente:</p>
+        <ul>
+          <li><strong>Saudação personalizada</strong> com resumo do dia (compromissos, tarefas, hábitos)</li>
+          <li><strong>Métricas em tempo real</strong> — tarefas atrasadas, tarefas importantes, hábitos concluídos e produtividade</li>
+          <li><strong>Próximo compromisso</strong> — mostra o evento mais próximo da tua agenda</li>
+          <li><strong>Indicador de produtividade</strong> com anel visual e percentagem</li>
+          <li><strong>Sugestão Kairo AI</strong> — dica personalizada baseada no estado do teu dia</li>
+          <li><strong>Destaques</strong> — alertas inteligentes sobre tarefas atrasadas, dia cheio ou agenda limpa</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>📅 Agenda</h3>
+        <p>Organiza o teu tempo com a vista de dia ou semana:</p>
+        <ul>
+          <li><strong>Vista por dia</strong> — mostra todos os compromissos e tarefas do dia selecionado</li>
+          <li><strong>Vista por semana</strong> — panorama completo da semana com distribuição de eventos</li>
+          <li><strong>Criar evento</strong> — título, horário, categoria (Reunião, Pessoal, Trabalho, etc.) e notas</li>
+          <li><strong>Editar/apagar</strong> — clica num evento para modificar ou remover</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>✅ Tarefas</h3>
+        <p>O coração da tua produtividade:</p>
+        <ul>
+          <li><strong>Criação rápida</strong> — título, prioridade (baixa/média/alta/crítica), categoria e prazo</li>
+          <li><strong>Filtros</strong> — filtra por estado (pendente, em andamento, concluída) e categoria</li>
+          <li><strong>Prioridades visuais</strong> — cores diferentes para cada nível de urgência</li>
+          <li><strong>Marcar como concluída</strong> — clica no círculo ao lado da tarefa</li>
+          <li><strong>Editar</strong> — clica no ícone de edição para alterar qualquer campo</li>
+          <li><strong>Limites Free</strong> — até 10 tarefas no plano gratuito, ilimitadas no Pro</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🔄 Hábitos</h3>
+        <p>Constrói rotinas que duram:</p>
+        <ul>
+          <li><strong>Criar hábito</strong> — nome e frequência (diário, semanal, etc.)</li>
+          <li><strong>Marcar hoje</strong> — clica para registar que cumpriste o hábito</li>
+          <li><strong>Streaks</strong> — vê quantos dias consecutivos mantiveste cada hábito</li>
+          <li><strong>Progresso semanal</strong> — visualiza a tua consistência ao longo da semana</li>
+          <li><strong>Sugestões AI</strong> — a Kairo AI sugere como melhorar a tua adesão aos hábitos</li>
+          <li><strong>Limites Free</strong> — até 6 hábitos no plano gratuito, ilimitados no Pro</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🤖 Kairo AI — Chat Inteligente</h3>
+        <p>O teu assistente pessoal de produtividade (funcionalidade Pro):</p>
+        <ul>
+          <li><strong>"O que tenho hoje?"</strong> — resumo completo do dia</li>
+          <li><strong>"Qual é a minha prioridade?"</strong> — identifica a tarefa mais urgente</li>
+          <li><strong>"Como estão os meus hábitos?"</strong> — estado dos streaks e progresso</li>
+          <li><strong>"Tarefas atrasadas"</strong> — lista de tarefas em atraso com sugestões</li>
+          <li><strong>"Produtividade"</strong> — percentagem actual e dicas de melhoria</li>
+          <li>Clica no ícone de chat flutuante no canto inferior direito</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>📈 Histórico (Pro)</h3>
+        <p>Registo completo do teu trabalho:</p>
+        <ul>
+          <li><strong>Todas as tarefas</strong> — registo completo com datas, estado e categorias</li>
+          <li><strong>Filtros avançados</strong> — por data, categoria e estado</li>
+          <li><strong>Exportação Word</strong> — gera um relatório profissional das tuas tarefas</li>
+          <li><strong>Estatísticas</strong> — número de tarefas concluídas e análise de produtividade</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ─── Planos ─── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(251,189,35,0.12);">💎</div>
+        <div>
+          <h2>Planos</h2>
+          <p>Escolhe o plano ideal para ti</p>
+        </div>
+      </div>
+      <div class="plans-grid">
+        <div class="plan-card">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">€0</div>
+          <div class="plan-period">Para sempre</div>
+          <ul>
+            <li><span class="check">✓</span> Até 10 tarefas</li>
+            <li><span class="check">✓</span> Até 6 hábitos</li>
+            <li><span class="check">✓</span> Dashboard completo</li>
+            <li><span class="check">✓</span> Agenda</li>
+            <li><span class="check">✓</span> Sincronização cloud</li>
+            <li><span class="cross">✗</span> Kairo AI Chat</li>
+            <li><span class="cross">✗</span> Histórico e exportação</li>
+            <li><span class="cross">✗</span> Comandos de voz</li>
+          </ul>
+        </div>
+        <div class="plan-card pro">
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">€9.99<span style="font-size:0.9rem;font-weight:400;color:var(--muted);">/mês</span></div>
+          <div class="plan-period">Tudo incluído — cancela quando quiseres</div>
+          <ul>
+            <li><span class="check">✓</span> Tarefas ilimitadas</li>
+            <li><span class="check">✓</span> Hábitos ilimitados</li>
+            <li><span class="check">✓</span> Dashboard completo</li>
+            <li><span class="check">✓</span> Agenda</li>
+            <li><span class="check">✓</span> Sincronização cloud</li>
+            <li><span class="check">✓</span> Kairo AI Chat</li>
+            <li><span class="check">✓</span> Histórico e exportação Word</li>
+            <li><span class="check">✓</span> Comandos de voz</li>
+            <li><span class="check">✓</span> Suporte prioritário</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Vouchers ─── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(255,70,106,0.12);">🎟️</div>
+        <div>
+          <h2>Vouchers Promocionais</h2>
+          <p>Recebeste um código? Veja como usar</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Como ativar um voucher</h3>
+        <ul>
+          <li>Abre a app e faz login com a tua conta Google</li>
+          <li>Clica no botão <strong>"⚡ Pro"</strong> ou tenta aceder a uma funcionalidade Pro</li>
+          <li>Na janela de upgrade, encontra o campo <strong>"Código voucher"</strong></li>
+          <li>Introduz o código (ex: KAIRO-XXXXXXXX) e clica <strong>"Aplicar"</strong></li>
+          <li>O plano Pro é ativado imediatamente pelo período do voucher</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ─── FAQ ─── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(154,170,196,0.12);">❓</div>
+        <div>
+          <h2>Perguntas Frequentes</h2>
+          <p>Respostas rápidas às dúvidas mais comuns</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Posso usar no telemóvel?</h3>
+        <p>Sim! O Kairo é uma PWA (Progressive Web App). No Chrome, abre <strong>kairoelite.app</strong> e toca em <strong>"Adicionar ao ecrã inicial"</strong>. Funciona como uma app nativa.</p>
+      </div>
+      <div class="card">
+        <h3>Os meus dados são seguros?</h3>
+        <p>Sim. Utilizamos Firebase (Google Cloud) com autenticação segura e regras de acesso rigorosas. Cada utilizador só acede aos seus próprios dados.</p>
+      </div>
+      <div class="card">
+        <h3>Posso usar offline?</h3>
+        <p>A app carrega offline graças ao Service Worker. Funcionalidades que dependem de sincronização (como criar tarefas) necessitam de ligação à internet.</p>
+      </div>
+      <div class="card">
+        <h3>Como cancelo a subscrição Pro?</h3>
+        <p>Na app, clica em <strong>"Gerir Subscrição"</strong> para aceder ao portal Stripe. Lá podes cancelar, alterar o método de pagamento ou ver as faturas.</p>
+      </div>
+      <div class="card">
+        <h3>Funciona em todos os browsers?</h3>
+        <p>Sim, compatível com Chrome, Firefox, Safari e Edge. Recomendamos Chrome ou Edge para a melhor experiência.</p>
+      </div>
+    </div>
+
+    <!-- ─── CTA ─── -->
+    <div class="cta-section">
+      <h2>Pronto para elevar a tua produtividade?</h2>
+      <p>Junta-te aos profissionais que já usam o Kairo Elite para dominar o seu dia.</p>
+      <a href="./app.html" class="btn-primary">Abrir o Kairo</a>
+      <a href="./index.html" class="btn-secondary">Ver Landing Page</a>
+    </div>
+
+    <!-- ─── Footer ─── -->
+    <div class="footer">
+      <p>Kairo Elite · Produtividade de Elite · © 2026</p>
+    </div>
+
+  </div>
+
+</body>
+</html>
