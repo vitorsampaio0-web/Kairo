@@ -1049,6 +1049,96 @@
       transform: translateY(-1px);
     }
 
+    /* ---- Focus / Pomodoro Widget ---- */
+    .focus-widget {
+      position: fixed; bottom: 28px; right: 28px; z-index: 1050;
+      width: 300px; background: #141422; border: 1px solid #2a2a42;
+      border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      overflow: hidden; transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .focus-widget.hidden { display: none; }
+    .focus-widget.minimized .focus-body { display: none; }
+    .focus-widget-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; cursor: pointer; user-select: none;
+    }
+    .focus-widget-header-left { display: flex; align-items: center; gap: 10px; }
+    .focus-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: #7c5cff;
+      animation: focus-pulse 2s infinite;
+    }
+    .focus-dot.break { background: #4ade80; }
+    .focus-dot.paused { animation: none; opacity: 0.4; }
+    @keyframes focus-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+    .focus-mode-pill {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #7c5cff;
+    }
+    .focus-mode-pill.break { color: #4ade80; }
+    .focus-header-timer { font-size: 0.85rem; font-weight: 700; color: #e0e0f0; font-variant-numeric: tabular-nums; }
+    .focus-widget-actions { display: flex; gap: 4px; }
+    .focus-icon-btn {
+      background: none; border: none; color: #555; cursor: pointer;
+      width: 28px; height: 28px; border-radius: 8px; display: flex;
+      align-items: center; justify-content: center; transition: background 0.15s, color 0.15s;
+    }
+    .focus-icon-btn:hover { background: rgba(255,255,255,0.06); color: #aaa; }
+    .focus-body { padding: 0 20px 20px; }
+    .focus-task-label {
+      font-size: 0.78rem; color: #555; margin-bottom: 4px; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .focus-task-name {
+      font-size: 0.92rem; color: #c0c0d8; margin-bottom: 20px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .focus-ring-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+    .focus-ring {
+      position: relative; width: 120px; height: 120px;
+    }
+    .focus-ring svg { transform: rotate(-90deg); }
+    .focus-ring-bg { fill: none; stroke: #1e1e30; stroke-width: 6; }
+    .focus-ring-progress {
+      fill: none; stroke: #7c5cff; stroke-width: 6;
+      stroke-linecap: round; transition: stroke-dashoffset 1s linear;
+    }
+    .focus-ring-progress.break { stroke: #4ade80; }
+    .focus-ring-time {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .focus-ring-time span:first-child {
+      font-size: 1.6rem; font-weight: 800; color: #f0f0f8;
+      font-variant-numeric: tabular-nums; line-height: 1;
+    }
+    .focus-ring-time span:last-child { font-size: 0.7rem; color: #555; margin-top: 2px; }
+    .focus-sessions {
+      display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;
+    }
+    .focus-session-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #2a2a40; transition: background 0.3s;
+    }
+    .focus-session-dot.done { background: #7c5cff; }
+    .focus-session-dot.active { background: #9b85ff; animation: focus-pulse 1.5s infinite; }
+    .focus-controls { display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .focus-ctrl-btn {
+      background: rgba(124,92,255,0.1); border: 1px solid rgba(124,92,255,0.2);
+      color: #9b85ff; width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .focus-ctrl-btn:hover { background: rgba(124,92,255,0.2); }
+    .focus-play-btn {
+      width: 56px; height: 56px; border-radius: 16px; border: none;
+      background: linear-gradient(135deg, #7c5cff, #4ea8ff);
+      color: #fff; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 8px 24px rgba(124,92,255,0.35);
+    }
+    .focus-play-btn:hover { opacity: 0.88; transform: scale(1.04); }
+    .focus-play-btn.break { background: linear-gradient(135deg, #22c55e, #4ade80); box-shadow: 0 8px 24px rgba(34,197,94,0.3); }
+
     /* ---- Mini Calendar ---- */
     .mini-cal { margin-top: 24px; }
     .mini-cal-header {
@@ -2207,6 +2297,49 @@
   <nav class="bottom-nav" id="bottom-nav"></nav>
   <div class="toast-wrap" id="toast-wrap"></div>
 
+  <!-- Focus / Pomodoro Widget -->
+  <div class="focus-widget hidden" id="focus-widget">
+    <div class="focus-widget-header" id="focus-widget-header">
+      <div class="focus-widget-header-left">
+        <div class="focus-dot" id="focus-dot"></div>
+        <span class="focus-mode-pill" id="focus-mode-pill">Modo Foco</span>
+        <span class="focus-header-timer" id="focus-header-timer">25:00</span>
+      </div>
+      <div class="focus-widget-actions">
+        <button class="focus-icon-btn" id="focus-minimize-btn" title="Minimizar"><i data-lucide="minus"></i></button>
+        <button class="focus-icon-btn" onclick="closeFocusWidget()" title="Fechar"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+    <div class="focus-body" id="focus-body">
+      <div class="focus-task-label">Tarefa em foco</div>
+      <div class="focus-task-name" id="focus-task-name">—</div>
+      <div class="focus-ring-wrap">
+        <div class="focus-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle class="focus-ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="focus-ring-progress" id="focus-ring-progress" cx="60" cy="60" r="52"
+              stroke-dasharray="326.7" stroke-dashoffset="0"/>
+          </svg>
+          <div class="focus-ring-time">
+            <span id="focus-timer-big">25:00</span>
+            <span id="focus-session-label">Sessão 1</span>
+          </div>
+        </div>
+      </div>
+      <div class="focus-sessions" id="focus-sessions">
+        <div class="focus-session-dot active"></div>
+        <div class="focus-session-dot"></div>
+        <div class="focus-session-dot"></div>
+        <div class="focus-session-dot"></div>
+      </div>
+      <div class="focus-controls">
+        <button class="focus-ctrl-btn" onclick="focusReset()" title="Reiniciar"><i data-lucide="rotate-ccw"></i></button>
+        <button class="focus-play-btn" id="focus-play-btn" onclick="focusToggle()"><i data-lucide="play" id="focus-play-icon"></i></button>
+        <button class="focus-ctrl-btn" onclick="focusSkip()" title="Saltar"><i data-lucide="skip-forward"></i></button>
+      </div>
+    </div>
+  </div>
+
   <!-- Calendar Day Popup -->
   <div class="cal-popup-overlay hidden" id="cal-day-popup">
     <div class="cal-popup-box">
@@ -3207,6 +3340,7 @@
                   </div>
                 </div>
                 <div class="task-actions">
+                  ${task.status !== "concluida" ? `<button class="focus-ctrl-btn" data-start-focus="${task.id}" title="Modo Foco"><i data-lucide="timer"></i></button>` : ""}
                   <button class="task-action-btn" data-edit-task="${task.id}" title="Editar tarefa">
                     <i data-lucide="edit"></i>
                   </button>
@@ -3897,6 +4031,9 @@
         button.onclick = () => completeTask(button.dataset.completeTask);
       });
 
+      document.querySelectorAll("[data-start-focus]").forEach(btn => {
+        btn.onclick = () => startFocus(Number(btn.dataset.startFocus));
+      });
       document.querySelectorAll("[data-edit-task]").forEach(button => {
         button.onclick = () => openEditModal(button.dataset.editTask);
       });
@@ -4681,6 +4818,162 @@
     document.getElementById("edit-habit-modal").addEventListener("click", function(e) {
       if (e.target === this) closeEditHabitModal();
     });
+
+    // ---- Focus / Pomodoro ----
+    const CIRCUMFERENCE = 2 * Math.PI * 52; // 326.7
+    const focusState = {
+      running: false, taskId: null, taskName: "",
+      mode: "work", timeLeft: 25 * 60, totalTime: 25 * 60,
+      session: 1, interval: null,
+      W: 25, SB: 5, LB: 15
+    };
+
+    function startFocus(taskId) {
+      const task = appState.tarefas.find(t => t.id === taskId);
+      if (!task) return;
+      if (focusState.interval) clearInterval(focusState.interval);
+      focusState.running = false;
+      focusState.taskId = taskId;
+      focusState.taskName = task.titulo;
+      focusState.mode = "work";
+      focusState.session = 1;
+      focusState.timeLeft = focusState.W * 60;
+      focusState.totalTime = focusState.W * 60;
+      document.getElementById("focus-task-name").textContent = task.titulo;
+      document.getElementById("focus-widget").classList.remove("hidden", "minimized");
+      focusUpdateUI();
+      lucide.createIcons();
+      showToast(`Modo Foco iniciado: "${task.titulo}"`);
+    }
+
+    function focusToggle() {
+      if (focusState.running) {
+        clearInterval(focusState.interval);
+        focusState.running = false;
+      } else {
+        focusState.running = true;
+        focusState.interval = setInterval(focusTick, 1000);
+      }
+      focusUpdateUI();
+    }
+
+    function focusTick() {
+      focusState.timeLeft--;
+      if (focusState.timeLeft <= 0) focusNextPhase();
+      else focusUpdateUI();
+    }
+
+    function focusNextPhase() {
+      clearInterval(focusState.interval);
+      focusState.running = false;
+      focusBeep();
+      if (focusState.mode === "work") {
+        if (focusState.session >= 4) {
+          focusState.mode = "long-break";
+          focusState.timeLeft = focusState.LB * 60;
+          focusState.totalTime = focusState.LB * 60;
+          showToast("🎉 4 sessões completas! Pausa longa de " + focusState.LB + " min.");
+        } else {
+          focusState.mode = "short-break";
+          focusState.timeLeft = focusState.SB * 60;
+          focusState.totalTime = focusState.SB * 60;
+          showToast("✓ Sessão " + focusState.session + " completa! Pausa de " + focusState.SB + " min.");
+        }
+      } else {
+        if (focusState.mode === "long-break") focusState.session = 1;
+        else focusState.session++;
+        focusState.mode = "work";
+        focusState.timeLeft = focusState.W * 60;
+        focusState.totalTime = focusState.W * 60;
+        showToast("▶ Pronto para a sessão " + focusState.session + "!");
+      }
+      focusUpdateUI();
+    }
+
+    function focusReset() {
+      clearInterval(focusState.interval);
+      focusState.running = false;
+      focusState.mode = "work";
+      focusState.session = 1;
+      focusState.timeLeft = focusState.W * 60;
+      focusState.totalTime = focusState.W * 60;
+      focusUpdateUI();
+    }
+
+    function focusSkip() {
+      clearInterval(focusState.interval);
+      focusState.running = false;
+      focusState.timeLeft = 0;
+      focusNextPhase();
+    }
+
+    function closeFocusWidget() {
+      clearInterval(focusState.interval);
+      focusState.running = false;
+      document.getElementById("focus-widget").classList.add("hidden");
+    }
+
+    function focusUpdateUI() {
+      const isBreak = focusState.mode !== "work";
+      const mins = String(Math.floor(focusState.timeLeft / 60)).padStart(2, "0");
+      const secs = String(focusState.timeLeft % 60).padStart(2, "0");
+      const timeStr = `${mins}:${secs}`;
+      const modeLabel = focusState.mode === "work" ? "Modo Foco" : focusState.mode === "short-break" ? "Pausa Curta" : "Pausa Longa";
+
+      document.getElementById("focus-timer-big").textContent = timeStr;
+      document.getElementById("focus-header-timer").textContent = timeStr;
+      document.getElementById("focus-mode-pill").textContent = modeLabel;
+      document.getElementById("focus-mode-pill").className = `focus-mode-pill${isBreak ? " break" : ""}`;
+      document.getElementById("focus-session-label").textContent = `Sessão ${focusState.session} de 4`;
+      document.getElementById("focus-dot").className = `focus-dot${isBreak ? " break" : ""}${!focusState.running ? " paused" : ""}`;
+
+      // Ring progress
+      const progress = focusState.timeLeft / focusState.totalTime;
+      const offset = CIRCUMFERENCE * (1 - progress);
+      const ring = document.getElementById("focus-ring-progress");
+      ring.style.strokeDashoffset = offset;
+      ring.className = `focus-ring-progress${isBreak ? " break" : ""}`;
+
+      // Play/pause icon
+      const playBtn = document.getElementById("focus-play-btn");
+      playBtn.className = `focus-play-btn${isBreak ? " break" : ""}`;
+      playBtn.innerHTML = focusState.running
+        ? `<i data-lucide="pause"></i>`
+        : `<i data-lucide="play"></i>`;
+
+      // Session dots
+      const dots = document.querySelectorAll(".focus-session-dot");
+      dots.forEach((dot, i) => {
+        dot.className = "focus-session-dot" +
+          (i + 1 < focusState.session ? " done" : i + 1 === focusState.session && focusState.mode === "work" ? " active" : "");
+      });
+
+      lucide.createIcons();
+    }
+
+    function focusBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.15, 0.3].forEach(t => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.frequency.value = 880;
+          o.type = "sine";
+          g.gain.setValueAtTime(0.3, ctx.currentTime + t);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.12);
+          o.start(ctx.currentTime + t);
+          o.stop(ctx.currentTime + t + 0.15);
+        });
+      } catch(_) {}
+    }
+
+    document.getElementById("focus-minimize-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      document.getElementById("focus-widget").classList.toggle("minimized");
+      lucide.createIcons();
+    });
+    // ---- End Focus / Pomodoro ----
 
     // ---- Mini Calendar ----
     const calState = { year: new Date().getFullYear(), month: new Date().getMonth() };
