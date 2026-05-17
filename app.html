@@ -2259,6 +2259,15 @@
           <input id="edit-task-time" class="task-input" type="time" />
         </div>
       </div>
+      <div class="modal-field">
+        <label>Repetição</label>
+        <select id="edit-task-repeat" class="task-select">
+          <option value="nenhuma">Sem repetição</option>
+          <option value="diaria">Repete diariamente</option>
+          <option value="semanal">Repete semanalmente</option>
+          <option value="mensal">Repete mensalmente</option>
+        </select>
+      </div>
       <div class="modal-footer">
         <button class="ghost-btn" id="modal-cancel-btn">Cancelar</button>
         <button class="primary-btn" id="modal-save-btn">Guardar alterações</button>
@@ -3059,6 +3068,12 @@
             </select>
             <input id="quick-task-date" class="task-input" type="date" />
             <input id="quick-task-time" class="task-input" type="time" />
+            <select id="quick-task-repeat" class="task-select">
+              <option value="nenhuma">Sem repetição</option>
+              <option value="diaria">Repete diariamente</option>
+              <option value="semanal">Repete semanalmente</option>
+              <option value="mensal">Repete mensalmente</option>
+            </select>
             <button id="quick-task-submit" class="primary-btn">Adicionar</button>
           </div>
 
@@ -3096,6 +3111,7 @@
                     <span class="badge">${task.categoria}</span>
                     <span class="badge">${new Date(task.prazo).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
                     ${overdueIds.has(task.id) ? `<span class="badge high">Atrasada</span>` : ""}
+                    ${task.repeticao && task.repeticao !== "nenhuma" ? `<span class="badge" style="color:var(--gold);border-color:rgba(124,92,255,0.3);"><i data-lucide="repeat" style="width:11px;height:11px;margin-right:3px;"></i>${task.repeticao === "diaria" ? "Diária" : task.repeticao === "semanal" ? "Semanal" : "Mensal"}</span>` : ""}
                   </div>
                 </div>
                 <div class="task-actions">
@@ -3492,6 +3508,7 @@
       const taskTime = timeInput && timeInput.value ? timeInput.value : "18:00";
 
       const id = Date.now();
+      const repeatInput = document.getElementById("quick-task-repeat");
       const newTask = {
         id,
         titulo: title,
@@ -3499,7 +3516,8 @@
         prioridade: priorityInput.value,
         status: "pendente",
         prazo: `${taskDate}T${taskTime}`,
-        categoria: categoryInput.value
+        categoria: categoryInput.value,
+        repeticao: repeatInput ? repeatInput.value : "nenhuma"
       };
       appState.tarefas.unshift(newTask);
       fsSet("tarefas", id, newTask);
@@ -3565,6 +3583,14 @@
       showToast(`Evento "${event.titulo}" apagado.`);
     }
 
+    function calcNextPrazo(prazo, repeticao) {
+      const d = new Date(prazo);
+      if (repeticao === "diaria")  d.setDate(d.getDate() + 1);
+      if (repeticao === "semanal") d.setDate(d.getDate() + 7);
+      if (repeticao === "mensal")  d.setMonth(d.getMonth() + 1);
+      return d.toISOString().slice(0, 16);
+    }
+
     function completeTask(taskId) {
       const nId = Number(taskId);
       const task = appState.tarefas.find(item => item.id === nId);
@@ -3577,8 +3603,18 @@
       } else {
         task.status = "concluida";
         fsUpdate("tarefas", taskId, { status: "concluida" });
+
+        if (task.repeticao && task.repeticao !== "nenhuma") {
+          const nextId = Date.now();
+          const nextTask = { ...task, id: nextId, status: "pendente", prazo: calcNextPrazo(task.prazo, task.repeticao) };
+          appState.tarefas.push(nextTask);
+          fsSet("tarefas", nextId, nextTask);
+          const label = task.repeticao === "diaria" ? "amanhã" : task.repeticao === "semanal" ? "na próxima semana" : "no próximo mês";
+          showToast(`✓ Concluída! Nova ocorrência criada para ${label}.`);
+        } else {
+          showToast(`Excelente! "${task.titulo}" foi concluída.`);
+        }
         renderAll();
-        showToast(`Excelente! "${task.titulo}" foi concluída.`);
       }
     }
 
@@ -3607,6 +3643,8 @@
       document.getElementById("edit-task-category").value = task.categoria;
       document.getElementById("edit-task-date").value = prazoDate;
       document.getElementById("edit-task-time").value = prazoTime;
+      const repeatSel = document.getElementById("edit-task-repeat");
+      if (repeatSel) repeatSel.value = task.repeticao || "nenhuma";
 
       document.getElementById("edit-modal").classList.remove("hidden");
     }
@@ -3633,6 +3671,7 @@
       const date = document.getElementById("edit-task-date").value || appState.today;
       const time = document.getElementById("edit-task-time").value || "18:00";
       task.prazo = `${date}T${time}`;
+      task.repeticao = document.getElementById("edit-task-repeat")?.value || "nenhuma";
 
       fsSet("tarefas", id, task);
       closeEditModal();
