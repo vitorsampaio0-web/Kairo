@@ -1057,3 +1057,100 @@ exports.processReferral = functions.https.onCall(async (data, context) => {
   console.log(`[processReferral] ${newUserUid} converteu via código ${codigoConvite} → referrer ${referrerUid} ganhou 30 dias Pro até ${currentExpiry.toISOString().split("T")[0]}`);
   return { ok: true, diasAdicionados: 30, novoExpiry: currentExpiry.toISOString().split("T")[0] };
 });
+
+// ---------------------------------------------------------------------------
+// sendTeamInvite — Envia email de convite para entrar numa equipa
+// ---------------------------------------------------------------------------
+exports.sendTeamInvite = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "Login necessário.");
+
+  const { toEmail, teamCode, teamName, fromName } = data;
+  if (!toEmail || !teamCode) throw new functions.https.HttpsError("invalid-argument", "Email e código obrigatórios.");
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const appUrl = "https://kairoelite.app";
+
+  const html = `
+<!DOCTYPE html>
+<html lang="pt">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Convite Kairo</title></head>
+<body style="margin:0;padding:0;background:#0a0a1a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a1a;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+
+        <!-- Header com logo -->
+        <tr><td style="background:linear-gradient(135deg,#0d0d1f,#1a0533);border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;border-bottom:3px solid #7c5cff;">
+          <img src="${appUrl}/logo-kairo.png" alt="Kairo" height="52" style="display:block;margin:0 auto 8px;" />
+          <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;">Elite Productivity</p>
+        </td></tr>
+
+        <!-- Body -->
+        <tr><td style="background:#111122;padding:36px 40px;">
+          <p style="margin:0 0 6px;font-size:13px;color:#9b85ff;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Convite de Equipa</p>
+          <h1 style="margin:0 0 16px;font-size:26px;font-weight:800;color:#ffffff;line-height:1.2;">
+            ${fromName} convidou-te para a equipa <span style="color:#9b85ff;">${teamName}</span>
+          </h1>
+          <p style="margin:0 0 28px;font-size:15px;color:#888;line-height:1.7;">
+            Junta-te à equipa no Kairo para colaborar em tarefas, acompanhar o progresso e aumentar a produtividade coletiva.
+          </p>
+
+          <!-- Código em destaque -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+            <tr><td style="background:#0d0d2a;border:2px dashed rgba(124,92,255,0.4);border-radius:14px;padding:24px;text-align:center;">
+              <p style="margin:0 0 8px;font-size:12px;color:#555;letter-spacing:1.5px;text-transform:uppercase;">O teu código de convite</p>
+              <p style="margin:0;font-size:32px;font-weight:900;color:#ffffff;letter-spacing:6px;">${teamCode}</p>
+            </td></tr>
+          </table>
+
+          <!-- Passos -->
+          <p style="margin:0 0 16px;font-size:13px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:1px;">Como entrar — 3 passos</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+            ${[
+              ["1", "#7c5cff", "Cria a tua conta", `Vai a <a href="${appUrl}" style="color:#9b85ff;">${appUrl}</a> e regista-te (é grátis).`],
+              ["2", "#4ea8ff", "Vai a Equipa",     "No menu lateral clica em <strong style='color:#c9c9e0;'>Equipa</strong>."],
+              ["3", "#31d0aa", "Insere o código",  `Clica em <strong style='color:#c9c9e0;'>Entrar com código</strong> e cola <strong style='color:#fff;letter-spacing:3px;'>${teamCode}</strong>.`]
+            ].map(([n, c, title, desc]) => `
+            <tr><td style="padding:10px 0;vertical-align:top;">
+              <table cellpadding="0" cellspacing="0"><tr>
+                <td style="width:32px;height:32px;border-radius:50%;background:${c};text-align:center;vertical-align:middle;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;">${n}</td>
+                <td style="padding-left:14px;vertical-align:middle;">
+                  <p style="margin:0 0 2px;font-size:14px;font-weight:700;color:#e0e0f0;">${title}</p>
+                  <p style="margin:0;font-size:13px;color:#666;line-height:1.5;">${desc}</p>
+                </td>
+              </tr></table>
+            </td></tr>`).join("")}
+          </table>
+
+          <!-- CTA -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td align="center">
+              <a href="${appUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c5cff,#4ea8ff);color:#fff;font-size:15px;font-weight:700;padding:14px 40px;border-radius:12px;text-decoration:none;letter-spacing:.3px;">Abrir Kairo →</a>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="background:#0d0d1f;border-radius:0 0 16px 16px;padding:20px 40px;text-align:center;border-top:1px solid #1e1e3a;">
+          <p style="margin:0;font-size:11px;color:#333;line-height:1.7;">
+            Recebeste este email porque ${fromName} te convidou para a equipa <strong style="color:#555;">${teamName}</strong>.<br>
+            Se não conheces ${fromName}, podes ignorar este email.<br>
+            © ${new Date().getFullYear()} Kairo Elite Productivity — <a href="${appUrl}" style="color:#555;text-decoration:none;">kairoelite.app</a>
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  await resend.emails.send({
+    from: "Kairo <noreply@kairoelite.app>",
+    to: toEmail,
+    subject: `${fromName} convidou-te para a equipa "${teamName}" no Kairo`,
+    html,
+  });
+
+  return { ok: true };
+});

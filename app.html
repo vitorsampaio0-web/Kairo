@@ -7130,7 +7130,48 @@
     }
 
     function copyTeamCode(code) {
-      navigator.clipboard.writeText(code).then(() => showToast(`Código ${code} copiado!`));
+      openTeamInviteModal(code);
+    }
+
+    function openTeamInviteModal(code) {
+      const equipa = appState.equipa;
+      document.getElementById("invite-code-display").textContent = code || equipa?.codigo || "";
+      document.getElementById("invite-team-name").textContent    = equipa?.nome ? `Equipa: ${equipa.nome}` : "";
+      document.getElementById("invite-email-input").value        = "";
+      document.getElementById("team-invite-modal").classList.remove("hidden");
+    }
+
+    function closeTeamInviteModal() {
+      document.getElementById("team-invite-modal").classList.add("hidden");
+    }
+
+    function copyTeamCodeOnly() {
+      const code = document.getElementById("invite-code-display").textContent;
+      navigator.clipboard.writeText(code).then(() => showToast("Código copiado!"));
+    }
+
+    async function sendTeamInviteEmail() {
+      const toEmail  = document.getElementById("invite-email-input").value.trim();
+      const teamCode = document.getElementById("invite-code-display").textContent.trim();
+      const teamName = appState.equipa?.nome || "Equipa";
+      const fromName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Alguém";
+
+      if (!toEmail || !toEmail.includes("@")) { showToast("Insere um email válido."); return; }
+
+      const btn = document.getElementById("btn-send-invite");
+      btn.disabled = true; btn.textContent = "A enviar...";
+
+      try {
+        const sendInvite = firebase.functions().httpsCallable("sendTeamInvite");
+        await sendInvite({ toEmail, teamCode, teamName, fromName });
+        showToast(`Convite enviado para ${toEmail}!`);
+        closeTeamInviteModal();
+      } catch (err) {
+        console.error(err);
+        showToast("Erro ao enviar o convite. Tenta novamente.");
+      } finally {
+        btn.disabled = false; btn.textContent = "Enviar Convite ✉️";
+      }
     }
     // ============================================================
     // END MODO EQUIPA
@@ -7282,5 +7323,35 @@
     });
     // ---- End Weekly Review ----
   </script>
+
+  <!-- Modal Convite Equipa por Email -->
+  <div class="digest-overlay hidden" id="team-invite-modal">
+    <div class="digest-card" style="max-width:420px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <h3 style="margin:0;font-size:1.05rem;font-weight:700;color:#e0e0f0;">Convidar para a Equipa</h3>
+        <button onclick="closeTeamInviteModal()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <p style="margin:0 0 20px;font-size:0.82rem;color:#555;line-height:1.6;">Envia um email com o código e as instruções para entrar na equipa.</p>
+      <div style="background:#080818;border:1px dashed rgba(124,92,255,0.35);border-radius:12px;padding:16px;text-align:center;margin-bottom:20px;">
+        <p style="margin:0 0 4px;font-size:0.7rem;color:#555;letter-spacing:1.5px;text-transform:uppercase;">Código da equipa</p>
+        <p id="invite-code-display" style="margin:0;font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:6px;"></p>
+        <p id="invite-team-name" style="margin:4px 0 0;font-size:0.75rem;color:#9b85ff;font-weight:600;"></p>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:0.78rem;color:#666;margin-bottom:6px;display:block;">Email do convidado</label>
+        <input type="email" id="invite-email-input" class="team-input" placeholder="email@exemplo.com" style="width:100%;box-sizing:border-box;" />
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="sendTeamInviteEmail()" id="btn-send-invite"
+          style="flex:1;background:linear-gradient(135deg,#7c5cff,#4ea8ff);border:none;color:#fff;padding:11px;border-radius:10px;font-size:0.88rem;font-weight:700;cursor:pointer;">
+          Enviar Convite ✉️
+        </button>
+        <button onclick="copyTeamCodeOnly()" style="background:#111128;border:1px solid #1e1e3a;color:#9b85ff;padding:11px 16px;border-radius:10px;font-size:0.82rem;font-weight:600;cursor:pointer;">
+          Copiar código
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
