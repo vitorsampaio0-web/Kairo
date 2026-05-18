@@ -7322,6 +7322,16 @@
       if (e.target === this) closeWeeklyModal();
     });
     // ---- End Weekly Review ----
+
+    // Fechar menu avatar ao clicar fora
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('topbar-user-menu');
+      const btn  = document.getElementById('topbar-user-btn');
+      if (menu && !menu.classList.contains('hidden') &&
+          !menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
   </script>
 
   <!-- Modal Convite Equipa por Email -->
