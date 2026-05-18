@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -6399,6 +6400,314 @@
       return insights;
     }
 
+    // ============================================================
+    // RELATÓRIO EXECUTIVO PDF — Pro Only
+    // ============================================================
+    async function gerarRelatorioExecutivoPDF() {
+      if (!isPro()) {
+        alert("O Relatório Executivo está disponível apenas no plano Pro. Faz upgrade para aceder.");
+        return;
+      }
+      const btn = document.getElementById("btn-relatorio-pdf");
+      if (btn) { btn.disabled = true; btn.textContent = "A gerar PDF..."; }
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const A4_W = 794, A4_H = 1123;
+
+      const tarefas    = appState.tarefas  || [];
+      const habitos    = appState.habitos  || [];
+      const metas      = appState.metas    || [];
+      const concluidas = tarefas.filter(t => t.status === "concluida");
+      const pendentes  = tarefas.filter(t => t.status !== "concluida");
+      const atrasadas  = getOverdueTasks();
+      const total      = tarefas.length;
+      const taxaConc   = total > 0 ? Math.round(concluidas.length / total * 100) : 0;
+      const habConc    = habitos.filter(h => h.concluidoHoje).length;
+      const taxaHab    = habitos.length > 0 ? Math.round(habConc / habitos.length * 100) : 0;
+      const prodScore  = getProductivityScore();
+      const userName   = appState.user.nome || "Utilizador";
+      const now        = new Date();
+      const meses      = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+      const periodo    = `${meses[now.getMonth()]} ${now.getFullYear()}`;
+      const dataGerado = now.toLocaleDateString("pt-PT", { day:"2-digit", month:"long", year:"numeric" });
+
+      const catMap = {};
+      tarefas.forEach(t => {
+        const c = t.categoria || "Geral";
+        if (!catMap[c]) catMap[c] = { total:0, done:0 };
+        catMap[c].total++;
+        if (t.status === "concluida") catMap[c].done++;
+      });
+      const cats   = Object.entries(catMap).sort((a,b) => b[1].total - a[1].total).slice(0, 6);
+      const maxCat = cats.length > 0 ? Math.max(...cats.map(([,v]) => v.total)) : 1;
+      const aiInsights = analisarPadroesKairo();
+
+      // helper: bar row
+      function barRow(label, val, maxV, doneVal, color) {
+        const w   = Math.round(val / (maxV||1) * 100);
+        const pct = val > 0 ? Math.round(doneVal / val * 100) : 0;
+        const pc  = pct >= 70 ? "#31d0aa" : pct >= 40 ? "#f59e0b" : "#f87171";
+        return `<tr>
+          <td style="padding:9px 0;font-size:12px;color:#444;font-weight:500;width:100px;white-space:nowrap;overflow:hidden;">${(label||"").slice(0,12)}</td>
+          <td style="padding:9px 0;width:100%;">
+            <div style="background:#f0f0f8;border-radius:5px;height:9px;overflow:hidden;">
+              <div style="width:${w}%;height:100%;background:linear-gradient(90deg,${color||"#7c5cff"},#4ea8ff);border-radius:5px;"></div>
+            </div>
+          </td>
+          <td style="padding:9px 0 9px 10px;font-size:11px;color:#888;white-space:nowrap;">${val} tarefas</td>
+          <td style="padding:9px 0 9px 8px;font-size:11px;font-weight:700;color:${pc};white-space:nowrap;">${pct}%</td>
+        </tr>`;
+      }
+
+      // ── PÁGINA 1 — CAPA ─────────────────────────────────────────
+      const p1 = `<div style="width:${A4_W}px;height:${A4_H}px;background:linear-gradient(150deg,#080818 0%,#130430 55%,#050510 100%);position:relative;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;top:-120px;right:-120px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,255,0.22) 0%,transparent 70%);"></div>
+        <div style="position:absolute;bottom:-140px;left:-140px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(78,168,255,0.14) 0%,transparent 70%);"></div>
+        <div style="position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#7c5cff,#4ea8ff,#7c5cff);"></div>
+        <div style="position:absolute;top:70px;left:70px;right:70px;">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:100px;">
+            <div style="width:56px;height:56px;border-radius:15px;background:linear-gradient(135deg,#7c5cff,#4ea8ff);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;font-family:Arial,sans-serif;">K</div>
+            <div>
+              <div style="font-size:21px;font-weight:800;color:#fff;letter-spacing:-0.5px;font-family:Arial,sans-serif;">KAIRO</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.38);letter-spacing:2.5px;text-transform:uppercase;margin-top:3px;font-family:Arial,sans-serif;">Elite Productivity</div>
+            </div>
+            <div style="margin-left:auto;padding:5px 16px;border:1px solid rgba(255,255,255,0.14);border-radius:20px;font-size:10px;color:rgba(255,255,255,0.38);letter-spacing:1.5px;text-transform:uppercase;font-family:Arial,sans-serif;">Confidencial</div>
+          </div>
+          <div style="font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:#9b85ff;font-weight:700;margin-bottom:18px;font-family:Arial,sans-serif;">Análise de Desempenho</div>
+          <div style="font-size:64px;font-weight:900;color:#fff;line-height:1;letter-spacing:-2px;font-family:Arial,sans-serif;">Relatório</div>
+          <div style="font-size:64px;font-weight:900;color:#9b85ff;line-height:1.1;letter-spacing:-2px;margin-bottom:40px;font-family:Arial,sans-serif;">Executivo</div>
+          <div style="width:90px;height:4px;background:linear-gradient(90deg,#7c5cff,#4ea8ff);border-radius:2px;margin-bottom:44px;"></div>
+          <div style="font-size:30px;font-weight:700;color:rgba(255,255,255,0.85);margin-bottom:8px;font-family:Arial,sans-serif;">${periodo}</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.38);font-family:Arial,sans-serif;">Gerado a ${dataGerado}</div>
+        </div>
+        <div style="position:absolute;bottom:65px;left:70px;right:70px;">
+          <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:30px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:5px;font-family:Arial,sans-serif;">Preparado para</div>
+              <div style="font-size:22px;font-weight:700;color:#fff;font-family:Arial,sans-serif;">${userName}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:5px;font-family:Arial,sans-serif;">Plataforma</div>
+              <div style="font-size:15px;font-weight:600;color:rgba(255,255,255,0.5);font-family:Arial,sans-serif;">kairoelite.app</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+      // ── PÁGINA 2 — SUMÁRIO EXECUTIVO ────────────────────────────
+      const kpis = [
+        { label:"Tarefas Concluídas", value:concluidas.length, sub:`de ${total} criadas`,   color:"#7c5cff", icon:"✓" },
+        { label:"Taxa de Conclusão",   value:taxaConc+"%",      sub:taxaConc>=70?"Excelente":taxaConc>=40?"Bom":"A melhorar", color:"#4ea8ff", icon:"%" },
+        { label:"Score Produtividade", value:prodScore+"%",      sub:"Score de hoje",        color:"#31d0aa", icon:"↑" },
+        { label:"Hábitos Hoje",        value:taxaHab+"%",        sub:`${habConc}/${habitos.length} concluídos`, color:"#f59e0b", icon:"★" },
+      ];
+      const kpiHtml = kpis.map(k => `
+        <div style="flex:1;background:#fff;border-radius:14px;padding:24px 20px;box-shadow:0 2px 18px rgba(0,0,0,0.07);border:1px solid #eef0f7;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${k.color};border-radius:14px 14px 0 0;"></div>
+          <div style="font-size:28px;font-weight:900;color:${k.color};width:36px;height:36px;border-radius:10px;background:${k.color}1a;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-family:Arial,sans-serif;">${k.icon}</div>
+          <div style="font-size:34px;font-weight:900;color:#1a1a2e;line-height:1;margin-bottom:5px;font-family:Arial,sans-serif;">${k.value}</div>
+          <div style="font-size:12px;font-weight:600;color:#444;margin-bottom:3px;font-family:Arial,sans-serif;">${k.label}</div>
+          <div style="font-size:10px;color:#aaa;font-family:Arial,sans-serif;">${k.sub}</div>
+        </div>`).join("");
+
+      const catRowsHtml = cats.map(([n,v]) => barRow(n, v.total, maxCat, v.done, "#7c5cff")).join("");
+
+      const statusBoxes = [
+        { label:"Concluídas", n:concluidas.length,             color:"#31d0aa", bg:"rgba(49,208,170,0.1)"  },
+        { label:"Pendentes",  n:pendentes.length-atrasadas.length, color:"#7c5cff", bg:"rgba(124,92,255,0.1)" },
+        { label:"Atrasadas",  n:atrasadas.length,              color:"#f87171", bg:"rgba(248,113,113,0.1)" },
+        { label:"Metas",      n:metas.length,                  color:"#4ea8ff", bg:"rgba(78,168,255,0.1)"  },
+      ].map(s => `<div style="flex:1;text-align:center;padding:16px 12px;background:${s.bg};border-radius:12px;">
+        <div style="font-size:28px;font-weight:900;color:${s.color};font-family:Arial,sans-serif;">${s.n}</div>
+        <div style="font-size:11px;color:#666;font-weight:500;margin-top:4px;font-family:Arial,sans-serif;">${s.label}</div>
+      </div>`).join("");
+
+      const p2 = `<div style="width:${A4_W}px;height:${A4_H}px;background:#f7f8fc;position:relative;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;box-sizing:border-box;">
+        <div style="background:linear-gradient(90deg,#7c5cff,#4ea8ff);height:7px;"></div>
+        <div style="padding:36px 58px 26px;display:flex;align-items:flex-end;justify-content:space-between;">
+          <div>
+            <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#9b85ff;font-weight:700;margin-bottom:5px;font-family:Arial,sans-serif;">Sumário Executivo — Página 2</div>
+            <div style="font-size:24px;font-weight:800;color:#1a1a2e;font-family:Arial,sans-serif;">Visão Geral de Desempenho</div>
+          </div>
+          <div style="font-size:10px;color:#bbb;text-align:right;font-family:Arial,sans-serif;">${periodo}<br>${userName}</div>
+        </div>
+        <div style="padding:0 58px;display:flex;gap:16px;margin-bottom:26px;">${kpiHtml}</div>
+        <div style="padding:0 58px;margin-bottom:22px;">
+          <div style="background:#fff;border-radius:14px;padding:26px;box-shadow:0 2px 18px rgba(0,0,0,0.06);border:1px solid #eef0f7;">
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9b85ff;font-weight:700;margin-bottom:3px;font-family:Arial,sans-serif;">Distribuição</div>
+            <div style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:18px;font-family:Arial,sans-serif;">Tarefas por Categoria</div>
+            ${cats.length > 0 ? `<table style="width:100%;border-collapse:collapse;">${catRowsHtml}</table>` : `<div style="color:#bbb;font-size:12px;font-family:Arial,sans-serif;">Sem categorias definidas.</div>`}
+          </div>
+        </div>
+        <div style="padding:0 58px;">
+          <div style="background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 18px rgba(0,0,0,0.06);border:1px solid #eef0f7;display:flex;gap:14px;">${statusBoxes}</div>
+        </div>
+        <div style="position:absolute;bottom:26px;left:58px;right:58px;border-top:1px solid #ebebf5;padding-top:14px;display:flex;justify-content:space-between;">
+          <span style="font-size:9px;color:#ccc;font-family:Arial,sans-serif;">KAIRO Elite Productivity — Confidencial</span>
+          <span style="font-size:9px;color:#ccc;font-family:Arial,sans-serif;">2 / 4</span>
+        </div>
+      </div>`;
+
+      // ── PÁGINA 3 — HÁBITOS & METAS ──────────────────────────────
+      const maxStreak = Math.max(...habitos.map(h => h.streak||0), 1);
+      const habitRowsHtml = habitos.slice(0, 9).map(h => {
+        const s   = h.streak || 0;
+        const pct = Math.round(s / maxStreak * 100);
+        const cc  = h.concluidoHoje ? "#31d0aa" : "#ddd";
+        return `<tr style="border-bottom:1px solid #f2f2f8;">
+          <td style="padding:10px 0;font-size:12px;color:#333;font-weight:500;font-family:Arial,sans-serif;">${(h.titulo||h.nome||"Hábito").slice(0,28)}</td>
+          <td style="padding:10px 8px;text-align:center;font-size:16px;color:${cc};font-family:Arial,sans-serif;">${h.concluidoHoje ? "✓" : "○"}</td>
+          <td style="padding:10px 8px;text-align:center;font-size:11px;font-weight:700;color:#f59e0b;white-space:nowrap;font-family:Arial,sans-serif;">🔥 ${s} dias</td>
+          <td style="padding:10px 0 10px 8px;width:150px;">
+            <div style="background:#f0f0f8;border-radius:4px;height:6px;overflow:hidden;">
+              <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:4px;"></div>
+            </div>
+          </td>
+        </tr>`;
+      }).join("");
+
+      const metaCards = metas.slice(0, 3).map(m => {
+        const sub = m.subtarefas || [];
+        const pct = sub.length > 0 ? Math.round(sub.filter(s=>s.concluida).length/sub.length*100) : 0;
+        const cor = m.cor || "#7c5cff";
+        return `<div style="flex:1;background:#fff;border-radius:12px;padding:18px;border:1px solid #eef0f7;min-width:0;">
+          <div style="font-size:12px;font-weight:700;color:#1a1a2e;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Arial,sans-serif;">${m.titulo}</div>
+          <div style="font-size:10px;color:#aaa;margin-bottom:10px;font-family:Arial,sans-serif;">${sub.length} sub-tarefas</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+            <span style="font-size:10px;color:#aaa;font-family:Arial,sans-serif;">Progresso</span>
+            <span style="font-size:13px;font-weight:800;color:${cor};font-family:Arial,sans-serif;">${pct}%</span>
+          </div>
+          <div style="background:#f0f0f8;border-radius:100px;height:7px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${cor};border-radius:100px;"></div>
+          </div>
+        </div>`;
+      }).join("");
+
+      const p3 = `<div style="width:${A4_W}px;height:${A4_H}px;background:#f7f8fc;position:relative;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;box-sizing:border-box;">
+        <div style="background:linear-gradient(90deg,#7c5cff,#4ea8ff);height:7px;"></div>
+        <div style="padding:36px 58px 26px;display:flex;align-items:flex-end;justify-content:space-between;">
+          <div>
+            <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#9b85ff;font-weight:700;margin-bottom:5px;font-family:Arial,sans-serif;">Comportamento — Página 3</div>
+            <div style="font-size:24px;font-weight:800;color:#1a1a2e;font-family:Arial,sans-serif;">Hábitos & Metas</div>
+          </div>
+          <div style="font-size:10px;color:#bbb;text-align:right;font-family:Arial,sans-serif;">${periodo}<br>${userName}</div>
+        </div>
+        <div style="padding:0 58px;margin-bottom:24px;">
+          <div style="background:#fff;border-radius:14px;padding:26px;box-shadow:0 2px 18px rgba(0,0,0,0.06);border:1px solid #eef0f7;">
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9b85ff;font-weight:700;margin-bottom:3px;font-family:Arial,sans-serif;">Seguimento Diário</div>
+            <div style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:16px;font-family:Arial,sans-serif;">Hábitos Ativos (${habitos.length})</div>
+            ${habitos.length > 0 ? `<table style="width:100%;border-collapse:collapse;">
+              <thead><tr style="border-bottom:2px solid #f0f0f8;">
+                <th style="text-align:left;font-size:9px;letter-spacing:1px;color:#bbb;text-transform:uppercase;padding-bottom:8px;font-family:Arial,sans-serif;">Hábito</th>
+                <th style="text-align:center;font-size:9px;letter-spacing:1px;color:#bbb;text-transform:uppercase;padding-bottom:8px;font-family:Arial,sans-serif;">Hoje</th>
+                <th style="text-align:center;font-size:9px;letter-spacing:1px;color:#bbb;text-transform:uppercase;padding-bottom:8px;font-family:Arial,sans-serif;">Streak</th>
+                <th style="text-align:left;font-size:9px;letter-spacing:1px;color:#bbb;text-transform:uppercase;padding-bottom:8px;padding-left:8px;font-family:Arial,sans-serif;">Desempenho</th>
+              </tr></thead>
+              <tbody>${habitRowsHtml}</tbody>
+            </table>` : `<div style="color:#bbb;font-size:12px;font-family:Arial,sans-serif;">Sem hábitos registados.</div>`}
+          </div>
+        </div>
+        ${metas.length > 0 ? `<div style="padding:0 58px;">
+          <div style="background:#fff;border-radius:14px;padding:26px;box-shadow:0 2px 18px rgba(0,0,0,0.06);border:1px solid #eef0f7;">
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9b85ff;font-weight:700;margin-bottom:3px;font-family:Arial,sans-serif;">Objetivos</div>
+            <div style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:16px;font-family:Arial,sans-serif;">Metas Ativas (${metas.length})</div>
+            <div style="display:flex;gap:14px;">${metaCards}</div>
+          </div>
+        </div>` : ""}
+        <div style="position:absolute;bottom:26px;left:58px;right:58px;border-top:1px solid #ebebf5;padding-top:14px;display:flex;justify-content:space-between;">
+          <span style="font-size:9px;color:#ccc;font-family:Arial,sans-serif;">KAIRO Elite Productivity — Confidencial</span>
+          <span style="font-size:9px;color:#ccc;font-family:Arial,sans-serif;">3 / 4</span>
+        </div>
+      </div>`;
+
+      // ── PÁGINA 4 — INSIGHTS IA + PLANO DE AÇÃO ──────────────────
+      const insightCardsHtml = aiInsights.slice(0, 4).map(ins => `
+        <div style="background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 14px rgba(0,0,0,0.05);border:1px solid #eef0f7;display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:40px;height:40px;border-radius:10px;background:#f0f0ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${ins.icon}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:4px;font-family:Arial,sans-serif;">${ins.title}</div>
+            <div style="font-size:11px;color:#666;line-height:1.55;margin-bottom:6px;font-family:Arial,sans-serif;">${ins.desc}</div>
+            <div style="font-size:11px;color:#7c5cff;font-weight:600;font-family:Arial,sans-serif;">→ ${ins.action}</div>
+          </div>
+        </div>`).join("");
+
+      const recs = [];
+      if (atrasadas.length > 0) recs.push({ title:"Resolver Atrasos Urgentes", text:`${atrasadas.length} tarefa(s) atrasada(s). Bloquear tempo esta semana para fechar.`, color:"#f87171" });
+      if (taxaHab < 70) recs.push({ title:"Reforçar Consistência de Hábitos", text:`Taxa de hoje: ${taxaHab}%. Objetivo: acima de 70% para criar momentum.`, color:"#f59e0b" });
+      if (taxaConc < 50) recs.push({ title:"Reduzir e Focar", text:`Taxa de conclusão global: ${taxaConc}%. Menos tarefas, mais foco = melhor resultado.`, color:"#7c5cff" });
+      if (recs.length < 3) recs.push({ title:"Manter o Ritmo", text:"O desempenho está acima da média. Mantém a consistência e escala gradualmente o volume.", color:"#31d0aa" });
+
+      const recItemsHtml = recs.slice(0, 3).map((r, i) => `
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #f5f5fa;">
+          <div style="width:30px;height:30px;border-radius:50%;background:${r.color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;font-family:Arial,sans-serif;">${i+1}</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#e0e0f0;margin-bottom:3px;font-family:Arial,sans-serif;">${r.title}</div>
+            <div style="font-size:11px;color:#888;line-height:1.5;font-family:Arial,sans-serif;">${r.text}</div>
+          </div>
+        </div>`).join("");
+
+      const p4 = `<div style="width:${A4_W}px;height:${A4_H}px;background:#f7f8fc;position:relative;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;box-sizing:border-box;">
+        <div style="background:linear-gradient(90deg,#7c5cff,#4ea8ff);height:7px;"></div>
+        <div style="padding:36px 58px 26px;display:flex;align-items:flex-end;justify-content:space-between;">
+          <div>
+            <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#9b85ff;font-weight:700;margin-bottom:5px;font-family:Arial,sans-serif;">Inteligência Artificial — Página 4</div>
+            <div style="font-size:24px;font-weight:800;color:#1a1a2e;font-family:Arial,sans-serif;">Insights Kairo IA & Plano de Ação</div>
+          </div>
+          <div style="padding:5px 12px;border-radius:20px;background:linear-gradient(135deg,rgba(124,92,255,0.12),rgba(78,168,255,0.12));border:1px solid rgba(124,92,255,0.2);">
+            <span style="font-size:11px;font-weight:700;color:#7c5cff;font-family:Arial,sans-serif;">🧠 KAIRO IA BETA</span>
+          </div>
+        </div>
+        <div style="padding:0 58px;display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+          ${aiInsights.length > 0 ? insightCardsHtml : `<div style="color:#bbb;font-size:12px;font-family:Arial,sans-serif;">Cria e conclui mais tarefas para ver análise de padrões.</div>`}
+        </div>
+        <div style="padding:0 58px;">
+          <div style="background:linear-gradient(135deg,#120330,#0d0d1f);border-radius:14px;padding:26px;">
+            <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#9b85ff;font-weight:700;margin-bottom:3px;font-family:Arial,sans-serif;">Para o Board</div>
+            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;font-family:Arial,sans-serif;">Plano de Ação — Top 3 Prioridades</div>
+            <div style="font-size:11px;color:#555;margin-bottom:14px;font-family:Arial,sans-serif;">Recomendações baseadas nos padrões de produtividade deste período.</div>
+            ${recItemsHtml}
+          </div>
+        </div>
+        <div style="position:absolute;bottom:26px;left:58px;right:58px;border-top:1px solid #ebebf5;padding-top:14px;display:flex;justify-content:space-between;">
+          <span style="font-size:9px;color:#ccc;font-family:Arial,sans-serif;">KAIRO Elite Productivity — Confidencial</span>
+          <span style="font-size:9px;color:#ccc;font-family:Arial,sans-serif;">4 / 4</span>
+        </div>
+      </div>`;
+
+      // ── RENDER COM html2canvas ───────────────────────────────────
+      const container = document.createElement("div");
+      container.style.cssText = `position:fixed;top:-9999px;left:-9999px;width:${A4_W}px;z-index:-999;`;
+      document.body.appendChild(container);
+
+      const pages = [p1, p2, p3, p4];
+      for (let i = 0; i < pages.length; i++) {
+        container.innerHTML = pages[i];
+        await new Promise(r => setTimeout(r, 350));
+        const canvas = await html2canvas(container.firstElementChild, {
+          scale: 2, useCORS: true, allowTaint: true,
+          backgroundColor: null, logging: false,
+          width: A4_W, height: A4_H,
+        });
+        const imgData = canvas.toDataURL("image/jpeg", 0.96);
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+      }
+
+      document.body.removeChild(container);
+      const filename = `Kairo_Relatorio_${meses[now.getMonth()]}_${now.getFullYear()}_${userName.replace(/\s+/g,"_")}.pdf`;
+      pdf.save(filename);
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="file-text" style="width:14px;height:14px;"></i> Relatório PDF`;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+    // ============================================================
+    // END RELATÓRIO PDF
+    // ============================================================
+
     function renderIAPanel() {
       const insights = analisarPadroesKairo();
       if (insights.length === 0) {
@@ -6425,6 +6734,13 @@
           <button class="ia-refresh-btn" onclick="renderAll()">↻ Atualizar</button>
         </div>
         ${cards}
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #111128;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="font-size:0.75rem;color:#444;line-height:1.4;">Exporta o teu desempenho em PDF para partilhar com o Board.</div>
+          ${isPro()
+            ? `<button id="btn-relatorio-pdf" onclick="gerarRelatorioExecutivoPDF()" style="flex-shrink:0;background:linear-gradient(135deg,#7c5cff,#4ea8ff);border:none;color:#fff;padding:8px 16px;border-radius:10px;font-size:0.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i data-lucide="file-text" style="width:14px;height:14px;"></i> Relatório PDF</button>`
+            : `<button onclick="document.querySelector('.upgrade-btn')?.click()" style="flex-shrink:0;background:linear-gradient(135deg,#2a1f5a,#1a1a3a);border:1px solid rgba(124,92,255,0.3);color:#9b85ff;padding:8px 16px;border-radius:10px;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap;">🔒 Pro</button>`
+          }
+        </div>
       </div>`;
     }
     // ============================================================
