@@ -2549,6 +2549,7 @@
           <div id="topbar-user-menu" class="topbar-user-menu hidden">
             <button onclick="openDigestModal()"><i data-lucide="mail"></i> Email Diário</button>
             <button onclick="openWeeklyModal()"><i data-lucide="bar-chart-2"></i> Resumo Semanal</button>
+            <button id="btn-relatorio-pdf" onclick="gerarRelatorioExecutivoPDF()"><i data-lucide="file-text"></i> Relatório Executivo</button>
             <button onclick="openNotifModal()"><i data-lucide="bell"></i> Notificações</button>
             <button onclick="openReferralModal()"><i data-lucide="gift"></i> Convidar Amigos</button>
             <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
@@ -6730,13 +6731,6 @@
           <button class="ia-refresh-btn" onclick="renderAll()">↻ Atualizar</button>
         </div>
         ${cards}
-        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #111128;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <div style="font-size:0.75rem;color:#444;line-height:1.4;">Exporta o teu desempenho em PDF para partilhar com o Board.</div>
-          ${isPro()
-            ? `<button id="btn-relatorio-pdf" onclick="gerarRelatorioExecutivoPDF()" style="flex-shrink:0;background:linear-gradient(135deg,#7c5cff,#4ea8ff);border:none;color:#fff;padding:8px 16px;border-radius:10px;font-size:0.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i data-lucide="file-text" style="width:14px;height:14px;"></i> Relatório PDF</button>`
-            : `<button onclick="document.querySelector('.upgrade-btn')?.click()" style="flex-shrink:0;background:linear-gradient(135deg,#2a1f5a,#1a1a3a);border:1px solid rgba(124,92,255,0.3);color:#9b85ff;padding:8px 16px;border-radius:10px;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap;">🔒 Pro</button>`
-          }
-        </div>
       </div>`;
     }
     // ============================================================
