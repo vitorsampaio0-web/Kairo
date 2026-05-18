@@ -1223,6 +1223,16 @@
     .notif-badge.denied  { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
     .notif-badge.default { background: rgba(124,92,255,0.1); color: #9b85ff; border: 1px solid rgba(124,92,255,0.2); }
 
+    /* ---- Day Picker (Repetição Específica) ---- */
+    .day-picker { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+    .day-picker-btn {
+      width:38px; height:38px; border-radius:50%; border:1.5px solid #2a2a4a;
+      background:#0d0d1f; color:#666; font-size:0.72rem; font-weight:600;
+      cursor:pointer; transition:all 0.18s; display:flex; align-items:center; justify-content:center;
+    }
+    .day-picker-btn:hover { border-color:#7c5cff; color:#9b85ff; }
+    .day-picker-btn.active { background:#7c5cff; border-color:#7c5cff; color:#fff; }
+
     /* ---- Digest Modal ---- */    .digest-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.7);
       display: flex; align-items: center; justify-content: center;
@@ -2580,12 +2590,22 @@
       </div>
       <div class="modal-field">
         <label>Repetição</label>
-        <select id="edit-task-repeat" class="task-select">
+        <select id="edit-task-repeat" class="task-select" onchange="toggleDayPicker('edit')">
           <option value="nenhuma">Sem repetição</option>
           <option value="diaria">Repete diariamente</option>
           <option value="semanal">Repete semanalmente</option>
           <option value="mensal">Repete mensalmente</option>
+          <option value="especifica">Dias específicos</option>
         </select>
+        <div id="edit-day-picker" class="day-picker" style="display:none;margin-top:8px;">
+          <button type="button" class="day-picker-btn" data-day="1" onclick="toggleDay(this,'edit')">Seg</button>
+          <button type="button" class="day-picker-btn" data-day="2" onclick="toggleDay(this,'edit')">Ter</button>
+          <button type="button" class="day-picker-btn" data-day="3" onclick="toggleDay(this,'edit')">Qua</button>
+          <button type="button" class="day-picker-btn" data-day="4" onclick="toggleDay(this,'edit')">Qui</button>
+          <button type="button" class="day-picker-btn" data-day="5" onclick="toggleDay(this,'edit')">Sex</button>
+          <button type="button" class="day-picker-btn" data-day="6" onclick="toggleDay(this,'edit')">Sáb</button>
+          <button type="button" class="day-picker-btn" data-day="0" onclick="toggleDay(this,'edit')">Dom</button>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="ghost-btn" id="modal-cancel-btn">Cancelar</button>
@@ -3396,12 +3416,22 @@
             </select>
             <input id="quick-task-date" class="task-input" type="date" />
             <input id="quick-task-time" class="task-input" type="time" />
-            <select id="quick-task-repeat" class="task-select">
+            <select id="quick-task-repeat" class="task-select" onchange="toggleDayPicker('quick')">
               <option value="nenhuma">Sem repetição</option>
               <option value="diaria">Repete diariamente</option>
               <option value="semanal">Repete semanalmente</option>
               <option value="mensal">Repete mensalmente</option>
+              <option value="especifica">Dias específicos</option>
             </select>
+            <div id="quick-day-picker" class="day-picker" style="display:none;">
+              <button type="button" class="day-picker-btn" data-day="1" onclick="toggleDay(this,'quick')">Seg</button>
+              <button type="button" class="day-picker-btn" data-day="2" onclick="toggleDay(this,'quick')">Ter</button>
+              <button type="button" class="day-picker-btn" data-day="3" onclick="toggleDay(this,'quick')">Qua</button>
+              <button type="button" class="day-picker-btn" data-day="4" onclick="toggleDay(this,'quick')">Qui</button>
+              <button type="button" class="day-picker-btn" data-day="5" onclick="toggleDay(this,'quick')">Sex</button>
+              <button type="button" class="day-picker-btn" data-day="6" onclick="toggleDay(this,'quick')">Sáb</button>
+              <button type="button" class="day-picker-btn" data-day="0" onclick="toggleDay(this,'quick')">Dom</button>
+            </div>
             <button id="quick-task-submit" class="primary-btn">Adicionar</button>
           </div>
 
@@ -3839,6 +3869,8 @@
 
       const id = Date.now();
       const repeatInput = document.getElementById("quick-task-repeat");
+      const repeticao = repeatInput ? repeatInput.value : "nenhuma";
+      const diasEspecificos = repeticao === "especifica" ? getSelectedDays("quick") : [];
       const newTask = {
         id,
         titulo: title,
@@ -3847,7 +3879,8 @@
         status: "pendente",
         prazo: `${taskDate}T${taskTime}`,
         categoria: categoryInput.value,
-        repeticao: repeatInput ? repeatInput.value : "nenhuma"
+        repeticao,
+        diasEspecificos
       };
       appState.tarefas.unshift(newTask);
       fsSet("tarefas", id, newTask);
@@ -3913,11 +3946,19 @@
       showToast(`Evento "${event.titulo}" apagado.`);
     }
 
-    function calcNextPrazo(prazo, repeticao) {
+    function calcNextPrazo(prazo, repeticao, diasEspecificos) {
       const d = new Date(prazo);
-      if (repeticao === "diaria")  d.setDate(d.getDate() + 1);
-      if (repeticao === "semanal") d.setDate(d.getDate() + 7);
-      if (repeticao === "mensal")  d.setMonth(d.getMonth() + 1);
+      if (repeticao === "diaria")  { d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 16); }
+      if (repeticao === "semanal") { d.setDate(d.getDate() + 7); return d.toISOString().slice(0, 16); }
+      if (repeticao === "mensal")  { d.setMonth(d.getMonth() + 1); return d.toISOString().slice(0, 16); }
+      if (repeticao === "especifica" && diasEspecificos && diasEspecificos.length > 0) {
+        const sorted = [...diasEspecificos].sort((a, b) => a - b);
+        const next = new Date(d);
+        for (let i = 1; i <= 7; i++) {
+          next.setDate(d.getDate() + i);
+          if (sorted.includes(next.getDay())) return next.toISOString().slice(0, 16);
+        }
+      }
       return d.toISOString().slice(0, 16);
     }
 
@@ -3936,11 +3977,14 @@
 
         if (task.repeticao && task.repeticao !== "nenhuma") {
           const nextId = Date.now();
-          const nextTask = { ...task, id: nextId, status: "pendente", prazo: calcNextPrazo(task.prazo, task.repeticao) };
+          const nextPrazo = calcNextPrazo(task.prazo, task.repeticao, task.diasEspecificos);
+          const nextTask = { ...task, id: nextId, status: "pendente", prazo: nextPrazo };
           appState.tarefas.push(nextTask);
           fsSet("tarefas", nextId, nextTask);
-          const label = task.repeticao === "diaria" ? "amanhã" : task.repeticao === "semanal" ? "na próxima semana" : "no próximo mês";
-          showToast(`✓ Concluída! Nova ocorrência criada para ${label}.`);
+          const dayNames = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+          const nextDate = new Date(nextPrazo);
+          const nextLabel = nextDate.toLocaleDateString("pt-PT", { weekday:"short", day:"numeric", month:"short" });
+          showToast(`✓ Concluída! Próxima ocorrência: ${nextLabel}.`);
         } else {
           showToast(`Excelente! "${task.titulo}" foi concluída.`);
         }
@@ -3974,7 +4018,13 @@
       document.getElementById("edit-task-date").value = prazoDate;
       document.getElementById("edit-task-time").value = prazoTime;
       const repeatSel = document.getElementById("edit-task-repeat");
-      if (repeatSel) repeatSel.value = task.repeticao || "nenhuma";
+      if (repeatSel) {
+        repeatSel.value = task.repeticao || "nenhuma";
+        toggleDayPicker("edit");
+        if (task.repeticao === "especifica" && task.diasEspecificos) {
+          setSelectedDays("edit", task.diasEspecificos);
+        }
+      }
 
       document.getElementById("edit-modal").classList.remove("hidden");
     }
@@ -4002,6 +4052,7 @@
       const time = document.getElementById("edit-task-time").value || "18:00";
       task.prazo = `${date}T${time}`;
       task.repeticao = document.getElementById("edit-task-repeat")?.value || "nenhuma";
+      task.diasEspecificos = task.repeticao === "especifica" ? getSelectedDays("edit") : [];
 
       fsSet("tarefas", id, task);
       closeEditModal();
@@ -5360,6 +5411,33 @@
       if (e.target === this) closeDigestModal();
     });
     // ---- End Email Digest ----
+
+    // ---- Day Picker helpers ----
+    function toggleDayPicker(ctx) {
+      const sel = document.getElementById(ctx === "quick" ? "quick-task-repeat" : "edit-task-repeat");
+      const picker = document.getElementById(ctx === "quick" ? "quick-day-picker" : "edit-day-picker");
+      if (picker) picker.style.display = sel && sel.value === "especifica" ? "flex" : "none";
+    }
+
+    function toggleDay(btn, ctx) {
+      btn.classList.toggle("active");
+    }
+
+    function getSelectedDays(ctx) {
+      const picker = document.getElementById(ctx === "quick" ? "quick-day-picker" : "edit-day-picker");
+      if (!picker) return [];
+      return Array.from(picker.querySelectorAll(".day-picker-btn.active"))
+        .map(b => parseInt(b.dataset.day, 10));
+    }
+
+    function setSelectedDays(ctx, days) {
+      const picker = document.getElementById(ctx === "quick" ? "quick-day-picker" : "edit-day-picker");
+      if (!picker) return;
+      picker.querySelectorAll(".day-picker-btn").forEach(b => {
+        b.classList.toggle("active", days.includes(parseInt(b.dataset.day, 10)));
+      });
+    }
+    // ---- End Day Picker helpers ----
 
     // ---- Weekly Review ----
     async function openWeeklyModal() {
