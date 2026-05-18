@@ -1214,6 +1214,27 @@
     .cal-popup-item p  { margin: 0; font-size: 0.75rem; color: #666; }
     .cal-popup-empty   { text-align: center; color: #555; font-size: 0.85rem; padding: 20px 0; }
 
+    /* ---- Kairo IA — Painel de Padrões ---- */
+    .ia-panel { background:#0d0d1f; border:1px solid #1e1e3a; border-radius:16px; padding:20px; margin-bottom:20px; }
+    .ia-panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .ia-panel-title { display:flex; align-items:center; gap:8px; font-size:0.92rem; font-weight:700; color:#e0e0f0; }
+    .ia-badge { font-size:0.65rem; font-weight:700; padding:2px 8px; border-radius:20px; background:linear-gradient(135deg,#7c5cff,#4ea8ff); color:#fff; letter-spacing:.05em; }
+    .ia-refresh-btn { background:none; border:none; color:#555; cursor:pointer; font-size:0.75rem; display:flex; align-items:center; gap:4px; transition:color 0.15s; }
+    .ia-refresh-btn:hover { color:#9b85ff; }
+    .ia-insight { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #111128; }
+    .ia-insight:last-child { border-bottom:none; padding-bottom:0; }
+    .ia-insight-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .ia-insight-body { flex:1; }
+    .ia-insight-title { font-size:0.85rem; font-weight:600; color:#c9c9e0; margin:0 0 3px; }
+    .ia-insight-desc  { font-size:0.78rem; color:#666; margin:0 0 6px; line-height:1.5; }
+    .ia-insight-action { font-size:0.75rem; color:#9b85ff; font-weight:600; }
+    .ia-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+    .ia-bar-label { font-size:0.7rem; color:#555; width:28px; text-align:right; flex-shrink:0; }
+    .ia-bar-track { flex:1; background:#1a1a3a; border-radius:3px; height:6px; overflow:hidden; }
+    .ia-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#7c5cff,#4ea8ff); transition:width 0.6s; }
+    .ia-bar-val { font-size:0.68rem; color:#666; width:20px; flex-shrink:0; }
+    .ia-empty { text-align:center; padding:20px; color:#444; font-size:0.82rem; }
+
     /* ---- Modo Equipa ---- */
     .team-empty { text-align:center; padding:60px 20px; }
     .team-empty-icon { font-size:48px; margin-bottom:12px; }
@@ -3619,6 +3640,8 @@
             </div>` : ""}
           </div>
         </div>
+
+        ${renderIAPanel()}
       `;
     }
 
@@ -6217,6 +6240,196 @@
       if (e.target === this) closeShareModal();
     });
     // ---- End Share Streak ----
+
+    // ============================================================
+    // KAIRO IA — Motor de Análise de Padrões
+    // ============================================================
+    function analisarPadroesKairo() {
+      const tarefas   = appState.tarefas || [];
+      const habitos   = appState.habitos || [];
+      const concluidas = tarefas.filter(t => t.status === "concluida" && t.prazo);
+      const insights  = [];
+
+      // ── 1. Hora de pico de produtividade ──────────────────────
+      if (concluidas.length >= 3) {
+        const porHora = Array(24).fill(0);
+        concluidas.forEach(t => {
+          const h = new Date(t.prazo).getHours();
+          if (!isNaN(h)) porHora[h]++;
+        });
+        const maxVal  = Math.max(...porHora);
+        const picoH   = porHora.indexOf(maxVal);
+        const manha   = porHora.slice(6,12).reduce((a,b)=>a+b,0);
+        const tarde   = porHora.slice(12,18).reduce((a,b)=>a+b,0);
+        const noite   = porHora.slice(18,24).reduce((a,b)=>a+b,0);
+        const total   = manha + tarde + noite || 1;
+        const pct     = Math.round(manha/total*100);
+        const periodo = manha >= tarde && manha >= noite ? "manhã" : tarde >= noite ? "tarde" : "noite";
+        const periodoIcon = manha >= tarde && manha >= noite ? "🌅" : tarde >= noite ? "☀️" : "🌙";
+        const bars = [
+          { l:"6-12h", v:manha }, { l:"12-18h", v:tarde }, { l:"18-24h", v:noite }
+        ];
+        const maxB = Math.max(...bars.map(b=>b.v)) || 1;
+        const barsHtml = bars.map(b => `
+          <div class="ia-bar-row">
+            <span class="ia-bar-label">${b.l}</span>
+            <div class="ia-bar-track"><div class="ia-bar-fill" style="width:${Math.round(b.v/maxB*100)}%"></div></div>
+            <span class="ia-bar-val">${b.v}</span>
+          </div>`).join("");
+        insights.push({
+          icon: periodoIcon, bg: "rgba(124,92,255,0.12)",
+          title: `Mais produtivo de ${periodo}`,
+          desc: `${pct}% das tuas tarefas concluídas são agendadas de manhã (6h-12h).`,
+          action: `Agenda as tarefas de Alta prioridade antes das 12h.`,
+          extra: barsHtml
+        });
+      }
+
+      // ── 2. Melhor dia da semana ────────────────────────────────
+      if (concluidas.length >= 5) {
+        const diasNome = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+        const porDia   = Array(7).fill(0);
+        concluidas.forEach(t => { const d = new Date(t.prazo).getDay(); if(!isNaN(d)) porDia[d]++; });
+        const maxD  = Math.max(...porDia);
+        const melhor= porDia.indexOf(maxD);
+        const pior  = porDia.indexOf(Math.min(...porDia.filter(v=>v>=0)));
+        const maxDv = Math.max(...porDia) || 1;
+        const barsHtml = diasNome.map((d,i) => `
+          <div class="ia-bar-row">
+            <span class="ia-bar-label">${d}</span>
+            <div class="ia-bar-track"><div class="ia-bar-fill" style="width:${Math.round(porDia[i]/maxDv*100)}%"></div></div>
+            <span class="ia-bar-val">${porDia[i]}</span>
+          </div>`).join("");
+        insights.push({
+          icon: "📅", bg: "rgba(78,168,255,0.12)",
+          title: `${diasNome[melhor]}feira é o teu melhor dia`,
+          desc: `Concluis mais tarefas às ${diasNome[melhor]}feiras (${maxD} tarefas). ${diasNome[pior]}feira é o dia mais fraco.`,
+          action: `Reserva as tarefas mais difíceis para ${diasNome[melhor]}feira.`,
+          extra: barsHtml
+        });
+      }
+
+      // ── 3. Categoria com mais atrasos ─────────────────────────
+      const atrasadas = tarefas.filter(t => t.status !== "concluida" && t.prazo && new Date(t.prazo) < new Date());
+      if (atrasadas.length >= 2) {
+        const porCat = {};
+        atrasadas.forEach(t => {
+          const c = t.categoria || "Geral";
+          porCat[c] = (porCat[c] || 0) + 1;
+        });
+        const catOrdenadas = Object.entries(porCat).sort((a,b)=>b[1]-a[1]);
+        const [catPior, qtd] = catOrdenadas[0];
+        const total = atrasadas.length;
+        const pct   = Math.round(qtd/total*100);
+        insights.push({
+          icon: "⚠️", bg: "rgba(248,113,113,0.1)",
+          title: `"${catPior}" com mais atrasos`,
+          desc: `${pct}% das tuas tarefas atrasadas pertencem à categoria "${catPior}" (${qtd} tarefas).`,
+          action: `Revê e reschedula as tarefas de "${catPior}" esta semana.`,
+          extra: catOrdenadas.slice(0,4).map(([c,n]) => `
+            <div class="ia-bar-row">
+              <span class="ia-bar-label" style="width:52px;font-size:0.68rem;">${c.slice(0,7)}</span>
+              <div class="ia-bar-track"><div class="ia-bar-fill" style="width:${Math.round(n/catOrdenadas[0][1]*100)}%;background:linear-gradient(90deg,#f87171,#f59e0b)"></div></div>
+              <span class="ia-bar-val">${n}</span>
+            </div>`).join("")
+        });
+      }
+
+      // ── 4. Padrão de streak dos hábitos ───────────────────────
+      if (habitos.length >= 1) {
+        const streaks = habitos.map(h => h.streak || 0);
+        const avgStreak = Math.round(streaks.reduce((a,b)=>a+b,0) / streaks.length);
+        const maxStreak = Math.max(...streaks);
+        const habitoFraco = habitos.sort((a,b)=>(a.streak||0)-(b.streak||0))[0];
+        const habitoForte = habitos.sort((a,b)=>(b.streak||0)-(a.streak||0))[0];
+        if (maxStreak > 0) {
+          insights.push({
+            icon: "🔥", bg: "rgba(245,158,11,0.1)",
+            title: `Streak médio: ${avgStreak} dias`,
+            desc: `Melhor streak: "${habitoForte.titulo}" com ${habitoForte.streak} dias. ${habitoFraco.streak < 2 ? `"${habitoFraco.titulo}" precisa de atenção (${habitoFraco.streak} dia${habitoFraco.streak!==1?"s":""}).` : ""}`,
+            action: `Mantém o streak de "${habitoForte.titulo}" — estás a criar um hábito real.`,
+            extra: ""
+          });
+        }
+      }
+
+      // ── 5. Velocidade de conclusão ─────────────────────────────
+      if (concluidas.length >= 5) {
+        const rapidasHs = [];
+        concluidas.forEach(t => {
+          if (t.id) {
+            const criado = parseInt(String(t.id).length === 13 ? t.id : 0);
+            const prazoMs = new Date(t.prazo).getTime();
+            if (criado > 0 && prazoMs > criado) {
+              rapidasHs.push((prazoMs - criado) / 3600000);
+            }
+          }
+        });
+        if (rapidasHs.length >= 3) {
+          const avg = rapidasHs.reduce((a,b)=>a+b,0) / rapidasHs.length;
+          const rapidas = rapidasHs.filter(h => h < 4).length;
+          const lentas  = rapidasHs.filter(h => h > 24).length;
+          const pctRap  = Math.round(rapidas/rapidasHs.length*100);
+          insights.push({
+            icon: "⚡", bg: "rgba(74,222,128,0.1)",
+            title: `${pctRap}% das tarefas são resolvidas em <4h`,
+            desc: `Tempo médio entre criação e prazo: ${avg < 24 ? Math.round(avg)+"h" : Math.round(avg/24)+" dias"}. ${lentas} tarefa${lentas!==1?"s":""} com prazo >24h.`,
+            action: lentas > 3 ? "Divide tarefas longas em passos menores para manter ritmo." : "Bom ritmo — continua a criar tarefas com prazos realistas.",
+            extra: ""
+          });
+        }
+      }
+
+      // ── 6. Taxa de conclusão global ───────────────────────────
+      const total  = tarefas.length;
+      const doneN  = concluidas.length;
+      const pctG   = total > 0 ? Math.round(doneN/total*100) : 0;
+      if (total >= 5) {
+        const emoji = pctG >= 70 ? "🏆" : pctG >= 40 ? "📈" : "💪";
+        const label = pctG >= 70 ? "excelente" : pctG >= 40 ? "bom" : "a melhorar";
+        insights.push({
+          icon: emoji, bg: "rgba(124,92,255,0.08)",
+          title: `Taxa de conclusão: ${pctG}% — ${label}`,
+          desc: `Concluíste ${doneN} de ${total} tarefas criadas até agora.`,
+          action: pctG < 50 ? "Considera reduzir o número de tarefas diárias para aumentar o foco." : "Mantém este ritmo — estás acima da média de produtividade.",
+          extra: ""
+        });
+      }
+
+      return insights;
+    }
+
+    function renderIAPanel() {
+      const insights = analisarPadroesKairo();
+      if (insights.length === 0) {
+        return `<div class="ia-panel">
+          <div class="ia-panel-header">
+            <div class="ia-panel-title">🧠 Kairo IA <span class="ia-badge">BETA</span></div>
+          </div>
+          <div class="ia-empty">Ainda não há dados suficientes para análise.<br>Cria e conclui mais tarefas para ver os teus padrões.</div>
+        </div>`;
+      }
+      const cards = insights.map(ins => `
+        <div class="ia-insight">
+          <div class="ia-insight-icon" style="background:${ins.bg};">${ins.icon}</div>
+          <div class="ia-insight-body">
+            <p class="ia-insight-title">${ins.title}</p>
+            <p class="ia-insight-desc">${ins.desc}</p>
+            ${ins.extra ? `<div style="margin:6px 0 4px;">${ins.extra}</div>` : ""}
+            <span class="ia-insight-action">→ ${ins.action}</span>
+          </div>
+        </div>`).join("");
+      return `<div class="ia-panel">
+        <div class="ia-panel-header">
+          <div class="ia-panel-title">🧠 Kairo IA <span class="ia-badge">BETA</span></div>
+          <button class="ia-refresh-btn" onclick="renderAll()">↻ Atualizar</button>
+        </div>
+        ${cards}
+      </div>`;
+    }
+    // ============================================================
+    // END KAIRO IA
+    // ============================================================
 
     // ============================================================
     // MODO EQUIPA
