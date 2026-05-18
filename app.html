@@ -1214,6 +1214,51 @@
     .cal-popup-item p  { margin: 0; font-size: 0.75rem; color: #666; }
     .cal-popup-empty   { text-align: center; color: #555; font-size: 0.85rem; padding: 20px 0; }
 
+    /* ---- Modo Equipa ---- */
+    .team-empty { text-align:center; padding:60px 20px; }
+    .team-empty-icon { font-size:48px; margin-bottom:12px; }
+    .team-empty h3 { color:#e0e0f0; margin:0 0 8px; }
+    .team-empty p  { color:#555; font-size:0.85rem; margin:0 0 24px; }
+    .team-btn-row  { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .team-btn-primary { background:linear-gradient(135deg,#7c5cff,#4ea8ff); border:none; color:#fff; padding:12px 24px; border-radius:12px; font-size:0.9rem; font-weight:700; cursor:pointer; }
+    .team-btn-secondary { background:#1a1a3a; border:1px solid #1e1e3a; color:#9b85ff; padding:12px 24px; border-radius:12px; font-size:0.9rem; font-weight:600; cursor:pointer; }
+    .team-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+    .team-name { font-size:1.2rem; font-weight:800; color:#e0e0f0; margin:0; }
+    .team-code-badge { background:rgba(124,92,255,0.12); border:1px solid rgba(124,92,255,0.3); color:#9b85ff; font-size:0.75rem; font-weight:700; padding:4px 12px; border-radius:20px; letter-spacing:.08em; cursor:pointer; }
+    .team-members-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-bottom:24px; }
+    .team-member-card { background:#12122a; border:1px solid #1e1e3a; border-radius:14px; padding:16px; text-align:center; transition:border-color 0.2s; }
+    .team-member-card:hover { border-color:#7c5cff; }
+    .team-member-avatar { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,#7c5cff,#4ea8ff); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:1.1rem; font-weight:700; color:#fff; }
+    .team-member-name { font-size:0.85rem; font-weight:600; color:#e0e0f0; margin:0 0 4px; }
+    .team-member-role { font-size:0.7rem; color:#555; margin:0 0 8px; }
+    .team-member-prog { background:#1a1a3a; border-radius:100px; height:5px; overflow:hidden; }
+    .team-member-prog-bar { height:100%; border-radius:100px; background:linear-gradient(90deg,#7c5cff,#4ea8ff); transition:width 0.4s; }
+    .team-member-stats { font-size:0.72rem; color:#666; margin-top:5px; }
+    .team-tasks-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .team-tasks-header h3 { margin:0; font-size:0.9rem; color:#777; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+    .team-task-item { display:flex; align-items:center; gap:10px; background:#12122a; border:1px solid #1e1e3a; border-radius:12px; padding:12px 14px; margin-bottom:8px; transition:border-color 0.2s; }
+    .team-task-item:hover { border-color:#2a2a4a; }
+    .team-task-check { width:22px; height:22px; border-radius:6px; border:1.5px solid #2a2a4a; background:#0a0a14; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+    .team-task-check.done { background:#7c5cff; border-color:#7c5cff; }
+    .team-task-check.done::after { content:'✓'; color:#fff; font-size:0.72rem; font-weight:700; }
+    .team-task-info { flex:1; min-width:0; }
+    .team-task-title { font-size:0.88rem; color:#c9c9e0; margin:0 0 3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .team-task-title.done { color:#444; text-decoration:line-through; }
+    .team-task-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .team-task-assignee { font-size:0.7rem; background:rgba(124,92,255,0.1); color:#9b85ff; border-radius:20px; padding:2px 8px; }
+    .team-task-date { font-size:0.7rem; color:#555; }
+    .team-leave-btn { background:none; border:1px solid rgba(248,113,113,0.2); color:#f87171; border-radius:8px; padding:6px 12px; font-size:0.75rem; cursor:pointer; }
+    /* Team Modals */
+    .team-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1200; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+    .team-modal-overlay.hidden { display:none !important; }
+    .team-modal-card { background:#12122a; border:1px solid #1e1e3a; border-radius:20px; padding:28px; width:min(440px,92vw); max-height:85vh; overflow-y:auto; }
+    .team-modal-card h3 { margin:0 0 20px; color:#e0e0f0; font-size:1.1rem; }
+    .team-field { margin-bottom:14px; }
+    .team-field label { display:block; font-size:0.78rem; color:#777; margin-bottom:5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+    .team-input { width:100%; background:#0a0a14; border:1px solid #1e1e3a; border-radius:10px; padding:10px 14px; color:#e0e0f0; font-size:0.9rem; outline:none; box-sizing:border-box; }
+    .team-input:focus { border-color:#7c5cff; }
+    .team-save-btn { width:100%; background:linear-gradient(135deg,#7c5cff,#4ea8ff); border:none; color:#fff; padding:13px; border-radius:12px; font-size:0.95rem; font-weight:700; cursor:pointer; margin-top:8px; }
+
     /* ---- Metas (Goals) ---- */
     .metas-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
     .metas-header h2 { margin:0; font-size:1.25rem; color:#e0e0f0; }
@@ -2495,6 +2540,7 @@
       <section id="habitos-view" class="view"></section>
       <section id="historico-view" class="view"></section>
       <section id="metas-view" class="view"></section>
+      <section id="equipa-view" class="view"></section>
     </main>
   </div>
 
@@ -2539,6 +2585,68 @@
   <!-- Meta Modal -->
   <!-- Share Streak Modal -->
   <!-- Referral Modal -->
+  <!-- Team Modals -->
+  <!-- Criar Equipa -->
+  <div class="team-modal-overlay hidden" id="team-create-modal">
+    <div class="team-modal-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;">Criar Equipa</h3>
+        <button onclick="closeTeamModal('create')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <div class="team-field">
+        <label>Nome da equipa</label>
+        <input id="team-create-nome" class="team-input" placeholder="Ex: Marketing, Dev Team, Família...">
+      </div>
+      <button class="team-save-btn" onclick="createTeam()">Criar Equipa</button>
+      <p id="team-create-note" style="text-align:center;font-size:0.8rem;color:#555;margin-top:10px;"></p>
+    </div>
+  </div>
+  <!-- Entrar numa Equipa -->
+  <div class="team-modal-overlay hidden" id="team-join-modal">
+    <div class="team-modal-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;">Entrar numa Equipa</h3>
+        <button onclick="closeTeamModal('join')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <div class="team-field">
+        <label>Código da equipa</label>
+        <input id="team-join-code" class="team-input" placeholder="Ex: KAIRO-X7K2" style="text-transform:uppercase;letter-spacing:.1em;">
+      </div>
+      <button class="team-save-btn" onclick="joinTeam()">Entrar</button>
+      <p id="team-join-note" style="text-align:center;font-size:0.8rem;color:#555;margin-top:10px;"></p>
+    </div>
+  </div>
+  <!-- Nova Tarefa de Equipa -->
+  <div class="team-modal-overlay hidden" id="team-task-modal">
+    <div class="team-modal-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;" id="team-task-modal-title">Nova Tarefa de Equipa</h3>
+        <button onclick="closeTeamModal('task')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <div class="team-field">
+        <label>Título</label>
+        <input id="team-task-titulo" class="team-input" placeholder="O que precisa de ser feito?">
+      </div>
+      <div class="team-field">
+        <label>Atribuir a</label>
+        <select id="team-task-assignee" class="team-input"></select>
+      </div>
+      <div class="team-field">
+        <label>Prazo</label>
+        <input id="team-task-prazo" class="team-input" type="datetime-local">
+      </div>
+      <div class="team-field">
+        <label>Prioridade</label>
+        <select id="team-task-prioridade" class="team-input">
+          <option value="media">Média</option>
+          <option value="alta">Alta</option>
+          <option value="baixa">Baixa</option>
+        </select>
+      </div>
+      <input type="hidden" id="team-task-edit-id">
+      <button class="team-save-btn" onclick="saveTeamTask()">Guardar</button>
+    </div>
+  </div>
   <div class="digest-overlay hidden" id="referral-modal">
     <div class="digest-card" style="max-width:440px;">
       <button class="digest-close" onclick="closeReferralModal()"><i data-lucide="x"></i></button>
@@ -3010,6 +3118,8 @@
       eventos: [],
       habitos: [],
       metas: [],
+      equipa: null,
+      equipaTarefas: [],
       subscription: { plan: "free" }
     };
 
@@ -3140,7 +3250,30 @@
         renderAll();
       }, err => console.error("[Firestore] metas onSnapshot:", err));
 
-      _firestoreUnsubs = [unsub1, unsub2, unsub3, unsub4];
+      // Listener para equipas do utilizador
+      let _teamTaskUnsub = null;
+      const unsub5 = db.collection("teams")
+        .where("membrosUids", "array-contains", uid)
+        .limit(1)
+        .onSnapshot(async snap => {
+          if (!snap.empty) {
+            const teamDoc = snap.docs[0];
+            appState.equipa = { id: teamDoc.id, ...teamDoc.data() };
+            // Listener para tarefas da equipa
+            if (_teamTaskUnsub) _teamTaskUnsub();
+            _teamTaskUnsub = db.collection(`teams/${teamDoc.id}/tarefas`).onSnapshot(tSnap => {
+              appState.equipaTarefas = tSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+              renderTeam();
+            });
+          } else {
+            appState.equipa = null;
+            appState.equipaTarefas = [];
+            if (_teamTaskUnsub) { _teamTaskUnsub(); _teamTaskUnsub = null; }
+          }
+          renderTeam();
+        }, err => console.error("[Firestore] teams onSnapshot:", err));
+
+      _firestoreUnsubs = [unsub1, unsub2, unsub3, unsub4, unsub5];
     }
 
     function fsSet(col, id, data) {
@@ -3167,15 +3300,17 @@
       { id: "agenda",    label: "Agenda",    icon: "calendar-range" },
       { id: "tarefas",   label: "Tarefas",   icon: "check-square" },
       { id: "metas",     label: "Metas",     icon: "target" },
+      { id: "equipa",    label: "Equipa",    icon: "users" },
       { id: "habitos",   label: "Hábitos",   icon: "heart-pulse" },
       { id: "historico", label: "Histórico", icon: "clock" }
     ];
 
     const viewIds = {
       dashboard: "dashboard-view",
-      metas:     "metas-view",
       agenda:    "agenda-view",
       tarefas:   "tarefas-view",
+      metas:     "metas-view",
+      equipa:    "equipa-view",
       habitos:   "habitos-view",
       historico: "historico-view"
     };
@@ -4146,6 +4281,7 @@
       renderHabitos();
       renderHistorico();
       renderMetas();
+      renderTeam();
       renderMiniCalendar();
 
       Object.entries(viewIds).forEach(([key, id]) => {
@@ -6081,6 +6217,264 @@
       if (e.target === this) closeShareModal();
     });
     // ---- End Share Streak ----
+
+    // ============================================================
+    // MODO EQUIPA
+    // ============================================================
+    function genTeamCode() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let code = "KAIRO-";
+      for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+      return code;
+    }
+
+    function renderTeam() {
+      const el = document.getElementById("equipa-view");
+      if (!el) return;
+      const equipa = appState.equipa;
+
+      if (!equipa) {
+        el.innerHTML = `
+          <div class="team-empty">
+            <div class="team-empty-icon">👥</div>
+            <h3>Sem equipa ainda</h3>
+            <p>Cria uma equipa ou entra numa existente com o código de convite.</p>
+            <div class="team-btn-row">
+              <button class="team-btn-primary" onclick="openTeamModal('create')">+ Criar Equipa</button>
+              <button class="team-btn-secondary" onclick="openTeamModal('join')">Entrar com código</button>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const membros = equipa.membros || [];
+      const tarefas = appState.equipaTarefas || [];
+      const isAdmin = equipa.criadoPor === currentUser?.uid;
+
+      // Cards de membros com progresso
+      const memberCards = membros.map(m => {
+        const mTarefas = tarefas.filter(t => t.atribuidoA === m.uid);
+        const mDone    = mTarefas.filter(t => t.status === "concluida").length;
+        const mPct     = mTarefas.length > 0 ? Math.round(mDone / mTarefas.length * 100) : 0;
+        const initials = (m.nome || "?").split(" ").map(n => n[0]).join("").slice(0,2).toUpperCase();
+        return `
+          <div class="team-member-card">
+            <div class="team-member-avatar">${initials}</div>
+            <p class="team-member-name">${m.nome}</p>
+            <p class="team-member-role">${m.role === "admin" ? "Admin" : "Membro"}</p>
+            <div class="team-member-prog">
+              <div class="team-member-prog-bar" style="width:${mPct}%"></div>
+            </div>
+            <p class="team-member-stats">${mDone}/${mTarefas.length} tarefas</p>
+          </div>`;
+      }).join("");
+
+      // Lista de tarefas
+      const prioColor = { alta:"#f87171", media:"#f59e0b", baixa:"#4ade80" };
+      const taskItems = [...tarefas]
+        .sort((a,b) => (a.prazo||"").localeCompare(b.prazo||""))
+        .map(t => {
+          const assignee = membros.find(m => m.uid === t.atribuidoA);
+          const prazoLabel = t.prazo ? new Date(t.prazo).toLocaleDateString("pt-PT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
+          return `
+            <div class="team-task-item">
+              <div class="team-task-check ${t.status==="concluida"?"done":""}" onclick="toggleTeamTask('${t.id}')"></div>
+              <div class="team-task-info">
+                <p class="team-task-title ${t.status==="concluida"?"done":""}">${t.titulo}</p>
+                <div class="team-task-meta">
+                  ${assignee ? `<span class="team-task-assignee">@${assignee.nome.split(" ")[0]}</span>` : ""}
+                  ${prazoLabel ? `<span class="team-task-date">${prazoLabel}</span>` : ""}
+                  <span style="width:8px;height:8px;border-radius:50%;background:${prioColor[t.prioridade]||"#666"};display:inline-block;"></span>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="meta-action-btn" onclick="openEditTeamTask('${t.id}')"><i data-lucide="pencil" style="width:12px;height:12px;"></i></button>
+                <button class="meta-action-btn" onclick="deleteTeamTask('${t.id}')" style="color:#f87171;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
+              </div>
+            </div>`;
+        }).join("");
+
+      el.innerHTML = `
+        <div class="team-header">
+          <div>
+            <p class="team-name">👥 ${equipa.nome}</p>
+            <span class="team-code-badge" onclick="copyTeamCode('${equipa.codigo}')" title="Clica para copiar">
+              ${equipa.codigo} · Copiar código
+            </span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="team-btn-primary" style="padding:8px 16px;font-size:0.82rem;" onclick="openTeamModal('task')">+ Nova Tarefa</button>
+            ${isAdmin ? `<button class="team-leave-btn" onclick="deleteTeam()">Apagar equipa</button>` : `<button class="team-leave-btn" onclick="leaveTeam()">Sair da equipa</button>`}
+          </div>
+        </div>
+
+        <div class="team-tasks-header">
+          <h3>Membros (${membros.length}/10)</h3>
+        </div>
+        <div class="team-members-grid">${memberCards || "<p style='color:#555;font-size:0.85rem;'>Ainda sem membros.</p>"}</div>
+
+        <div class="team-tasks-header">
+          <h3>Tarefas da Equipa (${tarefas.length})</h3>
+        </div>
+        ${taskItems || `<p style="color:#555;font-size:0.85rem;padding:20px 0;">Ainda sem tarefas. Clica em "+ Nova Tarefa".</p>`}`;
+
+      lucide.createIcons();
+    }
+
+    // --- Team Modal helpers ---
+    function openTeamModal(type) {
+      if (type === "task") {
+        // Popular assignee select
+        const sel = document.getElementById("team-task-assignee");
+        const membros = appState.equipa?.membros || [];
+        sel.innerHTML = `<option value="">Sem atribuição</option>` +
+          membros.map(m => `<option value="${m.uid}">${m.nome}</option>`).join("");
+        document.getElementById("team-task-titulo").value = "";
+        document.getElementById("team-task-prazo").value = "";
+        document.getElementById("team-task-edit-id").value = "";
+        document.getElementById("team-task-modal-title").textContent = "Nova Tarefa de Equipa";
+      }
+      document.getElementById(`team-${type}-modal`).classList.remove("hidden");
+    }
+
+    function closeTeamModal(type) {
+      document.getElementById(`team-${type}-modal`).classList.add("hidden");
+    }
+
+    async function createTeam() {
+      const nome = document.getElementById("team-create-nome").value.trim();
+      const note = document.getElementById("team-create-note");
+      if (!nome) { note.textContent = "Insere um nome para a equipa."; return; }
+      if (!currentUser) return;
+
+      note.textContent = "A criar...";
+      const codigo = genTeamCode();
+      const uid    = currentUser.uid;
+      const membro = { uid, nome: currentUser.displayName || currentUser.email.split("@")[0], role: "admin" };
+      const teamId = Date.now().toString();
+
+      await db.doc(`teams/${teamId}`).set({
+        id: teamId, nome, codigo, criadoPor: uid,
+        criadoEm: new Date().toISOString(),
+        membros: [membro],
+        membrosUids: [uid]
+      });
+
+      closeTeamModal("create");
+      showToast(`Equipa "${nome}" criada! Código: ${codigo}`);
+    }
+
+    async function joinTeam() {
+      const code = document.getElementById("team-join-code").value.trim().toUpperCase();
+      const note = document.getElementById("team-join-note");
+      if (!code) { note.textContent = "Insere o código da equipa."; return; }
+      if (!currentUser) return;
+
+      note.textContent = "A procurar equipa...";
+      try {
+        const snap = await db.collection("teams").where("codigo", "==", code).limit(1).get();
+        if (snap.empty) { note.textContent = "Código inválido. Verifica e tenta de novo."; return; }
+
+        const teamDoc = snap.docs[0];
+        const teamData = teamDoc.data();
+        const uid = currentUser.uid;
+
+        if ((teamData.membrosUids || []).includes(uid)) {
+          note.textContent = "Já és membro desta equipa."; return;
+        }
+        if ((teamData.membros || []).length >= 10) {
+          note.textContent = "Equipa cheia (máx. 10 membros)."; return;
+        }
+
+        const novoMembro = { uid, nome: currentUser.displayName || currentUser.email.split("@")[0], role: "membro" };
+        await db.doc(`teams/${teamDoc.id}`).update({
+          membros: firebase.firestore.FieldValue.arrayUnion(novoMembro),
+          membrosUids: firebase.firestore.FieldValue.arrayUnion(uid)
+        });
+
+        closeTeamModal("join");
+        showToast(`Entraste na equipa "${teamData.nome}"!`);
+      } catch (e) {
+        note.textContent = "Erro: " + e.message;
+      }
+    }
+
+    async function saveTeamTask() {
+      const titulo    = document.getElementById("team-task-titulo").value.trim();
+      const assignee  = document.getElementById("team-task-assignee").value;
+      const prazo     = document.getElementById("team-task-prazo").value;
+      const prioridade= document.getElementById("team-task-prioridade").value;
+      const editId    = document.getElementById("team-task-edit-id").value;
+      if (!titulo) { showToast("Insere o título da tarefa."); return; }
+      if (!appState.equipa) return;
+
+      const teamId = appState.equipa.id;
+      if (editId) {
+        await db.doc(`teams/${teamId}/tarefas/${editId}`).update({ titulo, atribuidoA: assignee, prazo, prioridade });
+        showToast("Tarefa atualizada!");
+      } else {
+        const id = Date.now().toString();
+        await db.doc(`teams/${teamId}/tarefas/${id}`).set({
+          id, titulo, atribuidoA: assignee, prazo, prioridade,
+          status: "pendente", criadoPor: currentUser.uid, criadoEm: new Date().toISOString()
+        });
+        showToast("Tarefa adicionada!");
+      }
+      closeTeamModal("task");
+    }
+
+    function openEditTeamTask(taskId) {
+      const task = appState.equipaTarefas.find(t => t.id === taskId);
+      if (!task || !appState.equipa) return;
+      const sel = document.getElementById("team-task-assignee");
+      sel.innerHTML = `<option value="">Sem atribuição</option>` +
+        (appState.equipa.membros || []).map(m => `<option value="${m.uid}"${m.uid===task.atribuidoA?" selected":""}>${m.nome}</option>`).join("");
+      document.getElementById("team-task-titulo").value   = task.titulo || "";
+      document.getElementById("team-task-prazo").value    = task.prazo || "";
+      document.getElementById("team-task-prioridade").value = task.prioridade || "media";
+      document.getElementById("team-task-edit-id").value  = taskId;
+      document.getElementById("team-task-modal-title").textContent = "Editar Tarefa";
+      document.getElementById("team-task-modal").classList.remove("hidden");
+    }
+
+    async function toggleTeamTask(taskId) {
+      const task = appState.equipaTarefas.find(t => t.id === taskId);
+      if (!task || !appState.equipa) return;
+      const newStatus = task.status === "concluida" ? "pendente" : "concluida";
+      await db.doc(`teams/${appState.equipa.id}/tarefas/${taskId}`).update({ status: newStatus });
+    }
+
+    async function deleteTeamTask(taskId) {
+      if (!appState.equipa) return;
+      if (!confirm("Apagar esta tarefa?")) return;
+      await db.doc(`teams/${appState.equipa.id}/tarefas/${taskId}`).delete();
+    }
+
+    async function leaveTeam() {
+      if (!appState.equipa || !currentUser) return;
+      if (!confirm("Tens a certeza que queres sair da equipa?")) return;
+      const uid = currentUser.uid;
+      const membro = (appState.equipa.membros || []).find(m => m.uid === uid);
+      await db.doc(`teams/${appState.equipa.id}`).update({
+        membros: firebase.firestore.FieldValue.arrayRemove(membro),
+        membrosUids: firebase.firestore.FieldValue.arrayRemove(uid)
+      });
+      showToast("Saíste da equipa.");
+    }
+
+    async function deleteTeam() {
+      if (!appState.equipa) return;
+      if (!confirm("Apagar a equipa para todos os membros?")) return;
+      await db.doc(`teams/${appState.equipa.id}`).delete();
+      showToast("Equipa apagada.");
+    }
+
+    function copyTeamCode(code) {
+      navigator.clipboard.writeText(code).then(() => showToast(`Código ${code} copiado!`));
+    }
+    // ============================================================
+    // END MODO EQUIPA
+    // ============================================================
 
     // ---- Day Picker Calendar helpers ----
     const _daycalState = {
