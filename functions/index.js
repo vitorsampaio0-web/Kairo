@@ -1010,3 +1010,50 @@ function buildWeeklyReviewEmail(nome, { weekLabel, thisCompleted, thisTotal, thi
 </table></td></tr></table>
 </body></html>`;
 }
+
+// ---------------------------------------------------------------------------
+// 16. processReferral — HTTP callable: chamado após subscrição Pro
+//     Credita 30 dias Pro ao utilizador que convidou
+// ---------------------------------------------------------------------------
+exports.processReferral = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "Login required.");
+  const { codigoConvite } = data;
+  if (!codigoConvite) throw new functions.https.HttpsError("invalid-argument", "Código em falta.");
+
+  // Encontrar o referrer pelo código
+  const refDoc = await db.doc(`referrals/${codigoConvite.toUpperCase()}`).get();
+  if (!refDoc.exists) throw new functions.https.HttpsError("not-found", "Código inválido.");
+
+  const referrerUid = refDoc.data().uid;
+  const newUserUid  = context.auth.uid;
+
+  // Não se pode auto-convidar
+  if (referrerUid === newUserUid) throw new functions.https.HttpsError("invalid-argument", "Não podes usar o teu próprio código.");
+
+  // Verificar se este utilizador já foi processado para este referrer
+  const alreadySnap = await db.collection("referrals")
+    .doc(codigoConvite.toUpperCase())
+    .collection("conversoes")
+    .doc(newUserUid).get();
+  if (alreadySnap.exists) return { ok: true, message: "Já processado." };
+
+  // Registar conversão
+  await db.collection("referrals").doc(codigoConvite.toUpperCase())
+    .collection("conversoes").doc(newUserUid)
+    .set({ uid: newUserUid, data: new Date().toISOString() });
+
+  // Calcular novo proExpiry para o referrer (+30 dias)
+  const referrerDoc = await db.doc(`users/${referrerUid}`).get();
+  const referrerData = referrerDoc.data() || {};
+  const currentExpiry = referrerData.proExpiry ? new Date(referrerData.proExpiry) : new Date();
+  if (currentExpiry < new Date()) currentExpiry.setTime(Date.now());
+  currentExpiry.setDate(currentExpiry.getDate() + 30);
+
+  await db.doc(`users/${referrerUid}`).set({
+    proExpiry: currentExpiry.toISOString().split("T")[0],
+    totalConvites: admin.firestore.FieldValue.increment(1)
+  }, { merge: true });
+
+  console.log(`[processReferral] ${newUserUid} converteu via código ${codigoConvite} → referrer ${referrerUid} ganhou 30 dias Pro até ${currentExpiry.toISOString().split("T")[0]}`);
+  return { ok: true, diasAdicionados: 30, novoExpiry: currentExpiry.toISOString().split("T")[0] };
+});

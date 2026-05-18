@@ -2232,5 +2232,16 @@
       metricObserver.observe(el);
     });
   </script>
+  <script>
+    // Capturar código de convite da URL e guardar em localStorage
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      if (ref) {
+        localStorage.setItem('kairo_ref', ref.toUpperCase());
+        console.log('[Referral] Código guardado:', ref);
+      }
+    })();
+  </script>
 </body>
 </html>

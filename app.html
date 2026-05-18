@@ -1330,6 +1330,28 @@
     .share-btn:hover { opacity:0.85; }
     .share-btn.download { background:linear-gradient(135deg,#7c5cff,#4ea8ff); color:#fff; }
     .share-btn.cancel   { background:#1a1a3a; color:#666; border:1px solid #1e1e3a; }
+
+    /* ---- Referral Modal ---- */
+    .referral-card {
+      background:linear-gradient(135deg,#7c5cff22,#4ea8ff11);
+      border:1px solid rgba(124,92,255,0.3); border-radius:14px; padding:18px; margin:16px 0;
+    }
+    .referral-link-row { display:flex; gap:8px; margin-top:8px; }
+    .referral-link-input {
+      flex:1; background:#0a0a14; border:1px solid #1e1e3a; border-radius:8px;
+      padding:9px 12px; color:#9b85ff; font-size:0.78rem; outline:none; font-family:monospace;
+    }
+    .referral-copy-btn {
+      background:#7c5cff; border:none; color:#fff; border-radius:8px;
+      padding:9px 14px; font-size:0.82rem; font-weight:600; cursor:pointer; white-space:nowrap;
+    }
+    .referral-stats { display:flex; gap:10px; margin:12px 0; }
+    .referral-stat {
+      flex:1; background:#0d0d1f; border:1px solid #1e1e3a; border-radius:10px;
+      padding:14px; text-align:center;
+    }
+    .referral-stat-num { font-size:1.6rem; font-weight:800; color:#7c5cff; }
+    .referral-stat-lbl { font-size:0.72rem; color:#555; margin-top:2px; }
     .meta-modal-card {
       background:#12122a; border:1px solid #1e1e3a; border-radius:20px;
       padding:28px; width:min(480px,92vw); max-height:85vh; overflow-y:auto;
@@ -2461,6 +2483,7 @@
             <button onclick="openDigestModal()"><i data-lucide="mail"></i> Email Diário</button>
             <button onclick="openWeeklyModal()"><i data-lucide="bar-chart-2"></i> Resumo Semanal</button>
             <button onclick="openNotifModal()"><i data-lucide="bell"></i> Notificações</button>
+            <button onclick="openReferralModal()"><i data-lucide="gift"></i> Convidar Amigos</button>
             <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
           </div>
         </div>
@@ -2515,6 +2538,45 @@
   <!-- Weekly Review Modal -->
   <!-- Meta Modal -->
   <!-- Share Streak Modal -->
+  <!-- Referral Modal -->
+  <div class="digest-overlay hidden" id="referral-modal">
+    <div class="digest-card" style="max-width:440px;">
+      <button class="digest-close" onclick="closeReferralModal()"><i data-lucide="x"></i></button>
+      <div class="digest-icon">🎁</div>
+      <h2>Convida Amigos</h2>
+      <p>Por cada amigo que subscrever o plano Pro, <strong style="color:#9b85ff;">ganhas 30 dias Pro grátis</strong>.</p>
+
+      <div class="referral-stats">
+        <div class="referral-stat">
+          <div class="referral-stat-num" id="ref-total">0</div>
+          <div class="referral-stat-lbl">Amigos convidados</div>
+        </div>
+        <div class="referral-stat">
+          <div class="referral-stat-num" id="ref-dias">0</div>
+          <div class="referral-stat-lbl">Dias Pro ganhos</div>
+        </div>
+        <div class="referral-stat" id="ref-expiry-stat" style="display:none;">
+          <div class="referral-stat-num" id="ref-expiry" style="font-size:0.95rem;">—</div>
+          <div class="referral-stat-lbl">Pro grátis até</div>
+        </div>
+      </div>
+
+      <div class="referral-card">
+        <p style="margin:0 0 4px;font-size:0.78rem;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">O teu link de convite</p>
+        <div class="referral-link-row">
+          <input class="referral-link-input" id="referral-link-input" readonly>
+          <button class="referral-copy-btn" onclick="copyReferralLink()" id="referral-copy-btn">Copiar</button>
+        </div>
+      </div>
+
+      <div style="background:#0d0d1f;border-radius:10px;padding:14px;font-size:0.8rem;color:#555;line-height:1.6;">
+        <strong style="color:#777;">Como funciona:</strong><br>
+        1. Partilha o teu link com amigos<br>
+        2. O amigo regista-se e subscreve Pro<br>
+        3. Recebes automaticamente <strong style="color:#9b85ff;">30 dias Pro grátis</strong>
+      </div>
+    </div>
+  </div>
   <div class="share-overlay hidden" id="share-modal">
     <div class="share-modal">
       <h3>Partilhar Streak 🔥</h3>
@@ -4673,6 +4735,17 @@
         try {
           const cred = await auth.createUserWithEmailAndPassword(email, password);
           await cred.user.updateProfile({ displayName: name });
+          // Processar código de convite se existir
+          const refCode = localStorage.getItem('kairo_ref');
+          if (refCode) {
+            try {
+              const processFn = firebase.functions().httpsCallable('processReferral');
+              await processFn({ codigoConvite: refCode });
+              localStorage.removeItem('kairo_ref');
+            } catch (refErr) {
+              console.warn("[Referral] Não processado:", refErr.message);
+            }
+          }
         } catch (err) {
           console.error("[Auth] Erro no registo:", err);
           errorEl.textContent = _getAuthErrorMessage(err.code);
@@ -4994,14 +5067,21 @@
 
     function isPro() {
       const sub = appState.subscription;
-      if (!sub || sub.plan !== 'pro') return false;
-      if (sub.source === 'voucher' && sub.expiresAt) {
-        const expMs = typeof sub.expiresAt === 'number'
-          ? sub.expiresAt
-          : (sub.expiresAt.toMillis ? sub.expiresAt.toMillis() : Number(sub.expiresAt));
-        if (expMs < Date.now()) return false;
+      // Pro pago via Stripe
+      if (sub && sub.plan === 'pro') {
+        if (sub.source === 'voucher' && sub.expiresAt) {
+          const expMs = typeof sub.expiresAt === 'number'
+            ? sub.expiresAt
+            : (sub.expiresAt.toMillis ? sub.expiresAt.toMillis() : Number(sub.expiresAt));
+          if (expMs < Date.now()) { /* expirou */ } else return true;
+        } else { return true; }
       }
-      return true;
+      // Pro grátis por convites
+      if (appState.proExpiry) {
+        const expiry = new Date(appState.proExpiry);
+        if (expiry > new Date()) return true;
+      }
+      return false;
     }
 
     let _subUnsub = null;
@@ -5024,7 +5104,6 @@
           const data = snap.data();
           if (data && data.subscription) {
             appState.subscription = data.subscription;
-            // Cache offline (apenas campos não-sensíveis)
             try {
               localStorage.setItem('kairo_sub_' + uid, JSON.stringify({
                 plan: data.subscription.plan || 'free',
@@ -5037,13 +5116,19 @@
           } else {
             appState.subscription = { plan: 'free' };
           }
+          // Carregar proExpiry e código de convite
+          appState.proExpiry      = data.proExpiry || null;
+          appState.codigoConvite  = data.codigoConvite || null;
+          appState.totalConvites  = data.totalConvites || 0;
         } else {
-          appState.subscription = { plan: 'free' };
+          appState.subscription  = { plan: 'free' };
+          appState.proExpiry     = null;
+          appState.codigoConvite = null;
+          appState.totalConvites = 0;
         }
         updatePlanUI();
         renderAll();
       }, () => {
-        // Offline: manter cache
         updatePlanUI();
       });
     }
@@ -5875,6 +5960,67 @@
     // ============================================================
     // END METAS
     // ============================================================
+
+    // ============================================================
+    // REFERRAL — Convite de Amigos
+    // ============================================================
+    async function openReferralModal() {
+      document.getElementById('topbar-user-menu').classList.add('hidden');
+      if (!currentUser) return;
+
+      // Gerar código de convite se não existir
+      let codigo = appState.codigoConvite;
+      if (!codigo) {
+        codigo = currentUser.uid.slice(0, 8).toUpperCase();
+        await db.doc(`users/${currentUser.uid}`).set({ codigoConvite: codigo }, { merge: true });
+        // Registo global: código → uid
+        await db.doc(`referrals/${codigo}`).set({ uid: currentUser.uid, criadoEm: new Date().toISOString() });
+        appState.codigoConvite = codigo;
+      }
+
+      const link = `https://kairoelite.app/?ref=${codigo}`;
+      document.getElementById('referral-link-input').value = link;
+
+      const total = appState.totalConvites || 0;
+      const dias  = total * 30;
+      document.getElementById('ref-total').textContent = total;
+      document.getElementById('ref-dias').textContent  = dias;
+
+      if (appState.proExpiry) {
+        const expDate = new Date(appState.proExpiry);
+        if (expDate > new Date()) {
+          document.getElementById('ref-expiry-stat').style.display = '';
+          document.getElementById('ref-expiry').textContent = expDate.toLocaleDateString('pt-PT', { day:'numeric', month:'short', year:'numeric' });
+        }
+      }
+
+      document.getElementById('referral-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeReferralModal() {
+      document.getElementById('referral-modal').classList.add('hidden');
+    }
+
+    function copyReferralLink() {
+      const input = document.getElementById('referral-link-input');
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('referral-copy-btn');
+        btn.textContent = '✓ Copiado!';
+        btn.style.background = '#4ade80';
+        btn.style.color = '#0a0a14';
+        setTimeout(() => {
+          btn.textContent = 'Copiar';
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 2000);
+      });
+    }
+
+    document.getElementById('referral-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeReferralModal();
+    });
+    // ---- End Referral ----
 
     // ============================================================
     // SHARE STREAK
