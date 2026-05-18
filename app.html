@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -1282,6 +1283,53 @@
       display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px);
     }
     .meta-modal-overlay.hidden { display:none !important; }
+
+    /* ---- Share Streak Card ---- */
+    .share-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1300;
+      display:flex; align-items:center; justify-content:center; backdrop-filter:blur(8px);
+    }
+    .share-overlay.hidden { display:none !important; }
+    .share-modal {
+      background:#12122a; border:1px solid #1e1e3a; border-radius:20px;
+      padding:28px; width:min(440px,92vw); text-align:center;
+    }
+    .share-modal h3 { margin:0 0 6px; color:#e0e0f0; font-size:1rem; }
+    .share-modal p  { margin:0 0 20px; color:#555; font-size:0.82rem; }
+    /* O card que vai ser capturado */
+    .streak-card {
+      width:360px; margin:0 auto 20px; border-radius:20px; padding:36px 28px;
+      background:linear-gradient(135deg,#0d0d1f 0%,#1a0a3a 50%,#0a0d1f 100%);
+      border:1px solid rgba(124,92,255,0.3); position:relative; overflow:hidden;
+      font-family:'Inter',sans-serif;
+    }
+    .streak-card::before {
+      content:''; position:absolute; top:-60px; right:-60px;
+      width:200px; height:200px; border-radius:50%;
+      background:radial-gradient(circle,rgba(124,92,255,0.3),transparent 70%);
+    }
+    .streak-card::after {
+      content:''; position:absolute; bottom:-40px; left:-40px;
+      width:150px; height:150px; border-radius:50%;
+      background:radial-gradient(circle,rgba(78,168,255,0.2),transparent 70%);
+    }
+    .streak-card-logo { font-size:0.78rem; font-weight:700; color:#555; letter-spacing:.12em; text-transform:uppercase; margin-bottom:24px; }
+    .streak-card-fire { font-size:56px; margin-bottom:8px; line-height:1; }
+    .streak-card-num  { font-size:64px; font-weight:800; color:#fff; line-height:1; margin-bottom:4px; }
+    .streak-card-label{ font-size:1rem; color:#9b85ff; font-weight:600; margin-bottom:20px; }
+    .streak-card-bar  { display:flex; gap:5px; justify-content:center; margin-bottom:20px; }
+    .streak-card-dot  { width:28px; height:6px; border-radius:3px; background:rgba(124,92,255,0.25); }
+    .streak-card-dot.active { background:linear-gradient(90deg,#7c5cff,#4ea8ff); }
+    .streak-card-user { font-size:0.8rem; color:#444; }
+    .streak-card-site { font-size:0.75rem; color:#333; margin-top:4px; letter-spacing:.05em; }
+    .share-btn-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .share-btn {
+      padding:10px 20px; border-radius:10px; border:none; font-size:0.85rem; font-weight:600;
+      cursor:pointer; display:flex; align-items:center; gap:7px; transition:opacity 0.15s;
+    }
+    .share-btn:hover { opacity:0.85; }
+    .share-btn.download { background:linear-gradient(135deg,#7c5cff,#4ea8ff); color:#fff; }
+    .share-btn.cancel   { background:#1a1a3a; color:#666; border:1px solid #1e1e3a; }
     .meta-modal-card {
       background:#12122a; border:1px solid #1e1e3a; border-radius:20px;
       padding:28px; width:min(480px,92vw); max-height:85vh; overflow-y:auto;
@@ -2466,6 +2514,28 @@
 
   <!-- Weekly Review Modal -->
   <!-- Meta Modal -->
+  <!-- Share Streak Modal -->
+  <div class="share-overlay hidden" id="share-modal">
+    <div class="share-modal">
+      <h3>Partilhar Streak 🔥</h3>
+      <p>Descarrega o card e partilha no Instagram ou LinkedIn</p>
+      <div class="streak-card" id="streak-card-el">
+        <div class="streak-card-logo">KAIRO</div>
+        <div class="streak-card-fire">🔥</div>
+        <div class="streak-card-num" id="share-streak-num">0</div>
+        <div class="streak-card-label">dias de produtividade</div>
+        <div class="streak-card-bar" id="share-streak-bar"></div>
+        <div class="streak-card-user" id="share-streak-user"></div>
+        <div class="streak-card-site">kairoelite.app</div>
+      </div>
+      <div class="share-btn-row">
+        <button class="share-btn download" onclick="downloadStreakCard()">
+          <i data-lucide="download" style="width:15px;height:15px;"></i> Guardar imagem
+        </button>
+        <button class="share-btn cancel" onclick="closeShareModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
   <div class="meta-modal-overlay hidden" id="meta-modal">
     <div class="meta-modal-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
@@ -3682,7 +3752,10 @@
                 <h3>Hábitos</h3>
                 <p>Consistência com progresso visual e streaks</p>
               </div>
-              <span class="pill"><i data-lucide="flame"></i>${appState.habitos.reduce((max, habit) => Math.max(max, habit.streak), 0)} dias melhor streak</span>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button onclick="openShareModal()" style="background:linear-gradient(135deg,#7c5cff,#4ea8ff);border:none;color:#fff;padding:6px 14px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;"><i data-lucide="share-2" style="width:13px;height:13px;"></i> Partilhar Streak</button>
+                <span class="pill"><i data-lucide="flame"></i>${appState.habitos.reduce((max, habit) => Math.max(max, habit.streak), 0)} dias melhor streak</span>
+              </div>
             </div>
 
             <div class="task-input-row" style="grid-template-columns: 1fr 160px auto;">
@@ -5802,6 +5875,63 @@
     // ============================================================
     // END METAS
     // ============================================================
+
+    // ============================================================
+    // SHARE STREAK
+    // ============================================================
+    function openShareModal() {
+      const maxStreak = appState.habitos.length > 0
+        ? Math.max(...appState.habitos.map(h => h.streak || 0)) : 0;
+      const userName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Utilizador";
+
+      document.getElementById("share-streak-num").textContent = maxStreak;
+
+      // Barra de 7 pontos (últimos 7 dias do melhor hábito)
+      const best = appState.habitos.sort((a,b) => (b.streak||0)-(a.streak||0))[0];
+      const dots = Array.from({length:7},(_,i) => {
+        const active = best && i < Math.min(best.streak || 0, 7);
+        return `<div class="streak-card-dot ${active ? "active" : ""}"></div>`;
+      }).join("");
+      document.getElementById("share-streak-bar").innerHTML = dots;
+      document.getElementById("share-streak-user").textContent = userName;
+
+      document.getElementById("share-modal").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function closeShareModal() {
+      document.getElementById("share-modal").classList.add("hidden");
+    }
+
+    async function downloadStreakCard() {
+      const btn = document.querySelector(".share-btn.download");
+      btn.textContent = "A gerar...";
+      btn.disabled = true;
+      try {
+        const el = document.getElementById("streak-card-el");
+        const canvas = await html2canvas(el, {
+          backgroundColor: null, scale: 2, useCORS: true,
+          logging: false, allowTaint: true
+        });
+        const link = document.createElement("a");
+        link.download = "kairo-streak.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        showToast("Imagem guardada! Partilha no Instagram ou LinkedIn 🚀");
+      } catch (e) {
+        showToast("Erro ao gerar imagem. Tenta de novo.");
+        console.error(e);
+      } finally {
+        btn.innerHTML = '<i data-lucide="download" style="width:15px;height:15px;"></i> Guardar imagem';
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    document.getElementById("share-modal").addEventListener("click", function(e) {
+      if (e.target === this) closeShareModal();
+    });
+    // ---- End Share Streak ----
 
     // ---- Day Picker Calendar helpers ----
     const _daycalState = {
