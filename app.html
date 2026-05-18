@@ -2292,6 +2292,7 @@
           </button>
           <div id="topbar-user-menu" class="topbar-user-menu hidden">
             <button onclick="openDigestModal()"><i data-lucide="mail"></i> Email Diário</button>
+            <button onclick="openWeeklyModal()"><i data-lucide="bar-chart-2"></i> Resumo Semanal</button>
             <button onclick="openNotifModal()"><i data-lucide="bell"></i> Notificações</button>
             <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
           </div>
@@ -2340,6 +2341,62 @@
         <i data-lucide="check"></i> Guardar
       </button>
       <p class="digest-note" id="notif-note"></p>
+    </div>
+  </div>
+
+  <!-- Weekly Review Modal -->
+  <div class="digest-overlay hidden" id="weekly-modal">
+    <div class="digest-card">
+      <button class="digest-close" onclick="closeWeeklyModal()"><i data-lucide="x"></i></button>
+      <div class="digest-icon"><i data-lucide="bar-chart-2"></i></div>
+      <h2>Resumo Semanal</h2>
+      <p>Recebe um email semanal com as tuas tarefas concluídas, streak e % de produtividade.</p>
+      <div class="digest-toggle-row">
+        <span>Ativar resumo semanal</span>
+        <label class="digest-switch">
+          <input type="checkbox" id="weekly-enabled" onchange="toggleWeeklyFields()">
+          <span class="digest-slider"></span>
+        </label>
+      </div>
+      <div class="digest-fields" id="weekly-fields" style="display:none;">
+        <div class="digest-field">
+          <label>Email</label>
+          <input type="email" id="weekly-email" class="digest-input" placeholder="o-teu-email@gmail.com">
+        </div>
+        <div class="digest-field">
+          <label>Dia da semana</label>
+          <select id="weekly-day" class="digest-input">
+            <option value="1">Segunda-feira</option>
+            <option value="2">Terça-feira</option>
+            <option value="3">Quarta-feira</option>
+            <option value="4">Quinta-feira</option>
+            <option value="5">Sexta-feira</option>
+            <option value="6">Sábado</option>
+            <option value="0" selected>Domingo</option>
+          </select>
+        </div>
+        <div class="digest-field">
+          <label>Hora de envio</label>
+          <select id="weekly-hour" class="digest-input">
+            <option value="8">08:00</option>
+            <option value="9">09:00</option>
+            <option value="10">10:00</option>
+            <option value="11">11:00</option>
+            <option value="12">12:00</option>
+            <option value="13">13:00</option>
+            <option value="14">14:00</option>
+            <option value="17">17:00</option>
+            <option value="18">18:00</option>
+            <option value="19" selected>19:00</option>
+            <option value="20">20:00</option>
+            <option value="21">21:00</option>
+          </select>
+        </div>
+      </div>
+      <button class="digest-save-btn" onclick="saveWeeklySettings()">
+        <i data-lucide="check"></i> Guardar
+      </button>
+      <p class="digest-note" id="weekly-note"></p>
     </div>
   </div>
 
@@ -5303,6 +5360,77 @@
       if (e.target === this) closeDigestModal();
     });
     // ---- End Email Digest ----
+
+    // ---- Weekly Review ----
+    async function openWeeklyModal() {
+      document.getElementById('topbar-user-menu').classList.add('hidden');
+      const modal = document.getElementById('weekly-modal');
+      modal.classList.remove('hidden');
+      if (currentUser) {
+        const snap = await db.doc(`users/${currentUser.uid}`).get();
+        const wr = (snap.data() || {}).weeklyReview || {};
+        const toggle = document.getElementById('weekly-enabled');
+        toggle.checked = !!wr.enabled;
+        if (wr.email) document.getElementById('weekly-email').value = wr.email;
+        if (wr.day !== undefined) document.getElementById('weekly-day').value = wr.day;
+        if (wr.hour !== undefined) document.getElementById('weekly-hour').value = wr.hour;
+        document.getElementById('weekly-fields').style.display = toggle.checked ? 'block' : 'none';
+      }
+      lucide.createIcons();
+    }
+
+    function closeWeeklyModal() {
+      document.getElementById('weekly-modal').classList.add('hidden');
+    }
+
+    function toggleWeeklyFields() {
+      const enabled = document.getElementById('weekly-enabled').checked;
+      document.getElementById('weekly-fields').style.display = enabled ? 'block' : 'none';
+    }
+
+    async function saveWeeklySettings() {
+      const note = document.getElementById('weekly-note');
+      const btn  = document.querySelector('#weekly-modal .digest-save-btn');
+      const enabled = document.getElementById('weekly-enabled').checked;
+
+      if (!currentUser) { note.textContent = 'Sessão expirada.'; return; }
+      note.textContent = '';
+
+      if (!enabled) {
+        await db.doc(`users/${currentUser.uid}`).set({ weeklyReview: { enabled: false } }, { merge: true });
+        note.textContent = 'Resumo semanal desativado.';
+        setTimeout(closeWeeklyModal, 1500);
+        return;
+      }
+
+      const email = document.getElementById('weekly-email').value.trim();
+      const day   = parseInt(document.getElementById('weekly-day').value, 10);
+      const hour  = parseInt(document.getElementById('weekly-hour').value, 10);
+      const days  = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+      if (!email || !/\S+@\S+\.\S+/.test(email)) { note.textContent = 'Insere um email válido.'; return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader"></i> A guardar...';
+      lucide.createIcons();
+
+      try {
+        await db.doc(`users/${currentUser.uid}`).set({ weeklyReview: { enabled: true, email, day, hour } }, { merge: true });
+        note.textContent = `Ativo! Recebes o resumo às ${String(hour).padStart(2,'0')}h de ${days[day]}.`;
+        setTimeout(closeWeeklyModal, 2000);
+      } catch (err) {
+        note.textContent = 'Erro: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check"></i> Guardar';
+        lucide.createIcons();
+      }
+    }
+
+    document.getElementById('weekly-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeWeeklyModal();
+    });
+    // ---- End Weekly Review ----
   </script>
 </body>
 </html>

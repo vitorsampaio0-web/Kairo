@@ -857,3 +857,156 @@ exports.sendDailyDigest = functions.pubsub
 
     return null;
   });
+
+// ─────────────────────────────────────────────
+// 15. sendWeeklyReview — Corre hora a hora, envia no dia/hora configurado
+// ─────────────────────────────────────────────
+exports.sendWeeklyReview = functions.pubsub
+  .schedule("0 * * * *")
+  .timeZone("Europe/Lisbon")
+  .onRun(async () => {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const now = new Date();
+
+    const lisbonHour = parseInt(
+      new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", hour: "numeric", hour12: false }).format(now), 10
+    );
+
+    // Dia da semana numérico em Lisboa (0=Dom,1=Seg,...,6=Sab)
+    const lisbonDayName = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", weekday: "short" }).format(now).toLowerCase();
+    const dayMap = { "dom": 0, "seg": 1, "ter": 2, "qua": 3, "qui": 4, "sex": 5, "sáb": 6, "sab": 6 };
+    const lisbonDay = dayMap[lisbonDayName.slice(0, 3)] ?? -1;
+
+    // Datas da semana actual (Seg a Dom)
+    const lisbonDateStr = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Lisbon" }).format(now);
+    const lisbonDate = new Date(lisbonDateStr + "T12:00:00");
+    const dow = lisbonDate.getDay();
+    const diffToMon = dow === 0 ? -6 : 1 - dow;
+    const weekStart = new Date(lisbonDate); weekStart.setDate(lisbonDate.getDate() + diffToMon);
+    const weekEnd   = new Date(weekStart);  weekEnd.setDate(weekStart.getDate() + 6);
+    const weekStartISO = weekStart.toISOString().split("T")[0];
+    const weekEndISO   = weekEnd.toISOString().split("T")[0];
+
+    // Semana anterior
+    const prevStart = new Date(weekStart); prevStart.setDate(weekStart.getDate() - 7);
+    const prevEnd   = new Date(weekEnd);   prevEnd.setDate(weekEnd.getDate() - 7);
+    const prevStartISO = prevStart.toISOString().split("T")[0];
+    const prevEndISO   = prevEnd.toISOString().split("T")[0];
+
+    console.log(`[sendWeeklyReview] dia=${lisbonDay}(${lisbonDayName}), hora=${lisbonHour}, semana=${weekStartISO}→${weekEndISO}`);
+
+    const usersSnap = await db.collection("users")
+      .where("weeklyReview.enabled", "==", true)
+      .where("weeklyReview.day", "==", lisbonDay)
+      .where("weeklyReview.hour", "==", lisbonHour)
+      .get();
+
+    if (usersSnap.empty) { console.log("[sendWeeklyReview] Nenhum utilizador."); return null; }
+
+    await Promise.all(usersSnap.docs.map(async (userDoc) => {
+      const uid  = userDoc.id;
+      const data = userDoc.data();
+      const toEmail = data.weeklyReview.email;
+
+      let displayName = "utilizador";
+      try { const u = await admin.auth().getUser(uid); displayName = u.displayName || u.email?.split("@")[0] || "utilizador"; } catch (_) {}
+
+      const tarefasSnap = await db.collection(`users/${uid}/tarefas`).get();
+      const all = tarefasSnap.docs.map(d => d.data());
+
+      const thisWeek = all.filter(t => t.prazo && t.prazo >= weekStartISO && t.prazo <= weekEndISO + "T23:59");
+      const prevWeek = all.filter(t => t.prazo && t.prazo >= prevStartISO  && t.prazo <= prevEndISO  + "T23:59");
+
+      const thisCompleted = thisWeek.filter(t => t.status === "concluida").length;
+      const thisTotal     = thisWeek.length;
+      const thisPct       = thisTotal > 0 ? Math.round((thisCompleted / thisTotal) * 100) : 0;
+      const prevCompleted = prevWeek.filter(t => t.status === "concluida").length;
+      const prevTotal     = prevWeek.length;
+      const prevPct       = prevTotal > 0 ? Math.round((prevCompleted / prevTotal) * 100) : 0;
+      const diff          = thisPct - prevPct;
+      const diffLabel     = diff > 0 ? `▲ +${diff}% vs semana anterior` : diff < 0 ? `▼ ${diff}% vs semana anterior` : "= igual à semana anterior";
+      const diffColor     = diff > 0 ? "#4ade80" : diff < 0 ? "#f87171" : "#9b85ff";
+
+      const habitosSnap = await db.collection(`users/${uid}/habitos`).get();
+      const habitos  = habitosSnap.docs.map(d => d.data());
+      const maxStreak = habitos.length > 0 ? Math.max(...habitos.map(h => h.streak || 0)) : 0;
+      const avgStreak = habitos.length > 0 ? Math.round(habitos.reduce((s, h) => s + (h.streak || 0), 0) / habitos.length) : 0;
+
+      const completedList = thisWeek.filter(t => t.status === "concluida")
+        .sort((a, b) => (b.prazo || "").localeCompare(a.prazo || "")).slice(0, 8);
+
+      const weekLabel = `${weekStart.toLocaleDateString("pt-PT", { day: "numeric", month: "long" })} – ${weekEnd.toLocaleDateString("pt-PT", { day: "numeric", month: "long", year: "numeric" })}`;
+
+      const html = buildWeeklyReviewEmail(displayName, { weekLabel, thisCompleted, thisTotal, thisPct, diffLabel, diffColor, maxStreak, avgStreak, completedList });
+
+      try {
+        await resend.emails.send({
+          from: "Kairo <digest@kairoelite.app>",
+          to: toEmail,
+          subject: `📊 O teu resumo semanal · ${weekLabel}`,
+          html,
+        });
+        console.log(`[sendWeeklyReview] Enviado para ${toEmail} (uid=${uid})`);
+      } catch (err) {
+        console.error(`[sendWeeklyReview] Erro para ${toEmail}:`, err.message);
+      }
+    }));
+
+    return null;
+  });
+
+function buildWeeklyReviewEmail(nome, { weekLabel, thisCompleted, thisTotal, thisPct, diffLabel, diffColor, maxStreak, avgStreak, completedList }) {
+  const taskRows = completedList.length > 0
+    ? completedList.map(t => `<tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #1e1e2e;color:#c9c9e0;font-size:14px;">✅ ${t.titulo}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #1e1e2e;color:#666;font-size:13px;text-align:right;">${t.prazo ? t.prazo.slice(0,10) : ""}</td>
+      </tr>`).join("")
+    : `<tr><td colspan="2" style="padding:16px;color:#555;text-align:center;font-size:14px;">Nenhuma tarefa concluída esta semana.</td></tr>`;
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0a0a14;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a14;padding:40px 20px;">
+<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="background:linear-gradient(135deg,#7c5cff,#4ea8ff);border-radius:16px 16px 0 0;padding:36px 40px;text-align:center;">
+    <div style="font-size:40px;margin-bottom:8px;">📊</div>
+    <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">Resumo Semanal</h1>
+    <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">${weekLabel}</p>
+  </td></tr>
+  <tr><td style="background:#12122a;padding:28px 40px;">
+    <p style="margin:0;color:#c9c9e0;font-size:16px;">Olá, <strong style="color:#fff;">${nome}</strong> 👋</p>
+    <p style="margin:10px 0 0;color:#888;font-size:14px;line-height:1.6;">Aqui está o resumo da tua semana de produtividade. Continua assim!</p>
+  </td></tr>
+  <tr><td style="background:#12122a;padding:0 40px 28px;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td width="32%" style="text-align:center;background:#0d0d1f;border-radius:12px;padding:20px 8px;border:1px solid #1e1e3a;">
+        <div style="font-size:30px;font-weight:700;color:#7c5cff;">${thisPct}%</div>
+        <div style="font-size:12px;color:#666;margin-top:4px;">Produtividade</div>
+        <div style="font-size:11px;color:${diffColor};margin-top:4px;">${diffLabel}</div>
+      </td>
+      <td width="2%"></td>
+      <td width="32%" style="text-align:center;background:#0d0d1f;border-radius:12px;padding:20px 8px;border:1px solid #1e1e3a;">
+        <div style="font-size:30px;font-weight:700;color:#4ade80;">${thisCompleted}</div>
+        <div style="font-size:12px;color:#666;margin-top:4px;">Tarefas concluídas</div>
+        <div style="font-size:11px;color:#555;margin-top:4px;">de ${thisTotal} agendadas</div>
+      </td>
+      <td width="2%"></td>
+      <td width="32%" style="text-align:center;background:#0d0d1f;border-radius:12px;padding:20px 8px;border:1px solid #1e1e3a;">
+        <div style="font-size:30px;font-weight:700;color:#f59e0b;">🔥${maxStreak}</div>
+        <div style="font-size:12px;color:#666;margin-top:4px;">Maior streak</div>
+        <div style="font-size:11px;color:#555;margin-top:4px;">média: ${avgStreak} dias</div>
+      </td>
+    </tr></table>
+  </td></tr>
+  <tr><td style="background:#12122a;padding:0 40px 28px;">
+    <h3 style="margin:0 0 14px;color:#fff;font-size:15px;">✅ Concluídas esta semana</h3>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #1e1e2e;border-radius:10px;overflow:hidden;">${taskRows}</table>
+  </td></tr>
+  <tr><td style="background:#12122a;padding:0 40px 36px;text-align:center;">
+    <a href="https://kairoelite.app/app.html" style="display:inline-block;background:linear-gradient(135deg,#7c5cff,#4ea8ff);color:#fff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:600;font-size:15px;">Planear a próxima semana →</a>
+  </td></tr>
+  <tr><td style="background:#0d0d1f;border-radius:0 0 16px 16px;padding:20px 40px;text-align:center;">
+    <p style="margin:0;color:#444;font-size:12px;">Kairo · kairoelite.app · Para cancelar, vai às definições do app.</p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>`;
+}
