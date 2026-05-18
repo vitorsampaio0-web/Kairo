@@ -1365,30 +1365,50 @@
     .share-modal p  { margin:0 0 20px; color:#555; font-size:0.82rem; }
     /* O card que vai ser capturado */
     .streak-card {
-      width:360px; margin:0 auto 20px; border-radius:20px; padding:36px 28px;
-      background:linear-gradient(135deg,#0d0d1f 0%,#1a0a3a 50%,#0a0d1f 100%);
-      border:1px solid rgba(124,92,255,0.3); position:relative; overflow:hidden;
+      width:400px; margin:0 auto 20px; border-radius:24px;
+      padding:0; position:relative; overflow:hidden;
       font-family:'Inter',sans-serif;
+      box-shadow:0 0 60px rgba(124,92,255,0.5), 0 0 120px rgba(78,168,255,0.2);
     }
-    .streak-card::before {
-      content:''; position:absolute; top:-60px; right:-60px;
-      width:200px; height:200px; border-radius:50%;
-      background:radial-gradient(circle,rgba(124,92,255,0.3),transparent 70%);
+    .streak-card-bg {
+      background:linear-gradient(145deg,#05051a 0%,#0f0530 40%,#050d20 100%);
+      padding:36px 32px 30px;
+      position:relative; overflow:hidden;
     }
-    .streak-card::after {
-      content:''; position:absolute; bottom:-40px; left:-40px;
-      width:150px; height:150px; border-radius:50%;
-      background:radial-gradient(circle,rgba(78,168,255,0.2),transparent 70%);
+    .streak-card-bg::before {
+      content:''; position:absolute; top:-80px; right:-80px;
+      width:300px; height:300px; border-radius:50%;
+      background:radial-gradient(circle,rgba(124,92,255,0.35),transparent 65%);
+      pointer-events:none;
     }
-    .streak-card-logo { font-size:0.78rem; font-weight:700; color:#555; letter-spacing:.12em; text-transform:uppercase; margin-bottom:24px; }
-    .streak-card-fire { font-size:56px; margin-bottom:8px; line-height:1; }
-    .streak-card-num  { font-size:64px; font-weight:800; color:#fff; line-height:1; margin-bottom:4px; }
-    .streak-card-label{ font-size:1rem; color:#9b85ff; font-weight:600; margin-bottom:20px; }
-    .streak-card-bar  { display:flex; gap:5px; justify-content:center; margin-bottom:20px; }
-    .streak-card-dot  { width:28px; height:6px; border-radius:3px; background:rgba(124,92,255,0.25); }
-    .streak-card-dot.active { background:linear-gradient(90deg,#7c5cff,#4ea8ff); }
-    .streak-card-user { font-size:0.8rem; color:#444; }
-    .streak-card-site { font-size:0.75rem; color:#333; margin-top:4px; letter-spacing:.05em; }
+    .streak-card-bg::after {
+      content:''; position:absolute; bottom:-60px; left:-60px;
+      width:250px; height:250px; border-radius:50%;
+      background:radial-gradient(circle,rgba(78,168,255,0.25),transparent 65%);
+      pointer-events:none;
+    }
+    .streak-card-border {
+      position:absolute; inset:0; border-radius:24px;
+      padding:2px;
+      background:linear-gradient(135deg,#7c5cff,#4ea8ff,#7c5cff);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude;
+      pointer-events:none;
+    }
+    .streak-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; position:relative; z-index:1; }
+    .streak-card-logo-img { height:44px; width:auto; object-fit:contain; }
+    .streak-card-badge { font-size:0.68rem; font-weight:700; padding:4px 10px; border-radius:20px; background:linear-gradient(135deg,rgba(124,92,255,0.25),rgba(78,168,255,0.25)); border:1px solid rgba(124,92,255,0.4); color:#9b85ff; letter-spacing:.08em; text-transform:uppercase; }
+    .streak-card-center { text-align:center; position:relative; z-index:1; margin-bottom:24px; }
+    .streak-card-fire { font-size:52px; line-height:1; margin-bottom:4px; filter:drop-shadow(0 0 16px rgba(245,158,11,0.7)); }
+    .streak-card-num  { font-size:88px; font-weight:900; line-height:1; margin-bottom:2px; background:linear-gradient(135deg,#fff 30%,#9b85ff 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:-3px; }
+    .streak-card-dias { font-size:1rem; font-weight:700; color:#9b85ff; letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px; }
+    .streak-card-habit { font-size:0.88rem; color:rgba(255,255,255,0.55); font-weight:500; }
+    .streak-card-bar  { display:flex; gap:5px; justify-content:center; margin-bottom:22px; position:relative; z-index:1; }
+    .streak-card-dot  { width:26px; height:5px; border-radius:3px; background:rgba(124,92,255,0.18); }
+    .streak-card-dot.active { background:linear-gradient(90deg,#7c5cff,#4ea8ff); box-shadow:0 0 6px rgba(124,92,255,0.5); }
+    .streak-card-bottom { display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; padding-top:16px; border-top:1px solid rgba(124,92,255,0.15); }
+    .streak-card-user { font-size:0.82rem; color:rgba(255,255,255,0.45); font-weight:500; }
+    .streak-card-cta  { font-size:0.75rem; font-weight:700; color:#4ea8ff; letter-spacing:.04em; }
     .share-btn-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .share-btn {
       padding:10px 20px; border-radius:10px; border:none; font-size:0.85rem; font-weight:600;
@@ -2713,13 +2733,24 @@
       <h3>Partilhar Streak 🔥</h3>
       <p>Descarrega o card e partilha no Instagram ou LinkedIn</p>
       <div class="streak-card" id="streak-card-el">
-        <div class="streak-card-logo">KAIRO</div>
-        <div class="streak-card-fire">🔥</div>
-        <div class="streak-card-num" id="share-streak-num">0</div>
-        <div class="streak-card-label">dias de produtividade</div>
-        <div class="streak-card-bar" id="share-streak-bar"></div>
-        <div class="streak-card-user" id="share-streak-user"></div>
-        <div class="streak-card-site">kairoelite.app</div>
+        <div class="streak-card-border"></div>
+        <div class="streak-card-bg">
+          <div class="streak-card-top">
+            <img src="/logo-kairo.png" alt="Kairo" class="streak-card-logo-img" crossorigin="anonymous" />
+            <div class="streak-card-badge">Elite Productivity</div>
+          </div>
+          <div class="streak-card-center">
+            <div class="streak-card-fire">🔥</div>
+            <div class="streak-card-num" id="share-streak-num">0</div>
+            <div class="streak-card-dias">Dias Consecutivos</div>
+            <div class="streak-card-habit" id="share-streak-habit">de produtividade</div>
+          </div>
+          <div class="streak-card-bar" id="share-streak-bar"></div>
+          <div class="streak-card-bottom">
+            <div class="streak-card-user" id="share-streak-user"></div>
+            <div class="streak-card-cta">kairoelite.app →</div>
+          </div>
+        </div>
       </div>
       <div class="share-btn-row">
         <button class="share-btn download" onclick="downloadStreakCard()">
@@ -6203,7 +6234,11 @@
         return `<div class="streak-card-dot ${active ? "active" : ""}"></div>`;
       }).join("");
       document.getElementById("share-streak-bar").innerHTML = dots;
-      document.getElementById("share-streak-user").textContent = userName;
+      document.getElementById("share-streak-user").textContent = `— ${userName}`;
+      if (document.getElementById("share-streak-habit")) {
+        const habitName = best ? `"${best.titulo || best.nome || "produtividade"}"` : "de produtividade";
+        document.getElementById("share-streak-habit").textContent = habitName;
+      }
 
       document.getElementById("share-modal").classList.remove("hidden");
       lucide.createIcons();
