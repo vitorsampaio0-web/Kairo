@@ -1129,12 +1129,13 @@
     // ─── Load users ───
     async function loadUsers() {
       try {
-        const [res, adminsSnap] = await Promise.all([
+        const uid = firebase.auth().currentUser?.uid;
+        const [res, adminDoc] = await Promise.all([
           callAdminFn('adminGetUsers'),
-          db.collection('admins').get(),
+          db.collection('admins').doc(uid).get(),
         ]);
         allUsers = (res.result && res.result.users) || [];
-        adminUids = new Set(adminsSnap.docs.map(d => d.id));
+        adminUids = adminDoc.exists ? new Set([uid]) : new Set();
         renderUsers();
         updateMetrics();
       } catch (err) {
