@@ -1213,6 +1213,104 @@
     .cal-popup-item p  { margin: 0; font-size: 0.75rem; color: #666; }
     .cal-popup-empty   { text-align: center; color: #555; font-size: 0.85rem; padding: 20px 0; }
 
+    /* ---- Metas (Goals) ---- */
+    .metas-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .metas-header h2 { margin:0; font-size:1.25rem; color:#e0e0f0; }
+    .meta-card {
+      background:linear-gradient(135deg,#12122a,#0d0d1f);
+      border:1px solid #1e1e3a; border-radius:16px; padding:20px;
+      margin-bottom:16px; cursor:pointer; transition:border-color 0.2s, transform 0.15s;
+      position:relative; overflow:hidden;
+    }
+    .meta-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:var(--meta-color,#7c5cff);
+    }
+    .meta-card:hover { border-color:var(--meta-color,#7c5cff); transform:translateY(-1px); }
+    .meta-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .meta-card-title { font-size:1rem; font-weight:700; color:#e0e0f0; margin:0 0 4px; }
+    .meta-card-desc { font-size:0.82rem; color:#666; margin:0; }
+    .meta-card-badges { display:flex; gap:6px; flex-wrap:wrap; margin:10px 0; }
+    .meta-badge {
+      font-size:0.7rem; font-weight:600; padding:3px 10px; border-radius:20px;
+      background:rgba(124,92,255,0.12); color:#9b85ff; border:1px solid rgba(124,92,255,0.2);
+    }
+    .meta-badge.urgente { background:rgba(248,113,113,0.12); color:#f87171; border-color:rgba(248,113,113,0.2); }
+    .meta-badge.concluida { background:rgba(74,222,128,0.12); color:#4ade80; border-color:rgba(74,222,128,0.2); }
+    .meta-progress-wrap { margin:12px 0 4px; }
+    .meta-progress-track { background:#1a1a3a; border-radius:100px; height:8px; overflow:hidden; }
+    .meta-progress-bar { height:100%; border-radius:100px; background:var(--meta-color,#7c5cff); transition:width 0.4s; }
+    .meta-progress-label { display:flex; justify-content:space-between; font-size:0.72rem; color:#555; margin-top:5px; }
+    .meta-actions { display:flex; gap:8px; }
+    .meta-action-btn {
+      background:none; border:1px solid #1e1e3a; color:#666; border-radius:8px;
+      padding:5px 10px; font-size:0.75rem; cursor:pointer; transition:all 0.15s;
+      display:flex; align-items:center; gap:4px;
+    }
+    .meta-action-btn:hover { border-color:#7c5cff; color:#9b85ff; }
+    .meta-subtasks { margin-top:14px; border-top:1px solid #1a1a3a; padding-top:14px; display:none; }
+    .meta-subtasks.open { display:block; }
+    .subtask-item {
+      display:flex; align-items:center; gap:10px; padding:8px 0;
+      border-bottom:1px solid #111128;
+    }
+    .subtask-item:last-child { border-bottom:none; }
+    .subtask-check {
+      width:20px; height:20px; border-radius:6px; border:1.5px solid #2a2a4a;
+      background:#0a0a14; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+      transition:all 0.15s;
+    }
+    .subtask-check.done { background:#7c5cff; border-color:#7c5cff; }
+    .subtask-check.done::after { content:'✓'; color:#fff; font-size:0.7rem; font-weight:700; }
+    .subtask-title { flex:1; font-size:0.85rem; color:#c9c9e0; transition:color 0.15s; }
+    .subtask-title.done { color:#444; text-decoration:line-through; }
+    .subtask-del { background:none; border:none; color:#333; cursor:pointer; font-size:0.85rem; padding:2px 6px; border-radius:4px; }
+    .subtask-del:hover { color:#f87171; }
+    .add-subtask-row { display:flex; gap:8px; margin-top:10px; }
+    .add-subtask-input {
+      flex:1; background:#0a0a14; border:1px solid #1e1e3a; border-radius:8px;
+      padding:8px 12px; color:#e0e0f0; font-size:0.83rem; outline:none;
+    }
+    .add-subtask-input:focus { border-color:#7c5cff; }
+    .add-subtask-btn {
+      background:#7c5cff; border:none; color:#fff; border-radius:8px;
+      padding:8px 14px; cursor:pointer; font-size:0.82rem; font-weight:600;
+    }
+    /* Meta Modal */
+    .meta-modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1200;
+      display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px);
+    }
+    .meta-modal-card {
+      background:#12122a; border:1px solid #1e1e3a; border-radius:20px;
+      padding:28px; width:min(480px,92vw); max-height:85vh; overflow-y:auto;
+    }
+    .meta-modal-card h3 { margin:0 0 20px; color:#e0e0f0; font-size:1.1rem; }
+    .meta-field { margin-bottom:14px; }
+    .meta-field label { display:block; font-size:0.78rem; color:#777; margin-bottom:5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+    .meta-input {
+      width:100%; background:#0a0a14; border:1px solid #1e1e3a; border-radius:10px;
+      padding:10px 14px; color:#e0e0f0; font-size:0.9rem; outline:none; box-sizing:border-box;
+    }
+    .meta-input:focus { border-color:#7c5cff; }
+    .meta-duration-row { display:flex; gap:8px; }
+    .meta-dur-btn {
+      flex:1; padding:10px; border-radius:10px; border:1.5px solid #1e1e3a;
+      background:#0a0a14; color:#666; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.15s;
+    }
+    .meta-dur-btn.active { background:rgba(124,92,255,0.15); border-color:#7c5cff; color:#9b85ff; }
+    .meta-color-row { display:flex; gap:8px; flex-wrap:wrap; }
+    .meta-color-swatch {
+      width:32px; height:32px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:border-color 0.15s;
+    }
+    .meta-color-swatch.active { border-color:#fff; }
+    .meta-save-btn {
+      width:100%; background:linear-gradient(135deg,#7c5cff,#4ea8ff); border:none; color:#fff;
+      padding:13px; border-radius:12px; font-size:0.95rem; font-weight:700; cursor:pointer; margin-top:8px;
+    }
+    .meta-empty { text-align:center; padding:60px 20px; color:#444; }
+    .meta-empty i { display:block; margin:0 auto 12px; width:40px; height:40px; }
+
     /* ---- Notifications Modal ---- */
     .notif-badge {
       display: inline-flex; align-items: center; gap: 6px;
@@ -2324,6 +2422,7 @@
       <section id="tarefas-view" class="view"></section>
       <section id="habitos-view" class="view"></section>
       <section id="historico-view" class="view"></section>
+      <section id="metas-view" class="view"></section>
     </main>
   </div>
 
@@ -2365,6 +2464,46 @@
   </div>
 
   <!-- Weekly Review Modal -->
+  <!-- Meta Modal -->
+  <div class="meta-modal-overlay hidden" id="meta-modal">
+    <div class="meta-modal-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h3 id="meta-modal-title" style="margin:0;">Nova Meta</h3>
+        <button onclick="closeMetaModal()" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <div class="meta-field">
+        <label>Título</label>
+        <input id="meta-titulo" class="meta-input" placeholder="Ex: Lançar produto, aprender inglês..." maxlength="60">
+      </div>
+      <div class="meta-field">
+        <label>Descrição (opcional)</label>
+        <input id="meta-descricao" class="meta-input" placeholder="O que queres alcançar?">
+      </div>
+      <div class="meta-field">
+        <label>Duração</label>
+        <div class="meta-duration-row">
+          <button type="button" class="meta-dur-btn active" data-dur="30" onclick="selectDur(this)">30 dias</button>
+          <button type="button" class="meta-dur-btn" data-dur="60" onclick="selectDur(this)">60 dias</button>
+          <button type="button" class="meta-dur-btn" data-dur="90" onclick="selectDur(this)">90 dias</button>
+          <button type="button" class="meta-dur-btn" data-dur="0" onclick="selectDur(this)">Personalizado</button>
+        </div>
+        <input id="meta-prazo-custom" class="meta-input" type="date" style="display:none;margin-top:8px;">
+      </div>
+      <div class="meta-field">
+        <label>Cor</label>
+        <div class="meta-color-row" id="meta-color-row">
+          <div class="meta-color-swatch active" data-color="#7c5cff" style="background:#7c5cff;" onclick="selectMetaColor(this)"></div>
+          <div class="meta-color-swatch" data-color="#4ea8ff" style="background:#4ea8ff;" onclick="selectMetaColor(this)"></div>
+          <div class="meta-color-swatch" data-color="#4ade80" style="background:#4ade80;" onclick="selectMetaColor(this)"></div>
+          <div class="meta-color-swatch" data-color="#f59e0b" style="background:#f59e0b;" onclick="selectMetaColor(this)"></div>
+          <div class="meta-color-swatch" data-color="#f87171" style="background:#f87171;" onclick="selectMetaColor(this)"></div>
+          <div class="meta-color-swatch" data-color="#a78bfa" style="background:#a78bfa;" onclick="selectMetaColor(this)"></div>
+        </div>
+      </div>
+      <input type="hidden" id="meta-edit-id">
+      <button class="meta-save-btn" onclick="saveMeta()">Guardar Meta</button>
+    </div>
+  </div>
   <div class="digest-overlay hidden" id="weekly-modal">
     <div class="digest-card">
       <button class="digest-close" onclick="closeWeeklyModal()"><i data-lucide="x"></i></button>
@@ -2737,6 +2876,7 @@
       tarefas: [],
       eventos: [],
       habitos: [],
+      metas: [],
       subscription: { plan: "free" }
     };
 
@@ -2862,7 +3002,12 @@
         renderAll();
       }, err => console.error("[Firestore] eventos onSnapshot:", err));
 
-      _firestoreUnsubs = [unsub1, unsub2, unsub3];
+      const unsub4 = db.collection(`users/${uid}/metas`).onSnapshot(snap => {
+        appState.metas = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+        renderAll();
+      }, err => console.error("[Firestore] metas onSnapshot:", err));
+
+      _firestoreUnsubs = [unsub1, unsub2, unsub3, unsub4];
     }
 
     function fsSet(col, id, data) {
@@ -2886,17 +3031,19 @@
 
     const navItems = [
       { id: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
-      { id: "agenda", label: "Agenda", icon: "calendar-range" },
-      { id: "tarefas", label: "Tarefas", icon: "check-square" },
-      { id: "habitos", label: "Hábitos", icon: "heart-pulse" },
+      { id: "metas",     label: "Metas",     icon: "target" },
+      { id: "agenda",    label: "Agenda",    icon: "calendar-range" },
+      { id: "tarefas",   label: "Tarefas",   icon: "check-square" },
+      { id: "habitos",   label: "Hábitos",   icon: "heart-pulse" },
       { id: "historico", label: "Histórico", icon: "clock" }
     ];
 
     const viewIds = {
       dashboard: "dashboard-view",
-      agenda: "agenda-view",
-      tarefas: "tarefas-view",
-      habitos: "habitos-view",
+      metas:     "metas-view",
+      agenda:    "agenda-view",
+      tarefas:   "tarefas-view",
+      habitos:   "habitos-view",
       historico: "historico-view"
     };
 
@@ -3180,6 +3327,28 @@
                 </div>
               </div>
             `).join("")}
+
+            ${appState.metas.length > 0 ? `
+            <div style="margin-top:16px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <h3 style="margin:0;font-size:0.9rem;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Metas Ativas</h3>
+                <button onclick="switchView('metas')" style="background:none;border:none;color:#7c5cff;font-size:0.78rem;cursor:pointer;">Ver todas →</button>
+              </div>
+              ${appState.metas.slice(0,3).map(m => {
+                const sub = m.subtarefas || [];
+                const pct = sub.length > 0 ? Math.round(sub.filter(s=>s.concluida).length/sub.length*100) : 0;
+                const color = m.cor || "#7c5cff";
+                return `<div style="margin-bottom:10px;" onclick="switchView('metas')" style="cursor:pointer;">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                    <span style="font-size:0.83rem;color:#c9c9e0;">${m.titulo}</span>
+                    <span style="font-size:0.75rem;color:${color};font-weight:700;">${pct}%</span>
+                  </div>
+                  <div style="background:#1a1a3a;border-radius:100px;height:5px;overflow:hidden;">
+                    <div style="width:${pct}%;height:100%;background:${color};border-radius:100px;transition:width 0.4s;"></div>
+                  </div>
+                </div>`;
+              }).join("")}
+            </div>` : ""}
           </div>
         </div>
       `;
@@ -3840,6 +4009,7 @@
       renderTarefas();
       renderHabitos();
       renderHistorico();
+      renderMetas();
       renderMiniCalendar();
 
       Object.entries(viewIds).forEach(([key, id]) => {
@@ -5422,6 +5592,215 @@
       if (e.target === this) closeDigestModal();
     });
     // ---- End Email Digest ----
+
+    // ============================================================
+    // METAS — Goals Feature
+    // ============================================================
+    const META_COLORS = ["#7c5cff","#4ea8ff","#4ade80","#f59e0b","#f87171","#a78bfa"];
+
+    function renderMetas() {
+      const el = document.getElementById("metas-view");
+      if (!el) return;
+      const today = new Date(appState.today + "T12:00:00");
+      const sorted = [...appState.metas].sort((a,b) => (a.prazo||"").localeCompare(b.prazo||""));
+
+      const cards = sorted.map(meta => {
+        const sub = meta.subtarefas || [];
+        const done = sub.filter(s => s.concluida).length;
+        const pct  = sub.length > 0 ? Math.round((done / sub.length) * 100) : 0;
+        const color = meta.cor || "#7c5cff";
+        const prazoDate = meta.prazo ? new Date(meta.prazo + "T12:00:00") : null;
+        const daysLeft = prazoDate ? Math.ceil((prazoDate - today) / 86400000) : null;
+        const isConc   = pct === 100;
+        const isUrg    = daysLeft !== null && daysLeft <= 7 && !isConc;
+
+        const daysLabel = daysLeft === null ? "" : daysLeft < 0 ? "Expirada" : daysLeft === 0 ? "Termina hoje" : `${daysLeft} dias restantes`;
+        const badge = isConc
+          ? `<span class="meta-badge concluida">✓ Concluída</span>`
+          : isUrg
+          ? `<span class="meta-badge urgente">⚡ ${daysLabel}</span>`
+          : daysLabel ? `<span class="meta-badge">${daysLabel}</span>` : "";
+
+        const subtaskHtml = sub.map(s => `
+          <div class="subtask-item">
+            <div class="subtask-check ${s.concluida ? 'done' : ''}" onclick="toggleSubtask('${meta.id}','${s.id}')"></div>
+            <span class="subtask-title ${s.concluida ? 'done' : ''}">${s.titulo}</span>
+            <button class="subtask-del" onclick="deleteSubtask('${meta.id}','${s.id}')" title="Apagar">✕</button>
+          </div>`).join("");
+
+        return `
+        <div class="meta-card" style="--meta-color:${color};">
+          <div class="meta-card-top">
+            <div style="flex:1;">
+              <p class="meta-card-title">${meta.titulo}</p>
+              ${meta.descricao ? `<p class="meta-card-desc">${meta.descricao}</p>` : ""}
+            </div>
+            <div class="meta-actions">
+              <button class="meta-action-btn" onclick="openEditMeta('${meta.id}')"><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
+              <button class="meta-action-btn" onclick="deleteMeta('${meta.id}')" style="color:#f87171;border-color:rgba(248,113,113,0.2);"><i data-lucide="trash-2" style="width:13px;height:13px;"></i></button>
+            </div>
+          </div>
+          <div class="meta-card-badges">${badge}</div>
+          <div class="meta-progress-wrap">
+            <div class="meta-progress-track">
+              <div class="meta-progress-bar" style="width:${pct}%;"></div>
+            </div>
+            <div class="meta-progress-label">
+              <span>${done}/${sub.length} sub-tarefas</span>
+              <span style="color:${color};font-weight:700;">${pct}%</span>
+            </div>
+          </div>
+          <button class="meta-action-btn" style="margin-top:8px;width:100%;justify-content:center;" onclick="toggleSubtasksPanel('${meta.id}')">
+            <i data-lucide="chevron-down" style="width:13px;height:13px;" id="meta-chevron-${meta.id}"></i> Sub-tarefas (${sub.length})
+          </button>
+          <div class="meta-subtasks" id="meta-sub-${meta.id}">
+            ${subtaskHtml || `<p style="color:#444;font-size:0.82rem;padding:8px 0;">Ainda sem sub-tarefas.</p>`}
+            <div class="add-subtask-row">
+              <input class="add-subtask-input" id="sub-input-${meta.id}" placeholder="Nova sub-tarefa..." onkeydown="if(event.key==='Enter')addSubtask('${meta.id}')">
+              <button class="add-subtask-btn" onclick="addSubtask('${meta.id}')">+</button>
+            </div>
+          </div>
+        </div>`;
+      }).join("");
+
+      el.innerHTML = `
+        <div class="metas-header">
+          <h2><i data-lucide="target" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;"></i>Metas</h2>
+          <button class="primary-btn" onclick="openNewMeta()" style="padding:8px 16px;font-size:0.85rem;">+ Nova Meta</button>
+        </div>
+        ${sorted.length === 0
+          ? `<div class="meta-empty">
+               <i data-lucide="target"></i>
+               <p style="font-size:1rem;color:#555;margin:0 0 6px;">Nenhuma meta ainda</p>
+               <p style="font-size:0.82rem;color:#333;">Define o teu primeiro objetivo de 30/60/90 dias</p>
+             </div>`
+          : cards}`;
+      lucide.createIcons();
+    }
+
+    // --- Modal helpers ---
+    function openNewMeta() {
+      document.getElementById("meta-modal-title").textContent = "Nova Meta";
+      document.getElementById("meta-titulo").value = "";
+      document.getElementById("meta-descricao").value = "";
+      document.getElementById("meta-edit-id").value = "";
+      document.getElementById("meta-prazo-custom").style.display = "none";
+      document.querySelectorAll(".meta-dur-btn").forEach((b,i) => b.classList.toggle("active", i===0));
+      document.querySelectorAll(".meta-color-swatch").forEach((s,i) => s.classList.toggle("active", i===0));
+      document.getElementById("meta-modal").classList.remove("hidden");
+    }
+
+    function openEditMeta(id) {
+      const meta = appState.metas.find(m => m.id === id);
+      if (!meta) return;
+      document.getElementById("meta-modal-title").textContent = "Editar Meta";
+      document.getElementById("meta-titulo").value = meta.titulo || "";
+      document.getElementById("meta-descricao").value = meta.descricao || "";
+      document.getElementById("meta-edit-id").value = id;
+      // duracao
+      document.querySelectorAll(".meta-dur-btn").forEach(b => {
+        b.classList.toggle("active", String(b.dataset.dur) === String(meta.duracao || 30));
+      });
+      if (meta.duracao === 0) {
+        document.getElementById("meta-prazo-custom").style.display = "block";
+        document.getElementById("meta-prazo-custom").value = meta.prazo || "";
+      } else {
+        document.getElementById("meta-prazo-custom").style.display = "none";
+      }
+      // cor
+      document.querySelectorAll(".meta-color-swatch").forEach(s => {
+        s.classList.toggle("active", s.dataset.color === (meta.cor || "#7c5cff"));
+      });
+      document.getElementById("meta-modal").classList.remove("hidden");
+    }
+
+    function closeMetaModal() {
+      document.getElementById("meta-modal").classList.add("hidden");
+    }
+
+    function selectDur(btn) {
+      document.querySelectorAll(".meta-dur-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const custom = document.getElementById("meta-prazo-custom");
+      custom.style.display = btn.dataset.dur === "0" ? "block" : "none";
+    }
+
+    function selectMetaColor(el) {
+      document.querySelectorAll(".meta-color-swatch").forEach(s => s.classList.remove("active"));
+      el.classList.add("active");
+    }
+
+    async function saveMeta() {
+      const titulo = document.getElementById("meta-titulo").value.trim();
+      if (!titulo) { showToast("Insere um título para a meta."); return; }
+      const durBtn = document.querySelector(".meta-dur-btn.active");
+      const duracao = parseInt(durBtn?.dataset.dur || "30", 10);
+      let prazo;
+      if (duracao === 0) {
+        prazo = document.getElementById("meta-prazo-custom").value;
+        if (!prazo) { showToast("Escolhe uma data limite."); return; }
+      } else {
+        const d = new Date(); d.setDate(d.getDate() + duracao);
+        prazo = d.toISOString().split("T")[0];
+      }
+      const cor = document.querySelector(".meta-color-swatch.active")?.dataset.color || "#7c5cff";
+      const descricao = document.getElementById("meta-descricao").value.trim();
+      const editId = document.getElementById("meta-edit-id").value;
+
+      if (editId) {
+        const meta = appState.metas.find(m => m.id === editId);
+        const updated = { ...meta, titulo, descricao, duracao, prazo, cor };
+        db.collection(`users/${currentUser.uid}/metas`).doc(editId).set(updated);
+      } else {
+        const id = String(Date.now());
+        const nova = { id, titulo, descricao, duracao, prazo, cor, criadaEm: appState.today, subtarefas: [] };
+        db.collection(`users/${currentUser.uid}/metas`).doc(id).set(nova);
+      }
+      closeMetaModal();
+      showToast(editId ? "Meta atualizada!" : "Meta criada!");
+    }
+
+    function deleteMeta(id) {
+      if (!confirm("Apagar esta meta?")) return;
+      db.collection(`users/${currentUser.uid}/metas`).doc(id).delete();
+      showToast("Meta apagada.");
+    }
+
+    function toggleSubtasksPanel(metaId) {
+      const panel   = document.getElementById("meta-sub-" + metaId);
+      const chevron = document.getElementById("meta-chevron-" + metaId);
+      if (!panel) return;
+      panel.classList.toggle("open");
+      if (chevron) chevron.style.transform = panel.classList.contains("open") ? "rotate(180deg)" : "";
+    }
+
+    function addSubtask(metaId) {
+      const input = document.getElementById("sub-input-" + metaId);
+      const titulo = input?.value.trim();
+      if (!titulo) return;
+      const meta = appState.metas.find(m => m.id === metaId);
+      if (!meta) return;
+      const sub = [...(meta.subtarefas || []), { id: String(Date.now()), titulo, concluida: false }];
+      db.collection(`users/${currentUser.uid}/metas`).doc(metaId).update({ subtarefas: sub });
+      input.value = "";
+    }
+
+    function toggleSubtask(metaId, subId) {
+      const meta = appState.metas.find(m => m.id === metaId);
+      if (!meta) return;
+      const sub = (meta.subtarefas || []).map(s => s.id === subId ? { ...s, concluida: !s.concluida } : s);
+      db.collection(`users/${currentUser.uid}/metas`).doc(metaId).update({ subtarefas: sub });
+    }
+
+    function deleteSubtask(metaId, subId) {
+      const meta = appState.metas.find(m => m.id === metaId);
+      if (!meta) return;
+      const sub = (meta.subtarefas || []).filter(s => s.id !== subId);
+      db.collection(`users/${currentUser.uid}/metas`).doc(metaId).update({ subtarefas: sub });
+    }
+    // ============================================================
+    // END METAS
+    // ============================================================
 
     // ---- Day Picker Calendar helpers ----
     const _daycalState = {
