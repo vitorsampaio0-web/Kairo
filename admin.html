@@ -460,6 +460,68 @@
       font-size: 0.9rem;
     }
 
+    /* ─── Feature Flags ─── */
+    .feat-section-tabs {
+      display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .feat-tab {
+      padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+      background: rgba(154,170,196,0.1); color: var(--muted); cursor: pointer;
+      border: 1px solid transparent; transition: all 0.15s;
+    }
+    .feat-tab.active, .feat-tab:hover {
+      background: rgba(124,92,255,0.18); color: var(--text);
+      border-color: rgba(124,92,255,0.3);
+    }
+    .feat-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(154,170,196,0.07);
+    }
+    .feat-row:last-of-type { border-bottom: none; }
+    .feat-info { min-width: 0; }
+    .feat-name { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .feat-desc { font-size: 0.75rem; color: var(--muted); }
+    .feat-col-label {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; text-align: center; width: 52px;
+    }
+    .feat-col-label.free-lbl { color: var(--muted); }
+    .feat-col-label.pro-lbl  { color: var(--primary-2); }
+    /* Toggle switch */
+    .tog { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .tog input { opacity: 0; width: 0; height: 0; }
+    .tog-slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: rgba(154,170,196,0.15); border-radius: 22px;
+      border: 1px solid rgba(154,170,196,0.15); transition: .25s;
+    }
+    .tog-slider::before {
+      content: ""; position: absolute;
+      width: 16px; height: 16px; left: 2px; bottom: 2px;
+      background: #4a5568; border-radius: 50%; transition: .25s;
+    }
+    .tog input:checked + .tog-slider { background: linear-gradient(90deg,#7c5cff,#00c2ff); border-color: rgba(124,92,255,0.4); }
+    .tog input:checked + .tog-slider::before { transform: translateX(18px); background: #fff; }
+    .feat-header-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(154,170,196,0.1);
+      margin-bottom: 4px;
+    }
+    .feat-save-bar {
+      margin-top: 20px; display: flex; align-items: center;
+      justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .feat-status { font-size: 0.82rem; color: var(--muted); }
+    .feat-status.saved { color: var(--success); }
+    .feat-status.error { color: var(--danger); }
+
     /* ─── Admin toggle button ─── */
     .admin-toggle-btn {
       border: 0;
@@ -826,10 +888,7 @@
           <table id="vouchers-table">
             <thead>
               <tr>
-                <th>Código</th>
-                <th>Duração</th>
-                <th>Usos</th>
-                <th>Criado em</th>
+                <th>Código</th><th>Duração</th><th>Usos</th><th>Criado em</th>
               </tr>
             </thead>
             <tbody id="vouchers-tbody">
@@ -838,8 +897,41 @@
           </table>
         </div>
       </div>
-    </div>
-  </div>
+
+      <!-- Feature Flags -->
+      <div class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-title">
+          <i data-lucide="sliders" style="width:18px;height:18px;"></i>
+          Gestão de Funcionalidades — Free vs Pro
+        </div>
+        <p style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">
+          Define quais as funcionalidades disponíveis em cada plano. As alterações ficam ativas na app após guardar.
+        </p>
+        <div class="feat-section-tabs" id="feat-tabs">
+          <button class="feat-tab active" data-cat="all">Todas</button>
+          <button class="feat-tab" data-cat="core">Core</button>
+          <button class="feat-tab" data-cat="productivity">Produtividade</button>
+          <button class="feat-tab" data-cat="ai">IA & Relatórios</button>
+          <button class="feat-tab" data-cat="social">Social & Equipa</button>
+          <button class="feat-tab" data-cat="notifications">Notificações</button>
+        </div>
+        <div class="feat-header-row">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Funcionalidade</div>
+          <div class="feat-col-label free-lbl">Free</div>
+          <div class="feat-col-label pro-lbl">Pro</div>
+          <div style="width:16px;"></div>
+        </div>
+        <div id="feat-rows"><div class="empty-msg">A carregar configuração…</div></div>
+        <div class="feat-save-bar">
+          <span class="feat-status" id="feat-status">A carregar…</span>
+          <button class="primary-btn" id="save-features-btn" style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="save" style="width:15px;height:15px;"></i> Guardar Configuração
+          </button>
+        </div>
+      </div>
+
+    </div><!-- end sections-grid -->
+  </div><!-- end admin-shell -->
 
   <!-- Admin Login Screen -->
   <div id="admin-login-screen" class="admin-login-screen" style="display:none;">
@@ -1284,6 +1376,128 @@
 
     // Render static lucide icons (login screen shield, etc.)
     lucide.createIcons();
+
+    // ═══════════════════════════════════════════════════════════
+    // FEATURE FLAGS — Gestão Free vs Pro
+    // ═══════════════════════════════════════════════════════════
+    const FEATURES = [
+      { id:"tarefas",       label:"Tarefas",                  desc:"Criação, edição e gestão de tarefas",              cat:"core",          free:true,  pro:true  },
+      { id:"habitos",       label:"Hábitos",                  desc:"Tracking de hábitos diários e streaks",            cat:"core",          free:true,  pro:true  },
+      { id:"agenda",        label:"Agenda Visual",            desc:"Calendário mensal com eventos e tarefas",          cat:"core",          free:true,  pro:true  },
+      { id:"recorrentes",   label:"Tarefas Recorrentes",      desc:"Tarefas diárias/semanais/mensais automáticas",     cat:"productivity",  free:true,  pro:true  },
+      { id:"pomodoro",      label:"Modo Foco (Pomodoro)",     desc:"Timer Pomodoro integrado nas tarefas",             cat:"productivity",  free:false, pro:true  },
+      { id:"metas",         label:"Metas",                    desc:"Objetivos com sub-tarefas e progresso",            cat:"productivity",  free:false, pro:true  },
+      { id:"historico",     label:"Histórico",                desc:"Análise de desempenho e gráficos históricos",      cat:"productivity",  free:false, pro:true  },
+      { id:"kairo_ia",      label:"Kairo IA",                 desc:"Análise de padrões de produtividade",              cat:"ai",            free:false, pro:true  },
+      { id:"relatorio_pdf", label:"Relatório Executivo PDF",  desc:"Relatório de 4 páginas para o Board",              cat:"ai",            free:false, pro:true  },
+      { id:"email_diario",  label:"Email Diário",             desc:"Resumo diário de tarefas por email",               cat:"notifications", free:false, pro:true  },
+      { id:"weekly_review", label:"Resumo Semanal",           desc:"Relatório semanal de produtividade por email",     cat:"notifications", free:false, pro:true  },
+      { id:"push_notifs",   label:"Notificações Push",        desc:"Lembretes push no navegador/telemóvel",            cat:"notifications", free:false, pro:true  },
+      { id:"modo_equipa",   label:"Modo Equipa",              desc:"Equipas, delegação e accountability",              cat:"social",        free:false, pro:true  },
+      { id:"share_streak",  label:"Partilhar Streak",         desc:"Card visual para partilhar nas redes sociais",     cat:"social",        free:true,  pro:true  },
+      { id:"convite_amigos",label:"Convite de Amigos",        desc:"30 dias Pro por cada amigo que subscrever",        cat:"social",        free:true,  pro:true  },
+    ];
+
+    let featConfig  = {};
+    let activeCat   = "all";
+
+    function renderFeatRows() {
+      const list = activeCat === "all" ? FEATURES : FEATURES.filter(f => f.cat === activeCat);
+      const html = list.map(f => {
+        const freeVal = featConfig[f.id]?.free  ?? f.free;
+        const proVal  = featConfig[f.id]?.pro   ?? f.pro;
+        const catColor = {
+          core:"#4ea8ff", productivity:"#31d0aa", ai:"#9b85ff",
+          notifications:"#f59e0b", social:"#f87171"
+        }[f.cat] || "#777";
+        return `
+          <div class="feat-row" data-id="${f.id}">
+            <div class="feat-info">
+              <div class="feat-name">
+                ${f.label}
+                <span style="font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:20px;background:${catColor}20;color:${catColor};margin-left:6px;vertical-align:middle;">${f.cat}</span>
+              </div>
+              <div class="feat-desc">${f.desc}</div>
+            </div>
+            <label class="tog">
+              <input type="checkbox" ${freeVal ? "checked" : ""} onchange="updateFeat('${f.id}','free',this.checked)">
+              <span class="tog-slider"></span>
+            </label>
+            <label class="tog">
+              <input type="checkbox" ${proVal ? "checked" : ""} onchange="updateFeat('${f.id}','pro',this.checked)">
+              <span class="tog-slider"></span>
+            </label>
+            <div style="width:16px;"></div>
+          </div>`;
+      }).join("");
+      document.getElementById("feat-rows").innerHTML = html || `<div class="empty-msg">Nenhuma funcionalidade nesta categoria.</div>`;
+    }
+
+    function updateFeat(id, plan, val) {
+      if (!featConfig[id]) featConfig[id] = {};
+      featConfig[id][plan] = val;
+      const status = document.getElementById("feat-status");
+      status.textContent = "Alterações não guardadas";
+      status.className = "feat-status";
+    }
+
+    async function loadFeatureConfig() {
+      try {
+        const doc = await db.collection("config").doc("features").get();
+        featConfig = doc.exists ? (doc.data() || {}) : {};
+        // Preencher defaults para features que ainda não têm config
+        FEATURES.forEach(f => {
+          if (!featConfig[f.id]) featConfig[f.id] = { free: f.free, pro: f.pro };
+        });
+        document.getElementById("feat-status").textContent = "Configuração carregada";
+        document.getElementById("feat-status").className = "feat-status saved";
+        renderFeatRows();
+      } catch (e) {
+        console.error("[Features]", e);
+        document.getElementById("feat-status").textContent = "Erro ao carregar";
+        document.getElementById("feat-status").className = "feat-status error";
+      }
+    }
+
+    async function saveFeatureConfig() {
+      const btn = document.getElementById("save-features-btn");
+      btn.disabled = true; btn.textContent = "A guardar…";
+      try {
+        await db.collection("config").doc("features").set(featConfig, { merge: true });
+        document.getElementById("feat-status").textContent = "✓ Guardado com sucesso — ativo na app";
+        document.getElementById("feat-status").className = "feat-status saved";
+      } catch (e) {
+        console.error("[Features save]", e);
+        document.getElementById("feat-status").textContent = "Erro ao guardar — verifica as regras do Firestore";
+        document.getElementById("feat-status").className = "feat-status error";
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="save" style="width:15px;height:15px;"></i> Guardar Configuração`;
+        lucide.createIcons();
+      }
+    }
+
+    // Tabs de categoria
+    document.getElementById("feat-tabs").addEventListener("click", e => {
+      const btn = e.target.closest("[data-cat]");
+      if (!btn) return;
+      activeCat = btn.dataset.cat;
+      document.querySelectorAll(".feat-tab").forEach(t => t.classList.toggle("active", t === btn));
+      renderFeatRows();
+    });
+
+    document.getElementById("save-features-btn").addEventListener("click", saveFeatureConfig);
+
+    // Carregar config após auth
+    firebase.auth().onAuthStateChanged(async user => {
+      if (user) {
+        const adminDoc = await db.collection("admins").doc(user.uid).get();
+        if (adminDoc.exists) loadFeatureConfig();
+      }
+    });
+    // ═══════════════════════════════════════════════════════════
+    // END FEATURE FLAGS
+    // ═══════════════════════════════════════════════════════════
   </script>
 </body>
 </html>
