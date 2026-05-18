@@ -5972,9 +5972,12 @@
       let codigo = appState.codigoConvite;
       if (!codigo) {
         codigo = currentUser.uid.slice(0, 8).toUpperCase();
-        await db.doc(`users/${currentUser.uid}`).set({ codigoConvite: codigo }, { merge: true });
-        // Registo global: código → uid
-        await db.doc(`referrals/${codigo}`).set({ uid: currentUser.uid, criadoEm: new Date().toISOString() });
+        try {
+          await db.doc(`users/${currentUser.uid}`).set({ codigoConvite: codigo }, { merge: true });
+          await db.doc(`referrals/${codigo}`).set({ uid: currentUser.uid, criadoEm: new Date().toISOString() });
+        } catch (e) {
+          console.warn("[Referral] Erro ao guardar código:", e.message);
+        }
         appState.codigoConvite = codigo;
       }
 

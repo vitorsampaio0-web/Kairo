@@ -5,8 +5,7 @@ service cloud.firestore {
     // Users: cada utilizador acede apenas aos seus dados
     match /users/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
-      // Escrita directa ao documento do user bloqueada (apenas Cloud Functions via Admin SDK)
-      allow write: if false;
+      allow write: if request.auth != null && request.auth.uid == uid;
 
       match /tarefas/{id} {
         allow read, write: if request.auth != null && request.auth.uid == uid;
@@ -16,6 +15,22 @@ service cloud.firestore {
       }
       match /eventos/{id} {
         allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+      match /metas/{id} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // Referrals: qualquer utilizador autenticado pode ler (para validar código)
+    // Só o dono pode criar o seu próprio código
+    match /referrals/{code} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+
+      match /conversoes/{uid} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null && request.auth.uid == uid;
       }
     }
 
