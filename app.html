@@ -1223,15 +1223,25 @@
     .notif-badge.denied  { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
     .notif-badge.default { background: rgba(124,92,255,0.1); color: #9b85ff; border: 1px solid rgba(124,92,255,0.2); }
 
-    /* ---- Day Picker (Repetição Específica) ---- */
-    .day-picker { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
-    .day-picker-btn {
-      width:38px; height:38px; border-radius:50%; border:1.5px solid #2a2a4a;
-      background:#0d0d1f; color:#666; font-size:0.72rem; font-weight:600;
-      cursor:pointer; transition:all 0.18s; display:flex; align-items:center; justify-content:center;
+    /* ---- Day Picker Calendar (Repetição Específica) ---- */
+    .daycal-wrap { margin-top:8px; background:#0d0d1f; border:1px solid #1e1e3a; border-radius:12px; padding:12px; }
+    .daycal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .daycal-header span { color:#c9c9e0; font-size:0.85rem; font-weight:600; }
+    .daycal-nav { background:none; border:none; color:#666; cursor:pointer; padding:4px 8px; border-radius:6px; font-size:1rem; transition:color 0.15s; }
+    .daycal-nav:hover { color:#9b85ff; }
+    .daycal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+    .daycal-weekday { text-align:center; font-size:0.68rem; color:#555; font-weight:600; padding:4px 0; }
+    .daycal-day {
+      text-align:center; padding:6px 2px; border-radius:6px; font-size:0.78rem;
+      cursor:pointer; color:#888; transition:all 0.15s; border:1.5px solid transparent;
     }
-    .day-picker-btn:hover { border-color:#7c5cff; color:#9b85ff; }
-    .day-picker-btn.active { background:#7c5cff; border-color:#7c5cff; color:#fff; }
+    .daycal-day:hover { background:#1a1a3a; color:#c9c9e0; }
+    .daycal-day.active { background:rgba(124,92,255,0.2); color:#9b85ff; border-color:#7c5cff; font-weight:600; }
+    .daycal-day.empty { cursor:default; }
+    .daycal-day.empty:hover { background:none; }
+    .daycal-hint { font-size:0.72rem; color:#444; text-align:center; margin-top:8px; }
+    .daycal-selected-days { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; }
+    .daycal-tag { font-size:0.72rem; background:rgba(124,92,255,0.15); color:#9b85ff; border:1px solid rgba(124,92,255,0.3); border-radius:20px; padding:2px 10px; }
 
     /* ---- Digest Modal ---- */    .digest-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -3423,14 +3433,15 @@
               <option value="mensal">Repete mensalmente</option>
               <option value="especifica">Dias específicos</option>
             </select>
-            <div id="quick-day-picker" class="day-picker" style="display:none;">
-              <button type="button" class="day-picker-btn" data-day="1" onclick="toggleDay(this,'quick')">Seg</button>
-              <button type="button" class="day-picker-btn" data-day="2" onclick="toggleDay(this,'quick')">Ter</button>
-              <button type="button" class="day-picker-btn" data-day="3" onclick="toggleDay(this,'quick')">Qua</button>
-              <button type="button" class="day-picker-btn" data-day="4" onclick="toggleDay(this,'quick')">Qui</button>
-              <button type="button" class="day-picker-btn" data-day="5" onclick="toggleDay(this,'quick')">Sex</button>
-              <button type="button" class="day-picker-btn" data-day="6" onclick="toggleDay(this,'quick')">Sáb</button>
-              <button type="button" class="day-picker-btn" data-day="0" onclick="toggleDay(this,'quick')">Dom</button>
+            <div id="quick-day-picker" class="daycal-wrap" style="display:none;">
+              <div class="daycal-header">
+                <button type="button" class="daycal-nav" onclick="daycalNav('quick',-1)">&#8249;</button>
+                <span id="quick-daycal-label"></span>
+                <button type="button" class="daycal-nav" onclick="daycalNav('quick',1)">&#8250;</button>
+              </div>
+              <div class="daycal-grid" id="quick-daycal-grid"></div>
+              <div class="daycal-hint">Clica num dia para selecionar esse dia da semana</div>
+              <div class="daycal-selected-days" id="quick-daycal-tags"></div>
             </div>
             <button id="quick-task-submit" class="primary-btn">Adicionar</button>
           </div>
@@ -5412,32 +5423,80 @@
     });
     // ---- End Email Digest ----
 
-    // ---- Day Picker helpers ----
+    // ---- Day Picker Calendar helpers ----
+    const _daycalState = {
+      quick: { year: new Date().getFullYear(), month: new Date().getMonth(), days: [] },
+      edit:  { year: new Date().getFullYear(), month: new Date().getMonth(), days: [] }
+    };
+    const _dayNames = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+    const _monthNames = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
     function toggleDayPicker(ctx) {
-      const sel = document.getElementById(ctx === "quick" ? "quick-task-repeat" : "edit-task-repeat");
-      const picker = document.getElementById(ctx === "quick" ? "quick-day-picker" : "edit-day-picker");
-      if (picker) picker.style.display = sel && sel.value === "especifica" ? "flex" : "none";
+      const sel    = document.getElementById(ctx === "quick" ? "quick-task-repeat" : "edit-task-repeat");
+      const picker = document.getElementById(ctx === "quick" ? "quick-day-picker"  : "edit-day-picker");
+      if (!picker) return;
+      const show = sel && sel.value === "especifica";
+      picker.style.display = show ? "block" : "none";
+      if (show) renderDayCal(ctx);
     }
 
-    function toggleDay(btn, ctx) {
-      btn.classList.toggle("active");
+    function daycalNav(ctx, dir) {
+      const s = _daycalState[ctx];
+      s.month += dir;
+      if (s.month > 11) { s.month = 0;  s.year++; }
+      if (s.month < 0)  { s.month = 11; s.year--; }
+      renderDayCal(ctx);
     }
 
-    function getSelectedDays(ctx) {
-      const picker = document.getElementById(ctx === "quick" ? "quick-day-picker" : "edit-day-picker");
-      if (!picker) return [];
-      return Array.from(picker.querySelectorAll(".day-picker-btn.active"))
-        .map(b => parseInt(b.dataset.day, 10));
+    function renderDayCal(ctx) {
+      const s      = _daycalState[ctx];
+      const label  = document.getElementById(ctx + "-daycal-label");
+      const grid   = document.getElementById(ctx + "-daycal-grid");
+      if (!label || !grid) return;
+
+      label.textContent = _monthNames[s.month] + " " + s.year;
+
+      const firstDay = new Date(s.year, s.month, 1).getDay(); // 0=Dom
+      const daysInMonth = new Date(s.year, s.month + 1, 0).getDate();
+
+      let html = _dayNames.map(d => `<div class="daycal-weekday">${d}</div>`).join("");
+
+      for (let i = 0; i < firstDay; i++) html += `<div class="daycal-day empty"></div>`;
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dow = new Date(s.year, s.month, d).getDay();
+        const active = s.days.includes(dow) ? " active" : "";
+        html += `<div class="daycal-day${active}" data-dow="${dow}" onclick="daycalToggleDay('${ctx}',${dow})">${d}</div>`;
+      }
+
+      grid.innerHTML = html;
+      renderDaycalTags(ctx);
     }
+
+    function daycalToggleDay(ctx, dow) {
+      const s = _daycalState[ctx];
+      if (s.days.includes(dow)) s.days = s.days.filter(d => d !== dow);
+      else s.days.push(dow);
+      renderDayCal(ctx);
+    }
+
+    function renderDaycalTags(ctx) {
+      const tags = document.getElementById(ctx + "-daycal-tags");
+      if (!tags) return;
+      const s = _daycalState[ctx];
+      const sorted = [...s.days].sort((a,b) => a - b);
+      tags.innerHTML = sorted.length > 0
+        ? sorted.map(d => `<span class="daycal-tag">${_dayNames[d]}</span>`).join("")
+        : `<span style="font-size:0.72rem;color:#444;">Nenhum dia selecionado</span>`;
+    }
+
+    function getSelectedDays(ctx) { return [..._daycalState[ctx].days]; }
 
     function setSelectedDays(ctx, days) {
-      const picker = document.getElementById(ctx === "quick" ? "quick-day-picker" : "edit-day-picker");
-      if (!picker) return;
-      picker.querySelectorAll(".day-picker-btn").forEach(b => {
-        b.classList.toggle("active", days.includes(parseInt(b.dataset.day, 10)));
-      });
+      _daycalState[ctx].days = [...days];
+      renderDayCal(ctx);
     }
-    // ---- End Day Picker helpers ----
+    // ---- End Day Picker Calendar helpers ----
 
     // ---- Weekly Review ----
     async function openWeeklyModal() {
