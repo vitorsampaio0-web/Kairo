@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Kairo Elite — Documentação de Produto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --primary: #7c5cff;
+    --accent:  #4ea8ff;
+    --green:   #10b981;
+    --amber:   #f59e0b;
+    --red:     #f87171;
+    --dark:    #06060f;
+    --dark2:   #0d0d1f;
+    --border:  #1e1e3a;
+    --text:    #e0e0f0;
+    --muted:   #7070a0;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:#fff; color:#1a1a2e; }
+
+  /* ============ CAPA ============ */
+  .cover {
+    background: linear-gradient(145deg, #06060f 0%, #0d0d1f 40%, #120a2e 100%);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    page-break-after: always;
+  }
+  .cover-orb1 {
+    position:absolute; width:600px; height:600px; border-radius:50%;
+    background: radial-gradient(circle, rgba(124,92,255,0.25) 0%, transparent 70%);
+    top:-150px; left:-150px; pointer-events:none;
+  }
+  .cover-orb2 {
+    position:absolute; width:500px; height:500px; border-radius:50%;
+    background: radial-gradient(circle, rgba(78,168,255,0.2) 0%, transparent 70%);
+    bottom:-100px; right:-100px; pointer-events:none;
+  }
+  .cover-orb3 {
+    position:absolute; width:300px; height:300px; border-radius:50%;
+    background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+    top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none;
+  }
+  .cover-grid {
+    position:absolute; inset:0; opacity:0.04;
+    background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .cover-content { position:relative; z-index:2; text-align:center; padding:60px 40px; }
+  .cover-logo { width:140px; margin-bottom:32px; filter: drop-shadow(0 0 40px rgba(124,92,255,0.7)); }
+  .cover-eyebrow {
+    font-size:0.72rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:20px;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .cover-eyebrow::before, .cover-eyebrow::after {
+    content:''; width:40px; height:1px; background:var(--accent); opacity:0.5;
+  }
+  .cover-title {
+    font-size:4rem; font-weight:900; line-height:1.05; margin-bottom:20px;
+    background: linear-gradient(135deg, #ffffff 0%, #c0b0ff 50%, var(--accent) 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .cover-subtitle {
+    font-size:1.15rem; color:rgba(200,200,255,0.65); font-weight:400; line-height:1.6;
+    max-width:560px; margin:0 auto 48px;
+  }
+  .cover-badges { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:64px; }
+  .cover-badge {
+    border:1px solid rgba(124,92,255,0.4); background:rgba(124,92,255,0.08);
+    color:rgba(200,200,255,0.8); font-size:0.8rem; font-weight:600;
+    padding:8px 18px; border-radius:100px; letter-spacing:0.04em;
+  }
+  .cover-stats { display:flex; gap:48px; justify-content:center; }
+  .cover-stat-val {
+    font-size:2.2rem; font-weight:900;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .cover-stat-lbl { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px; }
+  .cover-footer {
+    position:absolute; bottom:40px; left:0; right:0; text-align:center; z-index:2;
+    font-size:0.72rem; color:rgba(255,255,255,0.2); letter-spacing:0.08em;
+  }
+
+  /* ============ PÁGINAS INTERNAS ============ */
+  .page {
+    max-width:900px; margin:0 auto; padding:80px 60px;
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* Cabeçalho de secção */
+  .section-header { display:flex; align-items:center; gap:16px; margin-bottom:48px; }
+  .section-number {
+    font-size:0.65rem; font-weight:800; color:var(--primary);
+    letter-spacing:0.15em; text-transform:uppercase;
+    border:1px solid rgba(124,92,255,0.3); border-radius:100px;
+    padding:4px 12px; background:rgba(124,92,255,0.06);
+  }
+  .section-line { flex:1; height:1px; background:linear-gradient(90deg,#e8eaf0,transparent); }
+
+  .page-title {
+    font-size:2rem; font-weight:900; color:#0f0e2a; margin-bottom:10px; line-height:1.2;
+  }
+  .page-intro { font-size:1rem; color:#5a5a7a; line-height:1.7; margin-bottom:40px; }
+
+  /* Cards de funcionalidade */
+  .feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:32px; }
+  .feature-card {
+    border:1px solid #e8eaef; border-radius:16px; padding:24px;
+    background:#fafbff; position:relative; overflow:hidden;
+    transition:all .2s;
+  }
+  .feature-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg,var(--primary),var(--accent));
+    border-radius:16px 16px 0 0;
+  }
+  .feature-icon {
+    width:42px; height:42px; border-radius:12px; margin-bottom:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem;
+    background:linear-gradient(135deg,rgba(124,92,255,0.12),rgba(78,168,255,0.12));
+  }
+  .feature-name { font-size:0.92rem; font-weight:800; color:#0f0e2a; margin-bottom:8px; }
+  .feature-desc { font-size:0.82rem; color:#5a5a7a; line-height:1.6; }
+
+  /* Card horizontal de funcionalidade detalhada */
+  .detail-block { margin-bottom:36px; }
+  .detail-header {
+    display:flex; align-items:center; gap:14px; margin-bottom:16px;
+    padding-bottom:14px; border-bottom:1px solid #eceef5;
+  }
+  .detail-icon-wrap {
+    width:48px; height:48px; border-radius:14px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    box-shadow:0 4px 16px rgba(124,92,255,0.3);
+  }
+  .detail-title { font-size:1.1rem; font-weight:800; color:#0f0e2a; }
+  .detail-tag {
+    font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+    padding:3px 10px; border-radius:100px; margin-left:auto;
+  }
+  .tag-free { background:rgba(16,185,129,0.12); color:#059669; border:1px solid rgba(16,185,129,0.25); }
+  .tag-pro  { background:rgba(124,92,255,0.12); color:var(--primary); border:1px solid rgba(124,92,255,0.25); }
+  .tag-ceo  { background:rgba(245,158,11,0.12); color:#d97706; border:1px solid rgba(245,158,11,0.25); }
+
+  .detail-body { font-size:0.87rem; color:#4a4a6a; line-height:1.75; }
+  .detail-body p { margin-bottom:10px; }
+
+  /* Steps */
+  .steps { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .step {
+    display:flex; align-items:flex-start; gap:12px;
+    background:#f5f6fc; border-radius:10px; padding:12px 14px;
+  }
+  .step-num {
+    width:22px; height:22px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff; font-size:0.7rem; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step-text { font-size:0.83rem; color:#3a3a5a; line-height:1.5; }
+
+  /* Tabela de planos */
+  .plans-table { width:100%; border-collapse:collapse; margin-top:24px; border-radius:16px; overflow:hidden; }
+  .plans-table th {
+    padding:14px 20px; text-align:left; font-size:0.78rem; font-weight:800;
+    text-transform:uppercase; letter-spacing:0.08em;
+  }
+  .plans-table th:first-child { background:#f5f6fc; color:#3a3a5a; }
+  .plans-table th.free-h  { background:rgba(16,185,129,0.08); color:#059669; }
+  .plans-table th.pro-h   { background:rgba(124,92,255,0.1); color:var(--primary); }
+  .plans-table td {
+    padding:12px 20px; font-size:0.83rem; border-top:1px solid #eceef5;
+    vertical-align:middle;
+  }
+  .plans-table td:first-child { font-weight:600; color:#0f0e2a; }
+  .check { color:var(--green); font-size:1rem; }
+  .cross { color:#ccc; font-size:0.9rem; }
+
+  /* Highlight box */
+  .highlight {
+    background:linear-gradient(135deg,rgba(124,92,255,0.06),rgba(78,168,255,0.06));
+    border:1px solid rgba(124,92,255,0.2); border-radius:14px;
+    padding:20px 24px; margin:20px 0;
+  }
+  .highlight-title { font-size:0.82rem; font-weight:800; color:var(--primary); margin-bottom:6px; }
+  .highlight-text  { font-size:0.83rem; color:#4a4a6a; line-height:1.65; }
+
+  /* Quote */
+  .quote {
+    border-left:3px solid var(--primary); padding:16px 20px 16px 24px;
+    margin:20px 0; background:#fafbff; border-radius:0 12px 12px 0;
+  }
+  .quote-text { font-size:0.9rem; color:#3a3a5a; font-style:italic; line-height:1.6; }
+  .quote-author { font-size:0.75rem; color:var(--muted); margin-top:8px; font-weight:600; }
+
+  /* CTA final */
+  .cta-page {
+    background:linear-gradient(145deg,#06060f,#120a2e);
+    min-height:50vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    padding:80px 60px; position:relative; overflow:hidden;
+    page-break-before: always;
+  }
+  .cta-title {
+    font-size:2.6rem; font-weight:900; line-height:1.15;
+    background:linear-gradient(135deg,#fff,#c0b0ff);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    margin-bottom:20px;
+  }
+  .cta-sub { font-size:1rem; color:rgba(200,200,255,0.6); line-height:1.7; max-width:500px; margin-bottom:40px; }
+  .cta-btn {
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff; font-size:1rem; font-weight:800; padding:16px 40px;
+    border-radius:100px; text-decoration:none; letter-spacing:0.04em;
+    box-shadow:0 8px 32px rgba(124,92,255,0.5);
+    display:inline-block; margin-bottom:20px;
+  }
+  .cta-url { font-size:0.8rem; color:rgba(200,200,255,0.4); }
+
+  /* Header de página */
+  .page-header-bar {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:48px; padding-bottom:20px; border-bottom:2px solid #f0f1f8;
+  }
+  .page-brand { font-size:0.75rem; font-weight:800; color:var(--primary); letter-spacing:0.1em; text-transform:uppercase; }
+  .page-num   { font-size:0.72rem; color:#bbb; }
+
+  /* Print */
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { min-height:100vh; page-break-after:always; }
+    .page { page-break-after:always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================
+     CAPA
+=============================== -->
+<div class="cover">
+  <div class="cover-orb1"></div>
+  <div class="cover-orb2"></div>
+  <div class="cover-orb3"></div>
+  <div class="cover-grid"></div>
+
+  <div class="cover-content">
+    <img class="cover-logo" src="./logo-kairo.png" alt="Kairo" onerror="this.style.display='none'">
+    <div class="cover-eyebrow">Elite Productivity Platform</div>
+    <div class="cover-title">Kairo Elite</div>
+    <div class="cover-subtitle">
+      A plataforma de produtividade executiva que transforma a forma como líderes e equipas
+      gerem tempo, decisões e resultados — em qualquer lugar.
+    </div>
+    <div class="cover-badges">
+      <span class="cover-badge">✦ Tarefas Inteligentes</span>
+      <span class="cover-badge">✦ IA de Produtividade</span>
+      <span class="cover-badge">✦ Gestão de Equipa</span>
+      <span class="cover-badge">✦ Diário de Decisões</span>
+      <span class="cover-badge">✦ Relatório Executivo</span>
+    </div>
+    <div class="cover-stats">
+      <div>
+        <div class="cover-stat-val">20+</div>
+        <div class="cover-stat-lbl">Funcionalidades</div>
+      </div>
+      <div>
+        <div class="cover-stat-val">100%</div>
+        <div class="cover-stat-lbl">Tempo Real</div>
+      </div>
+      <div>
+        <div class="cover-stat-val">∞</div>
+        <div class="cover-stat-lbl">Produtividade</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-footer">CONFIDENCIAL · KAIRO ELITE · 2026 · kairoelite.app</div>
+</div>
+
+<!-- ============================
+     ÍNDICE
+=============================== -->
+<div class="page">
+  <div class="page-header-bar">
+    <span class="page-brand">Kairo Elite</span>
+    <span class="page-num">Índice</span>
+  </div>
+
+  <div class="section-header">
+    <span class="section-number">Índice</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="page-title">O que encontras neste documento</div>
+  <div class="page-intro">
+    Guia completo de todas as funcionalidades da plataforma Kairo Elite — como funcionam,
+    como usar, e que valor trazem ao teu dia a dia executivo.
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div style="border:1px solid #eceef5; border-radius:12px; padding:16px 20px; background:#fafbff;">
+      <div style="font-size:0.65rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Secção 1</div>
+      <div style="font-weight:800;color:#0f0e2a;margin-bottom:4px;">Gestão de Tarefas</div>
+      <div style="font-size:0.8rem;color:#7070a0;">Tarefas, recorrência, agenda visual, modo foco</div>
+    </div>
+    <div style="border:1px solid #eceef5; border-radius:12px; padding:16px 20px; background:#fafbff;">
+      <div style="font-size:0.65rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Secção 2</div>
+      <div style="font-weight:800;color:#0f0e2a;margin-bottom:4px;">Hábitos & Metas</div>
+      <div style="font-size:0.8rem;color:#7070a0;">Tracking de hábitos, metas de 30/90 dias</div>
+    </div>
+    <div style="border:1px solid #eceef5; border-radius:12px; padding:16px 20px; background:#fafbff;">
+      <div style="font-size:0.65rem;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Secção 3</div>
+      <div style="font-weight:800;color:#0f0e2a;margin-bottom:4px;">Modo Equipa</div>
+      <div style="font-size:0.8rem;color:#7070a0;">Delegação, accountability, feed de atividade</div>
+    </div>
+    <div style="border:1px solid #eceef5; border-radius:12px; padding:16px 20px; background:#fafbff;">
+      <div style="font-size:0.65rem;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Secção 4</div>
+      <div style="font-weight:800;color:#0f0e2a;margin-bottom:4px;">IA & Análise</div>
+      <div style="font-size:0.8rem;color:#7070a0;">Padrões de produtividade, Diário de Decisões</div>
+    </div>
+    <div style="border:1px solid #eceef5; border-radius:12px; padding:16px 20px; background:#fafbff;">
+      <div style="font-size:0.65rem;font-weight:800;color:#ec4899;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Secção 5</div>
+      <div style="font-weight:800;color:#0f0e2a;margin-bottom:4px;">Notificações & Email</div>
+      <div style="font-size:0.8rem;color:#7070a0;">Push, email diário, resumo semanal</div>
+    </div>
+    <div style="border:1px solid #eceef5; border-radius:12px; padding:16px 20px; background:#fafbff;">
+      <div style="font-size:0.65rem;font-weight:800;color:#7c5cff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Secção 6</div>
+      <div style="font-weight:800;color:#0f0e2a;margin-bottom:4px;">Pro & Relatórios</div>
+      <div style="font-size:0.8rem;color:#7070a0;">Relatório executivo PDF, planos de subscrição</div>
+    </div>
+  </div>
+
+  <div class="highlight" style="margin-top:32px;">
+    <div class="highlight-title">Como usar este documento</div>
+    <div class="highlight-text">
+      Cada secção descreve uma funcionalidade, explica <strong>para que serve</strong>, como se usa
+      passo a passo, e que plano é necessário. Partilha este documento com a tua equipa
+      ou board para demonstrar o valor da plataforma.
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SECÇÃO 1 — TAREFAS
+=============================== -->
+<div class="page">
+  <div class="page-header-bar">
+    <span class="page-brand">Kairo Elite</span>
+    <span class="page-num">Secção 1 — Gestão de Tarefas</span>
+  </div>
+
+  <div class="section-header">
+    <span class="section-number">01</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="page-title">Gestão de Tarefas</div>
+  <div class="page-intro">
+    O núcleo da plataforma. Cria, organiza e acompanha todas as tarefas do dia com prioridade,
+    hora, categoria e muito mais — tudo sincronizado em tempo real.
+  </div>
+
+  <!-- Tarefas base -->
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap">📋</div>
+      <div>
+        <div class="detail-title">Tarefas do Dia</div>
+      </div>
+      <span class="detail-tag tag-free">Free</span>
+    </div>
+    <div class="detail-body">
+      <p>Cria tarefas com título, hora de início, prioridade (Alta / Média / Baixa) e categoria. As tarefas aparecem ordenadas por hora e são marcadas como concluídas com um clique.</p>
+      <p>Tarefas em atraso ficam destacadas automaticamente na secção <strong>"Atrasadas"</strong> para que nunca percas o rasto de nada importante.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Clica em <strong>"+ Nova Tarefa"</strong> no painel Tarefas</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Preenche título, hora, prioridade e categoria</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Clica no círculo para marcar como concluída — aparece no Histórico</div></div>
+    </div>
+  </div>
+
+  <!-- Recorrência -->
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#10b981,#4ea8ff);">🔄</div>
+      <div>
+        <div class="detail-title">Tarefas Recorrentes</div>
+      </div>
+      <span class="detail-tag tag-free">Free</span>
+    </div>
+    <div class="detail-body">
+      <p>Tarefas que se renovam automaticamente todos os dias, semanas, meses, ou em dias específicos escolhidos através de um calendário interativo.</p>
+      <p>Ao fim do dia, a tarefa recorrente é automaticamente recriada para o próximo período — sem intervenção do utilizador.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Ao criar ou editar uma tarefa, ativa <strong>"Recorrente"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Escolhe: Diário, Semanal, Mensal, ou <strong>Dias Específicos</strong></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Para dias específicos, abre o calendário e seleciona os dias da semana</div></div>
+    </div>
+  </div>
+
+  <!-- Agenda Visual -->
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#f59e0b,#f87171);">📅</div>
+      <div>
+        <div class="detail-title">Agenda Visual (Mini Calendário)</div>
+      </div>
+      <span class="detail-tag tag-free">Free</span>
+    </div>
+    <div class="detail-body">
+      <p>Calendário mensal integrado que mostra quais os dias com tarefas agendadas. Clica em qualquer dia para ver um popup com todas as tarefas desse dia — perfeito para planear a semana ou o mês.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">No painel principal, vê o mini calendário abaixo das Tarefas Atrasadas</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Dias com pontos coloridos têm tarefas agendadas</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Clica num dia para ver o popup com todas as tarefas desse dia</div></div>
+    </div>
+  </div>
+
+  <!-- Modo Foco -->
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#ec4899,#f59e0b);">⏱️</div>
+      <div>
+        <div class="detail-title">Modo Foco — Pomodoro Integrado</div>
+      </div>
+      <span class="detail-tag tag-pro">Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>Timer Pomodoro diretamente dentro de cada tarefa. Trabalha em blocos de 25 minutos de foco total, seguidos de pausas de 5 minutos — sem sair da app.</p>
+      <p>O número de pomodoros concluídos fica registado em cada tarefa, permitindo medir quanto tempo real foi investido.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Abre uma tarefa e clica no ícone <strong>⏱ Foco</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">O timer de 25 min inicia — notificação sonora ao fim</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Pausa automática de 5 min, depois novo ciclo</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SECÇÃO 2 — HÁBITOS & METAS
+=============================== -->
+<div class="page">
+  <div class="page-header-bar">
+    <span class="page-brand">Kairo Elite</span>
+    <span class="page-num">Secção 2 — Hábitos & Metas</span>
+  </div>
+
+  <div class="section-header">
+    <span class="section-number">02</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="page-title">Hábitos & Metas</div>
+  <div class="page-intro">
+    Constrói rotinas sólidas e acompanha objetivos de longo prazo com visibilidade total
+    sobre o progresso — dia após dia.
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#10b981,#7c5cff);">✅</div>
+      <div><div class="detail-title">Hábitos Diários & Semanais</div></div>
+      <span class="detail-tag tag-free">Free</span>
+    </div>
+    <div class="detail-body">
+      <p>Cria hábitos com frequência diária ou semanal. Cada dia, os hábitos activos aparecem para serem validados — sim ou não. O Kairo calcula automaticamente o streak (dias consecutivos) e a taxa de conclusão semanal.</p>
+      <p><strong>Hábitos semanais</strong> funcionam de segunda a domingo: se adicionares um hábito a quarta-feira, ele aparece diariamente até domingo para validares cada dia. Na semana seguinte, recomeça automaticamente.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Vai a <strong>Hábitos</strong> e clica em <strong>"+ Novo Hábito"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Define o nome, ícone e frequência (Diário / Semanal)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Todos os dias, clica ✓ para validar — o streak cresce</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Clica no lápis ✏️ para editar um hábito existente</div></div>
+    </div>
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#f59e0b,#f87171);">🎯</div>
+      <div><div class="detail-title">Metas de 30/90 Dias</div></div>
+      <span class="detail-tag tag-pro">Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>Define grandes objetivos a 30 ou 90 dias, divididos em sub-tarefas accionáveis. A barra de progresso actualiza-se automaticamente conforme as sub-tarefas são concluídas.</p>
+      <p>Perfeito para OKRs, lançamentos de produto, campanhas ou transformações pessoais — tudo visível num único lugar.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Vai a <strong>Metas</strong> → <strong>"+ Nova Meta"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Define o título, prazo (30 ou 90 dias) e adiciona sub-tarefas</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Completa sub-tarefas para avançar a barra de progresso</div></div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <div class="highlight-title">💡 Porque é que hábitos e metas mudam tudo</div>
+    <div class="highlight-text">
+      Tarefas resolvem o hoje. Hábitos constroem quem és amanhã. Metas garantem que o trabalho de hoje tem uma direcção clara. O Kairo é a única plataforma que une os três numa visão integrada do progresso pessoal e profissional.
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SECÇÃO 3 — MODO EQUIPA
+=============================== -->
+<div class="page">
+  <div class="page-header-bar">
+    <span class="page-brand">Kairo Elite</span>
+    <span class="page-num">Secção 3 — Modo Equipa</span>
+  </div>
+
+  <div class="section-header">
+    <span class="section-number">03</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="page-title">Modo Equipa</div>
+  <div class="page-intro">
+    Cria a tua equipa dentro do Kairo, delega tarefas com prazo, acompanha o progresso
+    de cada membro e mantém todos accountable — em tempo real.
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#4ea8ff,#10b981);">👥</div>
+      <div><div class="detail-title">Criar & Gerir Equipa</div></div>
+      <span class="detail-tag tag-pro">Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>Cria uma equipa com um código único de 8 caracteres. Convida membros por email — o Kairo envia automaticamente um email de convite com o código e instruções para entrar.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Vai a <strong>Equipa</strong> → <strong>"Criar Equipa"</strong>, define o nome</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Clica em <strong>"Convidar Membro"</strong>, insere o email → o convite é enviado automaticamente</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">O membro entra com o código em <strong>"Entrar numa Equipa"</strong></div></div>
+    </div>
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#7c5cff,#f59e0b);">↗️</div>
+      <div><div class="detail-title">Delegação com Accountability</div></div>
+      <span class="detail-tag tag-pro">Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>Delega tarefas a qualquer membro com título, nota explicativa, prazo exacto (calendário + hora/minuto) e prioridade. O membro vê a tarefa delegada em tempo real no seu painel de equipa.</p>
+      <p>O <strong>painel de accountability</strong> mostra em percentagem quantas tarefas cada membro concluiu esta semana — visibilidade total para o líder.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Em <strong>Equipa</strong> → <strong>"+ Delegar Tarefa"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Seleciona o membro, define prazo no calendário e escolhe hora/minuto</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">O membro marca a tarefa como concluída — aparece no feed em tempo real</div></div>
+    </div>
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#10b981,#4ea8ff);">📡</div>
+      <div><div class="detail-title">Feed de Atividade em Tempo Real</div></div>
+      <span class="detail-tag tag-pro">Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>Feed ao vivo que mostra o que toda a equipa está a fazer — quem concluiu o quê, quem delegou a quem, e quem acabou de entrar na equipa. Actualiza instantaneamente sem recarregar a página.</p>
+      <p>Cada entrada mostra o avatar com as iniciais do membro, a ação com cor (verde = concluído, azul = delegado) e o tempo decorrido ("há 5 min", "há 2h").</p>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="quote-text">"O problema das equipas não é a falta de talento — é a falta de visibilidade. O Kairo resolve isso em tempo real, sem reuniões de estado desnecessárias."</div>
+    <div class="quote-author">Filosofia Kairo Elite</div>
+  </div>
+</div>
+
+<!-- ============================
+     SECÇÃO 4 — IA & DECISÕES
+=============================== -->
+<div class="page">
+  <div class="page-header-bar">
+    <span class="page-brand">Kairo Elite</span>
+    <span class="page-num">Secção 4 — IA & Diário de Decisões</span>
+  </div>
+
+  <div class="section-header">
+    <span class="section-number">04</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="page-title">IA & Diário de Decisões</div>
+  <div class="page-intro">
+    Funcionalidades exclusivas para líderes — inteligência artificial que analisa os teus padrões
+    de produtividade e um diário para registar, rever e aprender com cada decisão estratégica.
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#7c5cff,#4ea8ff);">🧠</div>
+      <div><div class="detail-title">Kairo IA — Análise de Padrões</div></div>
+      <span class="detail-tag tag-ceo">CEO / Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>A IA analisa os teus dados históricos de tarefas e hábitos para identificar padrões de produtividade. Descobre em que horas és mais produtivo, quais as categorias com mais atrasos, e qual o teu melhor dia da semana.</p>
+      <p>Exemplo de insight: <em>"Costumas ser mais produtivo das 9h às 11h. Agenda as tarefas de alta prioridade nesse período."</em></p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Vai ao menu do avatar (canto superior direito) → <strong>"Kairo IA"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Clica em <strong>"Analisar os meus padrões"</strong></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">A IA gera insights personalizados com base nos teus últimos 30 dias</div></div>
+    </div>
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#ec4899,#7c5cff);">⚖️</div>
+      <div><div class="detail-title">Diário de Decisões</div></div>
+      <span class="detail-tag tag-ceo">CEO / Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>Regista cada decisão estratégica com contexto, raciocínio e nível de confiança (1 a 5). Define um prazo de revisão — quando chegar, o Kairo alerta-te para abrires e avaliares o resultado (0 a 10) e o que aprendeste.</p>
+      <p>Com o tempo, o Diário de Decisões torna-se o ativo mais valioso do CEO: um registo auditável de todas as decisões, resultados e aprendizagens — algo que nenhuma outra app de produtividade oferece.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Vai a <strong>Decisões</strong> na barra lateral → <strong>"+ Nova Decisão"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Preenche a decisão, contexto, categoria, nível de confiança e prazo de revisão</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Quando chegar o prazo, o Kairo alerta — clica <strong>"Revisar"</strong> e avalia 0-10</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">O dashboard mostra a <strong>taxa de sucesso</strong> das decisões ao longo do tempo</div></div>
+    </div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-name">Gauge de Confiança</div>
+      <div class="feature-desc">Cada decisão tem um indicador circular colorido (vermelho/amarelo/verde) que mostra visualmente o nível de confiança no momento da decisão.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏷️</div>
+      <div class="feature-name">Categorias de Decisão</div>
+      <div class="feature-desc">Estratégia, Pessoas, Finanças, Operações, Produto ou Pessoal — classifica cada decisão para analisar padrões por área.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚠️</div>
+      <div class="feature-name">Alertas de Revisão</div>
+      <div class="feature-desc">O Kairo alerta quando uma decisão atingiu o prazo de revisão e ainda não foi avaliada — nunca perdes o acompanhamento.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📈</div>
+      <div class="feature-name">Taxa de Sucesso</div>
+      <div class="feature-desc">Percentagem de decisões com resultado ≥ 6/10. Acompanha a evolução da qualidade das tuas decisões ao longo do tempo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SECÇÃO 5 — NOTIFICAÇÕES & EMAIL
+=============================== -->
+<div class="page">
+  <div class="page-header-bar">
+    <span class="page-brand">Kairo Elite</span>
+    <span class="page-num">Secção 5 — Notificações & Email</span>
+  </div>
+
+  <div class="section-header">
+    <span class="section-number">05</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="page-title">Notificações & Comunicação</div>
+  <div class="page-intro">
+    O Kairo traz-te de volta quando precisas — com notificações push inteligentes, email
+    diário com as tarefas do dia, e resumo semanal de produtividade.
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#f59e0b,#f87171);">🔔</div>
+      <div><div class="detail-title">Notificações Push</div></div>
+      <span class="detail-tag tag-free">Free</span>
+    </div>
+    <div class="detail-body">
+      <p>Recebe notificações no telemóvel ou computador X minutos antes de uma tarefa com hora definida. Nunca mais esqueces uma reunião, prazo ou compromisso importante.</p>
+      <p>Funciona mesmo com o browser fechado — o service worker garante a entrega da notificação.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Clica no ícone 🔔 na barra superior → <strong>"Ativar Notificações"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Permite as notificações no browser quando pedido</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Define quantos minutos antes queres ser avisado em cada tarefa</div></div>
+    </div>
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#4ea8ff,#7c5cff);">📧</div>
+      <div><div class="detail-title">Email Diário Automático</div></div>
+      <span class="detail-tag tag-free">Free</span>
+    </div>
+    <div class="detail-body">
+      <p>Recebe todos os dias, à hora que escolheres, um email com todas as tarefas do dia — para nunca começares o dia sem saber o que tens pela frente. O email é enviado automaticamente pela plataforma Resend, sem intervenção.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Clica no avatar (canto superior direito) → <strong>"Email Diário"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Insere o teu email e escolhe a hora de envio (ex: 08:00)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Todos os dias a essa hora, recebes o resumo das tarefas</div></div>
+    </div>
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#10b981,#f59e0b);">📊</div>
+      <div><div class="detail-title">Resumo Semanal (Weekly Review)</div></div>
+      <span class="detail-tag tag-pro">Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>Ao domingo, recebe automaticamente um email com o resumo da semana: tarefas completadas, streak actual, taxa de produtividade comparada com a semana anterior, e os hábitos mantidos.</p>
+      <p>O formato é limpo e executivo — podes reencaminhar directamente para o teu board ou equipa como relatório semanal.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Clica no avatar → <strong>"Resumo Semanal"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Insere o email de destino e activa o envio automático</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Recebe todos os domingos o teu relatório de produtividade semanal</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SECÇÃO 6 — PRO & RELATÓRIOS
+=============================== -->
+<div class="page">
+  <div class="page-header-bar">
+    <span class="page-brand">Kairo Elite</span>
+    <span class="page-num">Secção 6 — Pro & Relatório Executivo</span>
+  </div>
+
+  <div class="section-header">
+    <span class="section-number">06</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="page-title">Pro & Relatório Executivo PDF</div>
+  <div class="page-intro">
+    Para líderes que precisam de apresentar resultados — o Kairo gera automaticamente um relatório
+    executivo em PDF de 4 páginas, pronto para o Board.
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#f59e0b,#7c5cff);">📄</div>
+      <div><div class="detail-title">Relatório Executivo PDF</div></div>
+      <span class="detail-tag tag-ceo">CEO / Pro</span>
+    </div>
+    <div class="detail-body">
+      <p>Gera em segundos um relatório de 4 páginas com design profissional que inclui: capa com branding Kairo, resumo de produtividade, tarefas concluídas, hábitos mantidos, metas em progresso e métricas da equipa.</p>
+      <p>Desenhado para ser apresentado ao Board ou a investidores sem qualquer edição adicional.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Clica no avatar → <strong>"Relatório Executivo"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">O PDF é gerado instantaneamente com os teus dados actuais</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Faz download e partilha com o teu board ou equipa</div></div>
+    </div>
+  </div>
+
+  <div class="detail-block">
+    <div class="detail-header">
+      <div class="detail-icon-wrap" style="background:linear-gradient(135deg,#ec4899,#f59e0b);">🔥</div>
+      <div><div class="detail-title">Partilha de Streak</div></div>
+      <span class="detail-tag tag-free">Free</span>
+    </div>
+    <div class="detail-body">
+      <p>Gera um card visual com o teu streak actual, nome e branding Kairo — perfeito para partilhar no LinkedIn, Instagram ou com a tua equipa como prova de consistência e disciplina.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Clica no avatar → <strong>"Partilhar Streak"</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Faz download do card gerado automaticamente</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Publica nas redes sociais e desafia os teus contactos</div></div>
+    </div>
+  </div>
+
+  <!-- Tabela de planos -->
+  <div style="margin-top:32px;">
+    <div style="font-size:0.85rem;font-weight:800;color:#0f0e2a;margin-bottom:16px;">Comparação de Planos</div>
+    <table class="plans-table">
+      <thead>
+        <tr>
+          <th>Funcionalidade</th>
+          <th class="free-h">Free</th>
+          <th class="pro-h">Pro / CEO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Tarefas ilimitadas</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Tarefas recorrentes (diário/semanal)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Agenda visual mensal</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Hábitos (diário/semanal)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Email diário automático</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Notificações push</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Partilha de streak</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Modo Foco (Pomodoro)</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Metas de 30/90 dias</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Modo Equipa + Delegação</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Feed de atividade em tempo real</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Resumo semanal por email</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Kairo IA — análise de padrões</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Diário de Decisões</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Relatório Executivo PDF</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Convite de amigos (30 dias Pro grátis)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================
+     CTA FINAL
+=============================== -->
+<div class="cta-page">
+  <div class="cover-orb1"></div>
+  <div class="cover-orb2"></div>
+  <div class="cover-grid"></div>
+  <div style="position:relative;z-index:2;text-align:center;">
+    <img src="./logo-kairo.png" alt="Kairo" style="width:80px;margin-bottom:28px;filter:drop-shadow(0 0 30px rgba(124,92,255,0.6));" onerror="this.style.display='none'">
+    <div class="cta-title">Pronto para ser<br>mais produtivo?</div>
+    <div class="cta-sub">
+      Junta-te aos líderes que usam o Kairo Elite para tomar melhores decisões,
+      construir equipas de alta performance e atingir os seus objetivos — todos os dias.
+    </div>
+    <a class="cta-btn" href="https://kairoelite.app">Começar gratuitamente</a>
+    <div class="cta-url">kairoelite.app</div>
+    <div style="margin-top:40px;display:flex;gap:40px;justify-content:center;">
+      <div style="text-align:center;">
+        <div style="font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#fff,#c0b0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Free</div>
+        <div style="font-size:0.72rem;color:rgba(200,200,255,0.5);margin-top:4px;text-transform:uppercase;letter-spacing:.08em;">Para começar</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.1);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#7c5cff,#4ea8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Pro</div>
+        <div style="font-size:0.72rem;color:rgba(200,200,255,0.5);margin-top:4px;text-transform:uppercase;letter-spacing:.08em;">Para crescer</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.1);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#f87171);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">CEO</div>
+        <div style="font-size:0.72rem;color:rgba(200,200,255,0.5);margin-top:4px;text-transform:uppercase;letter-spacing:.08em;">Para liderar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
