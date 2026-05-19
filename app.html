@@ -2768,7 +2768,25 @@
       </div>
       <div class="team-field">
         <label>Prazo</label>
-        <input id="team-task-prazo" class="team-input" type="datetime-local">
+        <input id="team-task-prazo-date" class="team-input" type="date" style="margin-bottom:8px;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="team-task-prazo-h" class="team-input" style="flex:1;">
+            <option value="">Hora</option>
+            <option value="07">07h</option><option value="08">08h</option><option value="09">09h</option>
+            <option value="10">10h</option><option value="11">11h</option><option value="12">12h</option>
+            <option value="13">13h</option><option value="14">14h</option><option value="15">15h</option>
+            <option value="16">16h</option><option value="17">17h</option><option value="18">18h</option>
+            <option value="19">19h</option><option value="20">20h</option><option value="21">21h</option>
+            <option value="22">22h</option><option value="23">23h</option>
+          </select>
+          <span style="color:#555;font-weight:700;">:</span>
+          <select id="team-task-prazo-m" class="team-input" style="flex:1;">
+            <option value="00">00 min</option>
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+          </select>
+        </div>
       </div>
       <div class="team-field">
         <label>Prioridade</label>
@@ -7380,7 +7398,9 @@
         sel.innerHTML = `<option value="">Sem atribuição</option>` +
           membros.map(m => `<option value="${m.uid}">${m.nome}</option>`).join("");
         document.getElementById("team-task-titulo").value = "";
-        document.getElementById("team-task-prazo").value = "";
+        document.getElementById("team-task-prazo-date").value = "";
+        document.getElementById("team-task-prazo-h").value = "";
+        document.getElementById("team-task-prazo-m").value = "00";
         document.getElementById("team-task-nota") && (document.getElementById("team-task-nota").value = "");
         document.getElementById("team-task-edit-id").value = "";
         document.getElementById("team-task-modal-title").textContent = "Delegar Nova Tarefa";
@@ -7453,7 +7473,10 @@
     async function saveTeamTask() {
       const titulo    = document.getElementById("team-task-titulo").value.trim();
       const assignee  = document.getElementById("team-task-assignee").value;
-      const prazo     = document.getElementById("team-task-prazo").value;
+      const prazoDate = document.getElementById("team-task-prazo-date").value;
+      const prazoH    = document.getElementById("team-task-prazo-h").value || "09";
+      const prazoM    = document.getElementById("team-task-prazo-m").value || "00";
+      const prazo     = prazoDate ? `${prazoDate}T${prazoH}:${prazoM}` : "";
       const prioridade= document.getElementById("team-task-prioridade").value;
       const nota      = document.getElementById("team-task-nota")?.value.trim() || "";
       const editId    = document.getElementById("team-task-edit-id").value;
@@ -7494,7 +7517,9 @@
       sel.innerHTML = `<option value="">Sem atribuição</option>` +
         (appState.equipa.membros || []).map(m => `<option value="${m.uid}"${m.uid===task.atribuidoA?" selected":""}>${m.nome}</option>`).join("");
       document.getElementById("team-task-titulo").value   = task.titulo || "";
-      document.getElementById("team-task-prazo").value    = task.prazo || "";
+      document.getElementById("team-task-prazo-date").value = task.prazo ? task.prazo.slice(0,10) : "";
+      document.getElementById("team-task-prazo-h").value   = task.prazo ? task.prazo.slice(11,13) : "";
+      document.getElementById("team-task-prazo-m").value   = task.prazo ? task.prazo.slice(14,16) : "00";
       document.getElementById("team-task-prioridade").value = task.prioridade || "media";
       if (document.getElementById("team-task-nota")) document.getElementById("team-task-nota").value = task.nota || "";
       document.getElementById("team-task-edit-id").value  = taskId;
