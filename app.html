@@ -4029,20 +4029,20 @@
         <div class="panel">
           <div class="panel-header">
             <div>
-              <h3>Agenda</h3>
+              <h3 data-i18n="agenda.titulo">Agenda</h3>
               <p>Calendário diário e semanal com blocos reais de execução</p>
             </div>
             <div class="tab-switch">
-              <button class="switch-btn ${appState.agendaMode === "dia" ? "active" : ""}" data-agenda-mode="dia">Hoje</button>
-              <button class="switch-btn ${appState.agendaMode === "semana" ? "active" : ""}" data-agenda-mode="semana">Semana</button>
+              <button class="switch-btn ${appState.agendaMode === "dia" ? "active" : ""}" data-agenda-mode="dia" data-i18n="datas.hoje">Hoje</button>
+              <button class="switch-btn ${appState.agendaMode === "semana" ? "active" : ""}" data-agenda-mode="semana" data-i18n="datas.semana">Semana</button>
             </div>
           </div>
           <div class="agenda-grid">
             <div class="panel">
               <div class="section-heading">
                 <div>
-                  <h3>${appState.agendaMode === "dia" ? "Agenda do dia" : "Visão semanal"}</h3>
-                  <p>${appState.agendaMode === "dia" ? "Compromissos e tarefas de hoje" : "Distribuição dos eventos e tarefas da semana"}</p>
+                  <h3>${appState.agendaMode === "dia" ? 'Agenda do dia' : 'Visão semanal'}</h3>
+                  <p>${appState.agendaMode === "dia" ? 'Compromissos e tarefas de hoje' : 'Distribuição dos eventos e tarefas da semana'}</p>
                 </div>
               </div>
               <div class="timeline-stack">
@@ -4368,7 +4368,7 @@
       if (!isPro()) {
         view.innerHTML = `
           <div class="panel" style="position:relative;min-height:340px;overflow:hidden;">
-            <div class="panel-header"><div><h3>Histórico</h3><p>Análise e exportação de registos</p></div></div>
+            <div class="panel-header"><div><h3 data-i18n="historico.titulo">Histórico</h3><p>Análise e exportação de registos</p></div></div>
             <div class="pro-overlay">
               <div class="pro-overlay-icon">🔒</div>
               <h4>Histórico Pro</h4>

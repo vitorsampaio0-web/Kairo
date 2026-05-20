@@ -201,7 +201,33 @@
     "voucher_invalido": "Invalid or already used voucher.",
     "dados_incompletos": "Please fill in all required fields."
   },
+  "agenda": {
+    "titulo": "Agenda",
+    "novo_evento": "New Event",
+    "titulo_evento": "Event title",
+    "horario": "Time",
+    "categoria": "Category",
+    "notas": "Notes",
+    "sem_eventos": "No events for this day",
+    "compromissos": "Appointments",
+    "hoje": "Today",
+    "proximo": "Upcoming",
+    "passado": "Past"
+  },
+  "historico": {
+    "titulo": "History",
+    "atividade_recente": "Recent Activity",
+    "sem_atividade": "No activity recorded",
+    "tarefa_concluida": "Task completed",
+    "habito_completado": "Habit completed",
+    "meta_atingida": "Goal reached",
+    "decisao_tomada": "Decision made"
+  },
   "datas": {
+    "hoje": "Today",
+    "amanha": "Tomorrow",
+    "ontem": "Yesterday",
+    "semana": "Week",
     "mes": "Month"
   }
 }

@@ -201,7 +201,33 @@
     "voucher_invalido": "Voucher inválido ou já utilizado.",
     "dados_incompletos": "Preenche todos os campos obrigatórios."
   },
+  "agenda": {
+    "titulo": "Agenda",
+    "novo_evento": "Novo Evento",
+    "titulo_evento": "Título do evento",
+    "horario": "Horário",
+    "categoria": "Categoria",
+    "notas": "Notas",
+    "sem_eventos": "Sem eventos para este dia",
+    "compromissos": "Compromissos",
+    "hoje": "Hoje",
+    "proximo": "Próximo",
+    "passado": "Passado"
+  },
+  "historico": {
+    "titulo": "Histórico",
+    "atividade_recente": "Atividade Recente",
+    "sem_atividade": "Sem atividade registada",
+    "tarefa_concluida": "Tarefa concluída",
+    "habito_completado": "Hábito completado",
+    "meta_atingida": "Meta atingida",
+    "decisao_tomada": "Decisão tomada"
+  },
   "datas": {
+    "hoje": "Hoje",
+    "amanha": "Amanhã",
+    "ontem": "Ontem",
+    "semana": "Semana",
     "mes": "Mês"
   }
 }
