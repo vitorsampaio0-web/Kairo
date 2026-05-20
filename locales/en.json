@@ -156,11 +156,52 @@
     "sim": "Yes",
     "nao": "No"
   },
+  "notificacoes": {
+    "titulo": "Notifications",
+    "ativar": "Enable notifications",
+    "minutos_antes": "Minutes before",
+    "estado": {
+      "verificando": "Checking...",
+      "permitido": "Allowed",
+      "negado": "Denied",
+      "padrao": "Default"
+    }
+  },
+  "email_diario": {
+    "titulo": "Daily Email",
+    "descricao": "Receive a daily summary of your tasks and habits.",
+    "ativar": "Enable daily email",
+    "email": "Email",
+    "hora": "Send time",
+    "guardar": "Save preferences"
+  },
+  "resumo_semanal": {
+    "titulo": "Weekly Summary",
+    "descricao": "Receive a weekly productivity report.",
+    "ativar": "Enable weekly summary",
+    "dia": "Day of week",
+    "hora": "Send time"
+  },
+  "toast": {
+    "tarefa_criada": "Task created!",
+    "tarefa_atualizada": "Task updated!",
+    "tarefa_eliminada": "Task deleted!",
+    "habito_criado": "Habit created!",
+    "habito_atualizado": "Habit updated!",
+    "meta_criada": "Goal created!",
+    "meta_atualizada": "Goal updated!",
+    "equipa_criada": "Team created!",
+    "convite_enviado": "Invite sent!",
+    "decisao_registada": "Decision recorded!",
+    "preferencias_guardadas": "Preferences saved!",
+    "erro": "Error: {mensagem}",
+    "copiado": "Copied!",
+    "codigo_copiado": "Code copied!",
+    "subscricao_pro": "Pro subscription activated! Welcome to Kairo Pro.",
+    "voucher_invalido": "Invalid or already used voucher.",
+    "dados_incompletos": "Please fill in all required fields."
+  },
   "datas": {
-    "hoje": "Today",
-    "amanha": "Tomorrow",
-    "ontem": "Yesterday",
-    "semana": "Week",
     "mes": "Month"
   }
 }

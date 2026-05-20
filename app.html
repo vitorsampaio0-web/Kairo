@@ -2809,11 +2809,11 @@
     <div class="digest-card">
       <button class="digest-close" onclick="closeNotifModal()"><i data-lucide="x"></i></button>
       <div class="digest-icon"><i data-lucide="bell"></i></div>
-      <h2>Notificações Push</h2>
+      <h2 data-i18n="notificacoes.titulo">Notificações Push</h2>
       <p>Recebe um aviso antes das tuas tarefas, mesmo com o app fechado.</p>
-      <div id="notif-permission-badge" class="notif-badge default"><i data-lucide="circle" style="width:8px;height:8px;"></i> A verificar...</div>
+      <div id="notif-permission-badge" class="notif-badge default"><i data-lucide="circle" style="width:8px;height:8px;"></i> <span data-i18n="notificacoes.estado.verificando">A verificar...</span></div>
       <div class="digest-toggle-row">
-        <span>Ativar notificações</span>
+        <span data-i18n="notificacoes.ativar">Ativar notificações</span>
         <label class="digest-switch">
           <input type="checkbox" id="notif-enabled" onchange="toggleNotifFields()">
           <span class="digest-slider"></span>
@@ -2821,7 +2821,7 @@
       </div>
       <div class="digest-fields" id="notif-fields" style="display:none;">
         <div class="digest-field">
-          <label>Avisar antes da tarefa</label>
+          <label data-i18n="notificacoes.minutos_antes">Avisar antes da tarefa</label>
           <select id="notif-minutos" class="digest-input">
             <option value="5">5 minutos antes</option>
             <option value="10">10 minutos antes</option>
@@ -2831,7 +2831,7 @@
           </select>
         </div>
       </div>
-      <button class="digest-save-btn" onclick="saveNotifSettings()">
+      <button class="digest-save-btn" onclick="saveNotifSettings()" data-i18n="botoes.guardar">
         <i data-lucide="check"></i> Guardar
       </button>
       <p class="digest-note" id="notif-note"></p>
@@ -3041,10 +3041,10 @@
     <div class="digest-card">
       <button class="digest-close" onclick="closeWeeklyModal()"><i data-lucide="x"></i></button>
       <div class="digest-icon"><i data-lucide="bar-chart-2"></i></div>
-      <h2>Resumo Semanal</h2>
-      <p>Recebe um email semanal com as tuas tarefas concluídas, streak e % de produtividade.</p>
+      <h2 data-i18n="resumo_semanal.titulo">Resumo Semanal</h2>
+      <p data-i18n="resumo_semanal.descricao">Recebe um email semanal com as tuas tarefas concluídas, streak e % de produtividade.</p>
       <div class="digest-toggle-row">
-        <span>Ativar resumo semanal</span>
+        <span data-i18n="resumo_semanal.ativar">Ativar resumo semanal</span>
         <label class="digest-switch">
           <input type="checkbox" id="weekly-enabled" onchange="toggleWeeklyFields()">
           <span class="digest-slider"></span>
@@ -3052,11 +3052,11 @@
       </div>
       <div class="digest-fields" id="weekly-fields" style="display:none;">
         <div class="digest-field">
-          <label>Email</label>
+          <label data-i18n="email_diario.email">Email</label>
           <input type="email" id="weekly-email" class="digest-input" placeholder="o-teu-email@gmail.com">
         </div>
         <div class="digest-field">
-          <label>Dia da semana</label>
+          <label data-i18n="resumo_semanal.dia">Dia da semana</label>
           <select id="weekly-day" class="digest-input">
             <option value="1">Segunda-feira</option>
             <option value="2">Terça-feira</option>
@@ -3177,11 +3177,11 @@
     <div class="digest-card">
       <button class="digest-close" onclick="closeDigestModal()"><i data-lucide="x"></i></button>
       <div class="digest-icon"><i data-lucide="mail"></i></div>
-      <h2>Email Diário</h2>
-      <p>Recebe as tuas tarefas por email todos os dias à hora que escolheres.</p>
+      <h2 data-i18n="email_diario.titulo">Email Diário</h2>
+      <p data-i18n="email_diario.descricao">Recebe as tuas tarefas por email todos os dias à hora que escolheres.</p>
 
       <div class="digest-toggle-row">
-        <span>Ativar email diário</span>
+        <span data-i18n="email_diario.ativar">Ativar email diário</span>
         <label class="digest-switch">
           <input type="checkbox" id="digest-enabled" onchange="toggleDigestHour()">
           <span class="digest-slider"></span>
@@ -3190,11 +3190,11 @@
 
       <div class="digest-fields" id="digest-fields" style="display:none;">
         <div class="digest-field">
-          <label>Email de destino</label>
+          <label data-i18n="email_diario.email">Email de destino</label>
           <input type="email" id="digest-email" placeholder="o-teu@email.com" class="digest-input" />
         </div>
         <div class="digest-field">
-          <label>Hora de envio</label>
+          <label data-i18n="email_diario.hora">Hora de envio</label>
           <select id="digest-hour" class="digest-input">
             <option value="5">05:00</option>
             <option value="6">06:00</option>

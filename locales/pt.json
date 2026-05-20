@@ -156,11 +156,52 @@
     "sim": "Sim",
     "nao": "Não"
   },
+  "notificacoes": {
+    "titulo": "Notificações",
+    "ativar": "Ativar notificações",
+    "minutos_antes": "Minutos antes",
+    "estado": {
+      "verificando": "A verificar...",
+      "permitido": "Permitido",
+      "negado": "Negado",
+      "padrao": "Por definir"
+    }
+  },
+  "email_diario": {
+    "titulo": "Email Diário",
+    "descricao": "Recebe um resumo diário das tuas tarefas e hábitos.",
+    "ativar": "Ativar email diário",
+    "email": "Email",
+    "hora": "Hora de envio",
+    "guardar": "Guardar preferências"
+  },
+  "resumo_semanal": {
+    "titulo": "Resumo Semanal",
+    "descricao": "Recebe um relatório semanal da tua produtividade.",
+    "ativar": "Ativar resumo semanal",
+    "dia": "Dia da semana",
+    "hora": "Hora de envio"
+  },
+  "toast": {
+    "tarefa_criada": "Tarefa criada!",
+    "tarefa_atualizada": "Tarefa atualizada!",
+    "tarefa_eliminada": "Tarefa eliminada!",
+    "habito_criado": "Hábito criado!",
+    "habito_atualizado": "Hábito atualizado!",
+    "meta_criada": "Meta criada!",
+    "meta_atualizada": "Meta atualizada!",
+    "equipa_criada": "Equipa criada!",
+    "convite_enviado": "Convite enviado!",
+    "decisao_registada": "Decisão registada!",
+    "preferencias_guardadas": "Preferências guardadas!",
+    "erro": "Erro: {mensagem}",
+    "copiado": "Copiado!",
+    "codigo_copiado": "Código copiado!",
+    "subscricao_pro": "Subscrição Pro ativada! Bem-vindo ao Kairo Pro.",
+    "voucher_invalido": "Voucher inválido ou já utilizado.",
+    "dados_incompletos": "Preenche todos os campos obrigatórios."
+  },
   "datas": {
-    "hoje": "Hoje",
-    "amanha": "Amanhã",
-    "ontem": "Ontem",
-    "semana": "Semana",
     "mes": "Mês"
   }
 }
