@@ -3657,10 +3657,6 @@
       const insights = generateKairoInsights();
       const dashboard = document.getElementById("dashboard-view");
 
-      // Atualiza a data no hero card
-      const todayLabel = document.getElementById("today-label");
-      if (todayLabel) todayLabel.textContent = formatDateLong(appState.today);
-
       const _overdueCount = getOverdueTasks().length;
       const _overdueBar = _overdueCount > 0
         ? `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(255,107,138,0.18),rgba(255,107,138,0.06)),var(--panel);border:1px solid rgba(255,107,138,0.35);display:flex;align-items:center;gap:12px;"><i data-lucide="alert-triangle" style="color:var(--danger);flex-shrink:0;"></i><strong style="color:var(--danger);font-size:0.95rem;">${_overdueCount} tarefa${_overdueCount > 1 ? "s" : ""} atrasada${_overdueCount > 1 ? "s" : ""}</strong></div>`
@@ -3817,6 +3813,10 @@
 
         ${renderIAPanel()}
       `;
+
+      // Atualiza a data no hero card após renderizar o HTML
+      const todayLabel = document.getElementById("today-label");
+      if (todayLabel) todayLabel.textContent = formatDateLong(appState.today);
     }
 
     function renderAgenda() {
