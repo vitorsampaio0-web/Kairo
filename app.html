@@ -2663,8 +2663,6 @@
             <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
           </div>
 
-          <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
-
           <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
           <span id="topbar-plan-badge" class="plan-badge free" style="display:none;">FREE</span>
         </div>
@@ -3664,7 +3662,7 @@
         <div class="hero-card">
           <div class="hero-content">
             <div class="hero-copy">
-              <div class="pill"><i data-lucide="sparkles"></i><span>Kairo AI ativo</span></div>
+              <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
               <h2>Bem-vindo ao <strong>Kairo</strong>, ${appState.user.nome}.</h2>
               <p>${insights[0].mensagem}</p>
               <p class="subtle">${getBusyDayInsight()}</p>
