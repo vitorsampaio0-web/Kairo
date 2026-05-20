@@ -223,11 +223,27 @@
     "meta_atingida": "Meta atingida",
     "decisao_tomada": "Decisão tomada"
   },
+  "emails": {
+    "digest_assunto": "Resumo do teu dia | Kairo",
+    "digest_titulo": "Bom dia, {nome}",
+    "digest_subtitulo": "Aqui está o resumo do teu dia",
+    "tarefas_pendentes": "Tarefas pendentes",
+    "tarefas_concluidas": "Tarefas concluídas",
+    "habitos_hoje": "Hábitos de hoje",
+    "proximos_eventos": "Próximos eventos",
+    "ver_app": "Ver na app",
+    "cancelar_digest": "Cancelar digest",
+    "convite_assunto": "Convite para equipa | Kairo",
+    "convite_titulo": "Foste convidado para uma equipa",
+    "convite_mensagem": "{nome} convidou-te para a equipa {equipa}.",
+    "aceitar_convite": "Aceitar convite",
+    "resumo_semanal_assunto": "Resumo semanal | Kairo",
+    "resumo_semanal_titulo": "Resumo da tua semana",
+    "produtividade_semanal": "Produtividade semanal",
+    "tarefas_completadas": "Tarefas completadas",
+    "streak_habitos": "Streak de hábitos"
+  },
   "datas": {
-    "hoje": "Hoje",
-    "amanha": "Amanhã",
-    "ontem": "Ontem",
-    "semana": "Semana",
     "mes": "Mês"
   }
 }

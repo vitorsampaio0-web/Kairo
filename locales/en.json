@@ -223,11 +223,27 @@
     "meta_atingida": "Goal reached",
     "decisao_tomada": "Decision made"
   },
+  "emails": {
+    "digest_assunto": "Your daily summary | Kairo",
+    "digest_titulo": "Good morning, {nome}",
+    "digest_subtitulo": "Here's your daily summary",
+    "tarefas_pendentes": "Pending tasks",
+    "tarefas_concluidas": "Completed tasks",
+    "habitos_hoje": "Today's habits",
+    "proximos_eventos": "Upcoming events",
+    "ver_app": "View in app",
+    "cancelar_digest": "Unsubscribe digest",
+    "convite_assunto": "Team invitation | Kairo",
+    "convite_titulo": "You've been invited to a team",
+    "convite_mensagem": "{nome} invited you to the {equipa} team.",
+    "aceitar_convite": "Accept invitation",
+    "resumo_semanal_assunto": "Weekly summary | Kairo",
+    "resumo_semanal_titulo": "Your week in review",
+    "produtividade_semanal": "Weekly productivity",
+    "tarefas_completadas": "Tasks completed",
+    "streak_habitos": "Habit streaks"
+  },
   "datas": {
-    "hoje": "Today",
-    "amanha": "Tomorrow",
-    "ontem": "Yesterday",
-    "semana": "Week",
     "mes": "Month"
   }
 }
