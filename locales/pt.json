@@ -43,6 +43,7 @@
     "tudo_dia": "Tudo em dia ✓",
     "resumo_dia": "Resumo do dia",
     "visao_rapida": "Visão rápida para entrar em execução",
+    "alta_prioridade": "Alta prioridade no radar",
     "tudo_concluido": "Tudo concluído hoje. Excelente ritmo.",
     "sem_eventos": "Sem eventos hoje",
     "sem_tarefas": "Sem tarefas pendentes",
@@ -55,11 +56,24 @@
   "tarefas": {
     "titulo": "Tarefas",
     "nova_tarefa": "Nova Tarefa",
+    "nova_tarefa_equipa": "Nova Tarefa de Equipa",
+    "delegar_tarefa": "Delegar Nova Tarefa",
     "titulo_tarefa": "Título",
     "descricao": "Descrição",
     "prioridade": "Prioridade",
     "prazo": "Prazo",
     "categoria": "Categoria",
+    "responsavel": "Responsável",
+    "filtrar": "Filtrar",
+    "ordenar": "Ordenar",
+    "todas": "Todas",
+    "minhas": "Minhas",
+    "atrasadas": "Atrasadas",
+    "concluidas": "Concluídas",
+    "criar_tarefa": "Criar tarefa",
+    "tarefa_rapida": "Criar tarefa rápida...",
+    "voz": "Criar tarefa por voz (pt-PT)",
+    "sem_tarefas": "Sem tarefas para mostrar",
     "status": {
       "pendente": "Pendente",
       "andamento": "Em andamento",
@@ -75,10 +89,38 @@
   "habitos": {
     "titulo": "Hábitos",
     "novo_habito": "Novo Hábito",
+    "editar_habito": "Editar Hábito",
     "streak": "streak",
     "dias": "dias",
     "feito_hoje": "Feito hoje",
-    "pendente": "Pendente"
+    "pendente": "Pendente",
+    "sem_habitos": "Sem hábitos registados",
+    "frequencia": "Frequência"
+  },
+  "metas": {
+    "titulo": "Metas",
+    "nova_meta": "Nova Meta",
+    "editar_meta": "Editar Meta",
+    "guardar_meta": "Guardar Meta",
+    "sem_metas": "Sem metas definidas"
+  },
+  "decisoes": {
+    "titulo": "Decisões",
+    "nova_decisao": "Nova Decisão",
+    "editar_decisao": "Editar Decisão",
+    "contexto": "Contexto",
+    "riscos": "Riscos",
+    "resultado": "Resultado",
+    "sem_decisoes": "Sem decisões registadas"
+  },
+  "equipa": {
+    "titulo": "Equipa",
+    "criar_equipa": "Criar Equipa",
+    "nome_equipa": "Nome da Equipa",
+    "membros": "Membros",
+    "convidar": "Convidar",
+    "codigo": "Código",
+    "sem_equipa": "Sem equipa"
   },
   "auth": {
     "entrar_google": "Entrar com Google",

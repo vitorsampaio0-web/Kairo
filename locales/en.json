@@ -43,6 +43,7 @@
     "tudo_dia": "All caught up ✓",
     "resumo_dia": "Daily Summary",
     "visao_rapida": "Quick view to start executing",
+    "alta_prioridade": "High priority on radar",
     "tudo_concluido": "Everything completed today. Great pace.",
     "sem_eventos": "No events today",
     "sem_tarefas": "No pending tasks",
@@ -55,11 +56,24 @@
   "tarefas": {
     "titulo": "Tasks",
     "nova_tarefa": "New Task",
+    "nova_tarefa_equipa": "New Team Task",
+    "delegar_tarefa": "Delegate New Task",
     "titulo_tarefa": "Title",
     "descricao": "Description",
     "prioridade": "Priority",
     "prazo": "Due Date",
     "categoria": "Category",
+    "responsavel": "Assignee",
+    "filtrar": "Filter",
+    "ordenar": "Sort",
+    "todas": "All",
+    "minhas": "Mine",
+    "atrasadas": "Overdue",
+    "concluidas": "Completed",
+    "criar_tarefa": "Create task",
+    "tarefa_rapida": "Create quick task...",
+    "voz": "Create task by voice (en-US)",
+    "sem_tarefas": "No tasks to show",
     "status": {
       "pendente": "Pending",
       "andamento": "In Progress",
@@ -75,10 +89,38 @@
   "habitos": {
     "titulo": "Habits",
     "novo_habito": "New Habit",
+    "editar_habito": "Edit Habit",
     "streak": "streak",
     "dias": "days",
     "feito_hoje": "Done today",
-    "pendente": "Pending"
+    "pendente": "Pending",
+    "sem_habitos": "No habits registered",
+    "frequencia": "Frequency"
+  },
+  "metas": {
+    "titulo": "Goals",
+    "nova_meta": "New Goal",
+    "editar_meta": "Edit Goal",
+    "guardar_meta": "Save Goal",
+    "sem_metas": "No goals defined"
+  },
+  "decisoes": {
+    "titulo": "Decisions",
+    "nova_decisao": "New Decision",
+    "editar_decisao": "Edit Decision",
+    "contexto": "Context",
+    "riscos": "Risks",
+    "resultado": "Outcome",
+    "sem_decisoes": "No decisions recorded"
+  },
+  "equipa": {
+    "titulo": "Team",
+    "criar_equipa": "Create Team",
+    "nome_equipa": "Team Name",
+    "membros": "Members",
+    "convidar": "Invite",
+    "codigo": "Code",
+    "sem_equipa": "No team"
   },
   "auth": {
     "entrar_google": "Sign in with Google",

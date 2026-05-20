@@ -22,43 +22,78 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
   <script>
-    /* ===== I18N ENGINE ===== */
+    /* ===== I18N ENGINE v2 - Robusto ===== */
     const I18N = {
-      locale: localStorage.getItem('kairo-lang') || 'pt',
+      locale: 'pt',
       translations: {},
+      loaded: false,
+      
+      // Detecta língua do browser ou usa preferência guardada
+      detectLang() {
+        const saved = localStorage.getItem('kairo-lang');
+        if (saved) return saved;
+        const browserLang = navigator.language || navigator.userLanguage;
+        if (browserLang.startsWith('en')) return 'en';
+        return 'pt';
+      },
       
       async load(lang) {
         try {
-          const res = await fetch(`./locales/${lang}.json`);
+          const res = await fetch(`./locales/${lang}.json?v=2`);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
           this.translations = await res.json();
           this.locale = lang;
+          this.loaded = true;
           document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
           return true;
         } catch (e) {
-          console.error('[i18n] Failed to load:', lang, e);
+          console.warn('[i18n] Falha ao carregar:', lang, '- usando PT');
+          this.locale = 'pt';
+          this.loaded = true;
           return false;
         }
       },
       
       t(key, vars = {}) {
+        if (!this.loaded) return key;
         const parts = key.split('.');
         let val = this.translations;
         for (const p of parts) {
           val = val?.[p];
-          if (val === undefined) return key;
+          if (val === undefined) {
+            if (this.locale !== 'pt') return this.tFallback(key, vars);
+            return key;
+          }
         }
         if (typeof val !== 'string') return key;
         return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
       },
       
+      tFallback(key, vars) {
+        const fallbacks = {
+          'dashboard.bem_vindo': 'Bem-vindo ao Kairo, {nome}.',
+          'dashboard.bom_dia': 'Bom dia! Tens {eventos} compromissos, {tarefas} tarefas e {habitos} hábitos hoje.',
+          'user_menu.email_diario': 'Email Diário',
+          'user_menu.resumo_semanal': 'Resumo Semanal',
+          'user_menu.guia': 'Guia',
+          'user_menu.notificacoes': 'Notificações',
+          'user_menu.convidar_amigos': 'Convidar Amigos',
+          'user_menu.sair': 'Sair',
+        };
+        const val = fallbacks[key] || key;
+        return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+      },
+      
       async setLang(lang) {
-        if (lang === this.locale) return;
+        if (lang === this.locale && this.loaded) return;
         await this.load(lang);
         localStorage.setItem('kairo-lang', lang);
         this.apply();
+        window.dispatchEvent(new CustomEvent('i18n-changed', { detail: { lang } }));
       },
       
       apply() {
+        if (!this.loaded) return;
         document.querySelectorAll('[data-i18n]').forEach(el => {
           const key = el.dataset.i18n;
           const vars = {};
@@ -73,14 +108,19 @@
           }
         });
         document.querySelectorAll('[data-i18n-html]').forEach(el => {
-          const key = el.dataset.i18nHtml;
-          el.innerHTML = this.t(key);
+          el.innerHTML = this.t(el.dataset.i18nHtml);
         });
+        const langLabel = document.getElementById('lang-label');
+        if (langLabel) langLabel.textContent = this.locale.toUpperCase();
       }
     };
     
-    // Load initial language
-    I18N.load(I18N.locale);
+    // Inicialização síncrona com PT, depois carrega a língua certa
+    (async function initI18N() {
+      const lang = I18N.detectLang();
+      await I18N.load(lang);
+      I18N.apply();
+    })();
   </script>
   <style>
     :root {
@@ -3127,8 +3167,8 @@
         </select>
       </div>
       <div class="modal-actions">
-        <button class="secondary-btn" onclick="closeEditHabitModal()">Cancelar</button>
-        <button class="primary-btn" onclick="saveEditHabit()">Guardar</button>
+        <button class="secondary-btn" onclick="closeEditHabitModal()" data-i18n="botoes.cancelar">Cancelar</button>
+        <button class="primary-btn" onclick="saveEditHabit()" data-i18n="botoes.guardar">Guardar</button>
       </div>
     </div>
   </div>
@@ -3250,8 +3290,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="ghost-btn" id="modal-cancel-btn">Cancelar</button>
-        <button class="primary-btn" id="modal-save-btn">Guardar alterações</button>
+        <button class="ghost-btn" id="modal-cancel-btn" data-i18n="botoes.cancelar">Cancelar</button>
+        <button class="primary-btn" id="modal-save-btn" data-i18n="botoes.guardar">Guardar alterações</button>
       </div>
     </div>
   </div>
@@ -3388,7 +3428,6 @@
     function toggleLang() {
       const newLang = I18N.locale === 'pt' ? 'en' : 'pt';
       I18N.setLang(newLang).then(() => {
-        document.getElementById('lang-label').textContent = newLang.toUpperCase();
         renderNav();
         renderAll();
       });
@@ -3765,30 +3804,30 @@
           <div class="hero-content">
             <div class="hero-copy">
               <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
-              <h2>Bem-vindo ao <strong>Kairo</strong>, ${appState.user.nome}.</h2>
+              <h2 data-i18n="dashboard.bem_vindo" data-i18n-vars='{"nome":"${appState.user.nome}"}'>Bem-vindo ao <strong>Kairo</strong>, ${appState.user.nome}.</h2>
               <p>${insights[0].mensagem}</p>
               <p class="subtle">${getBusyDayInsight()}</p>
             </div>
             <div class="hero-grid">
               <div class="metric-card" style="${_overdueCount > 0 ? 'border-color:rgba(255,107,138,0.35);background:linear-gradient(135deg,rgba(255,107,138,0.12),transparent 60%);cursor:pointer;' : ''}" ${_overdueCount > 0 ? 'onclick="appState.taskFilter=\'atrasadas\'; switchView(\'tarefas\');"' : ''}>
-                <small>Tarefas atrasadas</small>
+                <small data-i18n="dashboard.tarefas_atrasadas">Tarefas atrasadas</small>
                 <strong style="${_overdueCount > 0 ? 'color:var(--danger)' : 'color:var(--success)'}">${_overdueCount}</strong>
-                <span class="label">${_overdueCount > 0 ? 'Clica para ver →' : 'Tudo em dia ✓'}</span>
+                <span class="label" data-i18n="${_overdueCount > 0 ? 'dashboard.clica_ver' : 'dashboard.tudo_dia'}">${_overdueCount > 0 ? 'Clica para ver →' : 'Tudo em dia ✓'}</span>
               </div>
               <div class="metric-card">
-                <small>Tarefas importantes</small>
+                <small data-i18n="dashboard.tarefas_importantes">Tarefas importantes</small>
                 <strong>${getImportantTodayCount()}</strong>
-                <span class="label">Alta prioridade no radar</span>
+                <span class="label" data-i18n="dashboard.alta_prioridade">Alta prioridade no radar</span>
               </div>
               <div class="metric-card">
-                <small>Hábitos concluídos</small>
+                <small data-i18n="dashboard.habitos_concluidos">Hábitos concluídos</small>
                 <strong>${getCompletedHabitsToday().length}/${appState.habitos.length}</strong>
-                <span class="label">Consistência diária</span>
+                <span class="label" data-i18n="dashboard.consistencia_diaria">Consistência diária</span>
               </div>
               <div class="metric-card">
-                <small>Produtividade</small>
+                <small data-i18n="dashboard.produtividade">Produtividade</small>
                 <strong>${productivity}%</strong>
-                <span class="label">Atualizado em tempo real</span>
+                <span class="label" data-i18n="dashboard.atualizado_tempo_real">Atualizado em tempo real</span>
               </div>
             </div>
           </div>
@@ -3799,8 +3838,8 @@
             <div class="panel-header">
               <div class="section-heading">
                 <div>
-                  <h3>Resumo do dia</h3>
-                  <p>Visão rápida para entrar em execução</p>
+                  <h3 data-i18n="dashboard.resumo_dia">Resumo do dia</h3>
+                  <p data-i18n="dashboard.visao_rapida">Visão rápida para entrar em execução</p>
                 </div>
               </div>
             </div>
@@ -4141,8 +4180,8 @@
 
           <div class="task-input-row">
             <div class="task-title-wrapper">
-              <input id="quick-task-title" class="task-input" type="text" placeholder="Criar tarefa rápida..." />
-              <button id="voice-task-btn" class="voice-btn" title="Criar tarefa por voz (pt-PT)" type="button">
+              <input id="quick-task-title" class="task-input" type="text" data-i18n="tarefas.tarefa_rapida" placeholder="Criar tarefa rápida..." />
+              <button id="voice-task-btn" class="voice-btn" data-i18n="tarefas.voz" title="Criar tarefa por voz (pt-PT)" type="button">
                 <i data-lucide="mic"></i>
               </button>
             </div>
@@ -6259,7 +6298,7 @@
       el.innerHTML = `
         <div class="metas-header">
           <h2><i data-lucide="target" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;"></i>Metas</h2>
-          <button class="primary-btn" onclick="openNewMeta()" style="padding:8px 16px;font-size:0.85rem;">+ Nova Meta</button>
+          <button class="primary-btn" onclick="openNewMeta()" style="padding:8px 16px;font-size:0.85rem;" data-i18n="metas.nova_meta">+ Nova Meta</button>
         </div>
         ${sorted.length === 0
           ? `<div class="meta-empty">
@@ -7149,7 +7188,7 @@
       el.innerHTML = `
         <div class="section-header">
           <h2 class="section-title">Diário de Decisões</h2>
-          <button class="btn-primary" onclick="openDecisaoModal()">+ Nova Decisão</button>
+          <button class="btn-primary" onclick="openDecisaoModal()" data-i18n="decisoes.nova_decisao">+ Nova Decisão</button>
         </div>
 
         <div class="dec-stats">
@@ -7348,7 +7387,7 @@
             <h3>Sem equipa ainda</h3>
             <p>Cria uma equipa ou entra numa existente com o código de convite.</p>
             <div class="team-btn-row">
-              <button class="team-btn-primary" onclick="openTeamModal('create')">+ Criar Equipa</button>
+              <button class="team-btn-primary" onclick="openTeamModal('create')" data-i18n="equipa.criar_equipa">+ Criar Equipa</button>
               <button class="team-btn-secondary" onclick="openTeamModal('join')">Entrar com código</button>
             </div>
           </div>`;
