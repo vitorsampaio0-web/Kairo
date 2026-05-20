@@ -2649,6 +2649,10 @@
           </div>
         </div>
         <div class="topbar-meta">
+          <button class="kairo-chat-btn" id="kairo-chat-btn" title="Kairo AI" style="position:static;animation:none;box-shadow:none;width:40px;height:40px;">
+            <i data-lucide="bot" id="kairo-chat-icon"></i>
+            <span id="kairo-chat-lock" style="display:none;position:absolute;bottom:2px;right:2px;width:16px;height:16px;background:var(--warning);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.55rem;">🔒</span>
+          </button>
           <button id="topbar-user-btn" class="topbar-user-btn" onclick="document.getElementById('topbar-user-menu').classList.toggle('hidden')">
             <img id="topbar-avatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;display:none;" />
             <i data-lucide="user" id="topbar-avatar-icon"></i>
@@ -3174,12 +3178,6 @@
     </div>
   </div>
 
-  <!-- Kairo AI Floating Chat Button -->
-  <button class="kairo-chat-btn" id="kairo-chat-btn" title="Kairo AI">
-    <i data-lucide="bot" id="kairo-chat-icon"></i>
-    <span id="kairo-chat-lock" style="display:none;position:absolute;bottom:2px;right:2px;width:16px;height:16px;background:var(--warning);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.55rem;">🔒</span>
-  </button>
-
   <!-- Kairo AI Chat Panel -->
   <div class="kairo-chat-panel" id="kairo-chat-panel">
     <div class="chat-header">
@@ -3505,7 +3503,12 @@
 
     function formatDateLong(dateString) {
       const date = new Date(dateString + "T12:00:00");
-      return new Intl.DateTimeFormat("pt-PT", { weekday: "long", day: "2-digit", month: "long", timeZone: "Europe/Lisbon" }).format(date);
+      const parts = new Intl.DateTimeFormat("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric", timeZone: "Europe/Lisbon" }).formatToParts(date);
+      const weekday = parts.find(p => p.type === "weekday").value;
+      const day = parts.find(p => p.type === "day").value;
+      const month = parts.find(p => p.type === "month").value;
+      const year = parts.find(p => p.type === "year").value;
+      return `${weekday}, ${day} ${month} ${year}`;
     }
 
     function getTodayTasks() {
