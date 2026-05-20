@@ -1,0 +1,124 @@
+{
+  "app": {
+    "title": "Kairo",
+    "lang": "en",
+    "meta_description": "The command center for leaders who execute."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "agenda": "Agenda",
+    "tarefas": "Tasks",
+    "metas": "Goals",
+    "equipa": "Team",
+    "habitos": "Habits",
+    "historico": "History",
+    "decisoes": "Decisions",
+    "relatorio": "Report"
+  },
+  "topbar": {
+    "performance_diaria": "Daily Performance",
+    "pro": "PRO",
+    "free": "FREE",
+    "upgrade": "⚡ Pro"
+  },
+  "user_menu": {
+    "email_diario": "Daily Email",
+    "resumo_semanal": "Weekly Summary",
+    "guia": "Guide",
+    "notificacoes": "Notifications",
+    "convidar_amigos": "Invite Friends",
+    "sair": "Sign Out",
+    "gerir_subscricao": "Manage Subscription"
+  },
+  "dashboard": {
+    "bem_vindo": "Welcome to Kairo, {nome}.",
+    "bom_dia": "Good morning! You have {eventos} events, {tarefas} tasks and {habitos} habits today.",
+    "tarefas_atrasadas": "Overdue Tasks",
+    "tarefas_importantes": "Important Tasks",
+    "habitos_concluidos": "Habits Completed",
+    "produtividade": "Productivity",
+    "consistencia_diaria": "Daily Consistency",
+    "atualizado_tempo_real": "Updated in real-time",
+    "clica_ver": "Click to view →",
+    "tudo_dia": "All caught up ✓",
+    "resumo_dia": "Daily Summary",
+    "visao_rapida": "Quick view to start executing",
+    "tudo_concluido": "Everything completed today. Great pace.",
+    "sem_eventos": "No events today",
+    "sem_tarefas": "No pending tasks",
+    "sem_prioridades": "No priorities defined",
+    "sem_habitos": "No habits for today",
+    "proximo_compromisso": "Next event",
+    "prioridades": "Priorities",
+    "agenda": "Agenda"
+  },
+  "tarefas": {
+    "titulo": "Tasks",
+    "nova_tarefa": "New Task",
+    "titulo_tarefa": "Title",
+    "descricao": "Description",
+    "prioridade": "Priority",
+    "prazo": "Due Date",
+    "categoria": "Category",
+    "status": {
+      "pendente": "Pending",
+      "andamento": "In Progress",
+      "concluida": "Completed",
+      "atrasada": "Overdue"
+    },
+    "prioridades": {
+      "alta": "High",
+      "media": "Medium",
+      "baixa": "Low"
+    }
+  },
+  "habitos": {
+    "titulo": "Habits",
+    "novo_habito": "New Habit",
+    "streak": "streak",
+    "dias": "days",
+    "feito_hoje": "Done today",
+    "pendente": "Pending"
+  },
+  "auth": {
+    "entrar_google": "Sign in with Google",
+    "entrar_email": "Sign in with Email",
+    "criar_conta": "Create account",
+    "nome": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmar_password": "Confirm Password",
+    "ja_tem_conta": "Already have an account?",
+    "nao_tem_conta": "Don't have an account?",
+    "dados_seguros": "Your data is stored securely"
+  },
+  "planos": {
+    "free": "Free",
+    "pro": "Pro",
+    "upgrade_pro": "Upgrade to Pro"
+  },
+  "ai": {
+    "kairo_ai_ativo": "Kairo AI active",
+    "sugestao": "Kairo AI Suggestion",
+    "resumo": "summary",
+    "placeholder": "Ask Kairo AI..."
+  },
+  "botoes": {
+    "guardar": "Save",
+    "cancelar": "Cancel",
+    "eliminar": "Delete",
+    "editar": "Edit",
+    "criar": "Create",
+    "adicionar": "Add",
+    "fechar": "Close",
+    "sim": "Yes",
+    "nao": "No"
+  },
+  "datas": {
+    "hoje": "Today",
+    "amanha": "Tomorrow",
+    "ontem": "Yesterday",
+    "semana": "Week",
+    "mes": "Month"
+  }
+}

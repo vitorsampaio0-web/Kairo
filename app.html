@@ -21,6 +21,67 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+  <script>
+    /* ===== I18N ENGINE ===== */
+    const I18N = {
+      locale: localStorage.getItem('kairo-lang') || 'pt',
+      translations: {},
+      
+      async load(lang) {
+        try {
+          const res = await fetch(`./locales/${lang}.json`);
+          this.translations = await res.json();
+          this.locale = lang;
+          document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+          return true;
+        } catch (e) {
+          console.error('[i18n] Failed to load:', lang, e);
+          return false;
+        }
+      },
+      
+      t(key, vars = {}) {
+        const parts = key.split('.');
+        let val = this.translations;
+        for (const p of parts) {
+          val = val?.[p];
+          if (val === undefined) return key;
+        }
+        if (typeof val !== 'string') return key;
+        return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+      },
+      
+      async setLang(lang) {
+        if (lang === this.locale) return;
+        await this.load(lang);
+        localStorage.setItem('kairo-lang', lang);
+        this.apply();
+      },
+      
+      apply() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          const vars = {};
+          if (el.dataset.i18nVars) {
+            try { Object.assign(vars, JSON.parse(el.dataset.i18nVars)); } catch {}
+          }
+          const text = this.t(key, vars);
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.placeholder = text;
+          } else {
+            el.textContent = text;
+          }
+        });
+        document.querySelectorAll('[data-i18n-html]').forEach(el => {
+          const key = el.dataset.i18nHtml;
+          el.innerHTML = this.t(key);
+        });
+      }
+    };
+    
+    // Load initial language
+    I18N.load(I18N.locale);
+  </script>
   <style>
     :root {
       --bg: #07111f;
@@ -132,6 +193,25 @@
       margin: 0;
       color: var(--muted);
       font-size: 0.92rem;
+    }
+
+    .lang-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--muted-strong);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s ease;
+    }
+    .lang-toggle:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text);
     }
 
     .topbar-meta {
@@ -2645,6 +2725,9 @@
           </div>
         </div>
         <div class="topbar-meta">
+          <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()" title="PT / EN">
+            <span id="lang-label">PT</span>
+          </button>
           <button class="kairo-chat-btn" id="kairo-chat-btn" title="Kairo AI" style="position:static;animation:none;box-shadow:none;width:40px;height:40px;">
             <i data-lucide="bot" id="kairo-chat-icon"></i>
             <span id="kairo-chat-lock" style="display:none;position:absolute;bottom:2px;right:2px;width:16px;height:16px;background:var(--warning);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.55rem;">🔒</span>
@@ -2654,12 +2737,12 @@
             <i data-lucide="user" id="topbar-avatar-icon"></i>
           </button>
           <div id="topbar-user-menu" class="topbar-user-menu hidden">
-            <button onclick="openDigestModal()"><i data-lucide="mail"></i> Email Diário</button>
-            <button onclick="openWeeklyModal()"><i data-lucide="bar-chart-2"></i> Resumo Semanal</button>
-            <button onclick="window.open('kairo-brochure.html','_blank')"><i data-lucide="book-open"></i> Guia</button>
-            <button onclick="openNotifModal()"><i data-lucide="bell"></i> Notificações</button>
-            <button onclick="openReferralModal()"><i data-lucide="gift"></i> Convidar Amigos</button>
-            <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
+            <button onclick="openDigestModal()"><i data-lucide="mail"></i> <span data-i18n="user_menu.email_diario">Email Diário</span></button>
+            <button onclick="openWeeklyModal()"><i data-lucide="bar-chart-2"></i> <span data-i18n="user_menu.resumo_semanal">Resumo Semanal</span></button>
+            <button onclick="window.open('kairo-brochure.html','_blank')"><i data-lucide="book-open"></i> <span data-i18n="user_menu.guia">Guia</span></button>
+            <button onclick="openNotifModal()"><i data-lucide="bell"></i> <span data-i18n="user_menu.notificacoes">Notificações</span></button>
+            <button onclick="openReferralModal()"><i data-lucide="gift"></i> <span data-i18n="user_menu.convidar_amigos">Convidar Amigos</span></button>
+            <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> <span data-i18n="user_menu.sair">Sair</span></button>
           </div>
 
           <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
@@ -3302,6 +3385,15 @@
       renderAll();
     }
 
+    function toggleLang() {
+      const newLang = I18N.locale === 'pt' ? 'en' : 'pt';
+      I18N.setLang(newLang).then(() => {
+        document.getElementById('lang-label').textContent = newLang.toUpperCase();
+        renderNav();
+        renderAll();
+      });
+    }
+
     function updateSidebarUser(user) {
       const displayName = user.displayName || user.email || "Utilizador";
       const firstName = displayName.split(" ")[0];
@@ -3635,18 +3727,19 @@
 
     function renderNav() {
       const markup = navItems.map(item => {
+        const label = I18N.t('nav.' + item.id) || item.label;
         if (item.action) {
           return `
-            <button class="nav-btn" onclick="${item.action}" title="${item.label}">
+            <button class="nav-btn" onclick="${item.action}" title="${label}">
               <i data-lucide="${item.icon}"></i>
-              <span>${item.label}</span>
+              <span>${label}</span>
             </button>
           `;
         }
         return `
           <button class="nav-btn ${appState.currentView === item.id ? "active" : ""}" data-view="${item.id}">
             <i data-lucide="${item.icon}"></i>
-            <span>${item.label}</span>
+            <span>${label}</span>
           </button>
         `;
       }).join("");
@@ -4485,6 +4578,9 @@
       renderTeam();
       renderDecisoes();
       renderMiniCalendar();
+
+      // Aplica traduções i18n após renderizar
+      I18N.apply();
 
       Object.entries(viewIds).forEach(([key, id]) => {
         document.getElementById(id).classList.toggle("active", key === appState.currentView);

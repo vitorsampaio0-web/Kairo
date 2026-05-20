@@ -1,0 +1,124 @@
+{
+  "app": {
+    "title": "Kairo",
+    "lang": "pt",
+    "meta_description": "O centro de comando para líderes que executam."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "agenda": "Agenda",
+    "tarefas": "Tarefas",
+    "metas": "Metas",
+    "equipa": "Equipa",
+    "habitos": "Hábitos",
+    "historico": "Histórico",
+    "decisoes": "Decisões",
+    "relatorio": "Relatório"
+  },
+  "topbar": {
+    "performance_diaria": "Performance Diária",
+    "pro": "PRO",
+    "free": "FREE",
+    "upgrade": "⚡ Pro"
+  },
+  "user_menu": {
+    "email_diario": "Email Diário",
+    "resumo_semanal": "Resumo Semanal",
+    "guia": "Guia",
+    "notificacoes": "Notificações",
+    "convidar_amigos": "Convidar Amigos",
+    "sair": "Sair",
+    "gerir_subscricao": "Gerir Subscrição"
+  },
+  "dashboard": {
+    "bem_vindo": "Bem-vindo ao Kairo, {nome}.",
+    "bom_dia": "Bom dia! Tens {eventos} compromissos, {tarefas} tarefas e {habitos} hábitos hoje.",
+    "tarefas_atrasadas": "Tarefas atrasadas",
+    "tarefas_importantes": "Tarefas importantes",
+    "habitos_concluidos": "Hábitos concluídos",
+    "produtividade": "Produtividade",
+    "consistencia_diaria": "Consistência diária",
+    "atualizado_tempo_real": "Atualizado em tempo real",
+    "clica_ver": "Clica para ver →",
+    "tudo_dia": "Tudo em dia ✓",
+    "resumo_dia": "Resumo do dia",
+    "visao_rapida": "Visão rápida para entrar em execução",
+    "tudo_concluido": "Tudo concluído hoje. Excelente ritmo.",
+    "sem_eventos": "Sem eventos hoje",
+    "sem_tarefas": "Sem tarefas pendentes",
+    "sem_prioridades": "Sem prioridades definidas",
+    "sem_habitos": "Sem hábitos para hoje",
+    "proximo_compromisso": "Próximo compromisso",
+    "prioridades": "Prioridades",
+    "agenda": "Agenda"
+  },
+  "tarefas": {
+    "titulo": "Tarefas",
+    "nova_tarefa": "Nova Tarefa",
+    "titulo_tarefa": "Título",
+    "descricao": "Descrição",
+    "prioridade": "Prioridade",
+    "prazo": "Prazo",
+    "categoria": "Categoria",
+    "status": {
+      "pendente": "Pendente",
+      "andamento": "Em andamento",
+      "concluida": "Concluída",
+      "atrasada": "Atrasada"
+    },
+    "prioridades": {
+      "alta": "Alta",
+      "media": "Média",
+      "baixa": "Baixa"
+    }
+  },
+  "habitos": {
+    "titulo": "Hábitos",
+    "novo_habito": "Novo Hábito",
+    "streak": "streak",
+    "dias": "dias",
+    "feito_hoje": "Feito hoje",
+    "pendente": "Pendente"
+  },
+  "auth": {
+    "entrar_google": "Entrar com Google",
+    "entrar_email": "Entrar com Email",
+    "criar_conta": "Criar conta",
+    "nome": "Nome",
+    "email": "Email",
+    "password": "Password",
+    "confirmar_password": "Confirmar Password",
+    "ja_tem_conta": "Já tens conta?",
+    "nao_tem_conta": "Não tens conta?",
+    "dados_seguros": "Os teus dados ficam guardados de forma segura"
+  },
+  "planos": {
+    "free": "Free",
+    "pro": "Pro",
+    "upgrade_pro": "Fazer Upgrade Pro"
+  },
+  "ai": {
+    "kairo_ai_ativo": "Kairo AI ativo",
+    "sugestao": "Sugestão Kairo AI",
+    "resumo": "resumo",
+    "placeholder": "Pergunta ao Kairo AI..."
+  },
+  "botoes": {
+    "guardar": "Guardar",
+    "cancelar": "Cancelar",
+    "eliminar": "Eliminar",
+    "editar": "Editar",
+    "criar": "Criar",
+    "adicionar": "Adicionar",
+    "fechar": "Fechar",
+    "sim": "Sim",
+    "nao": "Não"
+  },
+  "datas": {
+    "hoje": "Hoje",
+    "amanha": "Amanhã",
+    "ontem": "Ontem",
+    "semana": "Semana",
+    "mes": "Mês"
+  }
+}
