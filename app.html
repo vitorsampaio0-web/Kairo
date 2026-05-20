@@ -2649,10 +2649,6 @@
           </div>
         </div>
         <div class="topbar-meta">
-          <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
-
-          <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
-          <span id="topbar-plan-badge" class="plan-badge free" style="display:none;">FREE</span>
           <button id="topbar-user-btn" class="topbar-user-btn" onclick="document.getElementById('topbar-user-menu').classList.toggle('hidden')">
             <img id="topbar-avatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;display:none;" />
             <i data-lucide="user" id="topbar-avatar-icon"></i>
@@ -2666,6 +2662,11 @@
             <button onclick="openReferralModal()"><i data-lucide="gift"></i> Convidar Amigos</button>
             <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
           </div>
+
+          <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
+
+          <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
+          <span id="topbar-plan-badge" class="plan-badge free" style="display:none;">FREE</span>
         </div>
       </div>
 
