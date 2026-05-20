@@ -18,6 +18,11 @@
       "node_modules/**",
       ".git/**"
     ],
-    "rewrites": []
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/landing.html"
+      }
+    ]
   }
 }
