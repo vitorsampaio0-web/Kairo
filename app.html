@@ -22,11 +22,199 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
   <script>
-    /* ===== I18N ENGINE v2 - Robusto ===== */
+    /* ===== I18N ENGINE v3 - Completo ===== */
     const I18N = {
       locale: 'pt',
       translations: {},
       loaded: false,
+      
+      // Dicionário completo PT → EN para tradução automática
+      dictionary: {
+        // Labels e placeholders
+        'Nome da equipa': 'Team name',
+        'Código da equipa': 'Team code',
+        'Título': 'Title',
+        'Atribuir a': 'Assign to',
+        'Prazo': 'Due date',
+        'Prioridade': 'Priority',
+        'Categoria': 'Category',
+        'Descrição': 'Description',
+        'Data': 'Date',
+        'Hora': 'Time',
+        'Repetição': 'Repeat',
+        'Nome': 'Name',
+        'Frequência': 'Frequency',
+        'Notas': 'Notes',
+        'Horário': 'Time',
+        
+        // Select options
+        'Média': 'Medium',
+        'Alta': 'High',
+        'Baixa': 'Low',
+        'Trabalho': 'Work',
+        'Pessoal': 'Personal',
+        'Saúde': 'Health',
+        'Desporto': 'Sports',
+        'Diário': 'Daily',
+        'Semanal': 'Weekly',
+        'Sem repetição': 'No repeat',
+        'Repete diariamente': 'Repeat daily',
+        'Repete semanalmente': 'Repeat weekly',
+        'Repete mensalmente': 'Repeat monthly',
+        'Dias específicos': 'Specific days',
+        'Hora de envio': 'Send time',
+        'Email de destino': 'Destination email',
+        'Avisar antes da tarefa': 'Alert before task',
+        
+        // Buttons
+        'Entrar': 'Join',
+        'Copiar': 'Copy',
+        'Fechar': 'Close',
+        'Guardar alterações': 'Save changes',
+        
+        // Dashboard
+        'Tudo em dia': 'All caught up',
+        'Clica para ver →': 'Click to view →',
+        'Alta prioridade no radar': 'High priority on radar',
+        'Consistência diária': 'Daily consistency',
+        'Atualizado em tempo real': 'Updated in real-time',
+        'Resumo do dia': 'Daily Summary',
+        'Visão rápida para entrar em execução': 'Quick view to start executing',
+        'Próximo compromisso': 'Next appointment',
+        'Prioridades': 'Priorities',
+        'Agenda': 'Agenda',
+        
+        // Sections
+        'Tarefas': 'Tasks',
+        'Hábitos': 'Habits',
+        'Metas': 'Goals',
+        'Equipa': 'Team',
+        'Decisões': 'Decisions',
+        'Histórico': 'History',
+        
+        // Auth
+        'Entrar com Google': 'Sign in with Google',
+        'Entrar com Email': 'Sign in with Email',
+        'Criar conta': 'Create account',
+        'Já tens conta?': 'Already have an account?',
+        'Não tens conta?': "Don't have an account?",
+        'Os teus dados ficam guardados de forma segura': 'Your data is stored securely',
+        
+        // Misc
+        'Calendário diário e semanal com blocos reais de execução': 'Daily and weekly calendar with real execution blocks',
+        'Execute prioridades com agilidade e clareza': 'Execute priorities with agility and clarity',
+        'Indicadores inteligentes do teu dia': 'Smart indicators of your day',
+        'Mensagens inteligentes': 'Smart messages',
+        'Leitura rápida para a tua execução': 'Quick read for your execution',
+        'Destaques': 'Highlights',
+        'de produtividade': 'of productivity',
+        'Tarefa em foco': 'Task in focus',
+        'Amigos convidados': 'Friends invited',
+        'Pro grátis até': 'Free Pro until',
+        'O teu link de convite': 'Your invite link',
+        'Usado por mais de 2.000 líderes em todo o mundo': 'Used by over 2,000 leaders worldwide',
+        'Execução acima de intenção.': 'Execution over intention.',
+        'Para de gerir. Começa a executar.': 'Stop managing. Start executing.',
+        'Bom dia! Tens': 'Good morning! You have',
+        'compromissos': 'appointments',
+        'tarefas': 'tasks',
+        'hábitos': 'habits',
+        'hoje.': 'today.',
+        
+        // Time options
+        '5 minutos antes': '5 minutes before',
+        '10 minutos antes': '10 minutes before',
+        '15 minutos antes': '15 minutes before',
+        '30 minutos antes': '30 minutes before',
+        '1 hora antes': '1 hour before',
+        
+        // Days
+        'Segunda': 'Monday',
+        'Terça': 'Tuesday',
+        'Quarta': 'Wednesday',
+        'Quinta': 'Thursday',
+        'Sexta': 'Friday',
+        'Sábado': 'Saturday',
+        'Domingo': 'Sunday',
+        'Seg-Sex': 'Mon-Fri',
+        
+        // Status
+        'Pendente': 'Pending',
+        'Em andamento': 'In Progress',
+        'Concluída': 'Completed',
+        'Atrasada': 'Overdue',
+        
+        // Task filters
+        'Todas': 'All',
+        'Minhas': 'Mine',
+        'Atrasadas': 'Overdue',
+        'Concluídas': 'Completed',
+        'Filtrar': 'Filter',
+        'Ordenar': 'Sort',
+        
+        // Modal titles
+        'Nova Tarefa': 'New Task',
+        'Nova Tarefa de Equipa': 'New Team Task',
+        'Editar Tarefa': 'Edit Task',
+        'Novo Evento': 'New Event',
+        'Editar Evento': 'Edit Event',
+        'Novo Hábito': 'New Habit',
+        'Editar Hábito': 'Edit Habit',
+        'Nova Meta': 'New Goal',
+        'Editar Meta': 'Edit Goal',
+        'Nova Decisão': 'New Decision',
+        'Editar Decisão': 'Edit Decision',
+        'Criar Equipa': 'Create Team',
+        'Entrar com código': 'Join with code',
+        
+        // Placeholders
+        'Criar tarefa rápida...': 'Create quick task...',
+        'Pergunta ao Kairo AI...': 'Ask Kairo AI...',
+        'o-teu@email.com': 'your@email.com',
+        
+        // Empty states
+        'Sem eventos para este dia': 'No events for this day',
+        'Sem tarefas para mostrar': 'No tasks to show',
+        'Sem hábitos registados': 'No habits registered',
+        'Sem metas definidas': 'No goals defined',
+        'Sem decisões registadas': 'No decisions recorded',
+        'Sem equipa': 'No team',
+        'Sem atividade registada': 'No activity recorded',
+        
+        // Misc UI
+        'Personalizado': 'Custom',
+        'Ativo': 'Active',
+        'Pronto': 'Ready',
+        'Sincronização encriptada ponta a ponta': 'End-to-end encrypted sync',
+        'Sempre ativo': 'Always active',
+        'Sem ligação necessária': 'No connection needed',
+        'Tarefas concluídas diariamente': 'Tasks completed daily',
+        'Taxa de retenção de utilizadores': 'User retention rate',
+        'Classificação média da app': 'Average app rating',
+        'Líderes a bordo': 'Leaders on board',
+        'O problema': 'The problem',
+        'Funcionalidades': 'Features',
+        'Testemunhos': 'Testimonials',
+        'Preços': 'Pricing',
+        'Começar': 'Get Started',
+        'Construído para a forma\ncomo realmente lideras.': 'Built for how\nyou actually lead.',
+        'Vista global': 'Global view',
+        'Clareza diária': 'Daily clarity',
+        'Zero ruído': 'Zero noise',
+        'Tarefas concluídas hoje': 'Tasks completed today',
+        'Próxima reunião': 'Next meeting',
+        'Pontuação de foco': 'Focus score',
+        'Progresso diário': 'Daily progress',
+        'Sequência semanal': 'Weekly streak',
+        'Sugestão de prioridades': 'Priority suggestions',
+        'Agendamento inteligente': 'Smart scheduling',
+        'Insights contextuais': 'Contextual insights',
+        'Criação por voz': 'Voice creation',
+        'Histórico completo': 'Full history',
+        'Export para Word': 'Export to Word',
+        'Sincronização em tempo real': 'Real-time sync',
+        'Funciona offline': 'Works offline',
+      },
       
       // Detecta língua do browser ou usa preferência guardada
       detectLang() {
@@ -39,7 +227,7 @@
       
       async load(lang) {
         try {
-          const res = await fetch(`./locales/${lang}.json?v=2`);
+          const res = await fetch(`./locales/${lang}.json?v=3`);
           if (!res.ok) throw new Error('HTTP ' + res.status);
           this.translations = await res.json();
           this.locale = lang;
@@ -71,17 +259,30 @@
       
       tFallback(key, vars) {
         const fallbacks = {
-          'dashboard.bem_vindo': 'Bem-vindo ao Kairo, {nome}.',
-          'dashboard.bom_dia': 'Bom dia! Tens {eventos} compromissos, {tarefas} tarefas e {habitos} hábitos hoje.',
-          'user_menu.email_diario': 'Email Diário',
-          'user_menu.resumo_semanal': 'Resumo Semanal',
-          'user_menu.guia': 'Guia',
-          'user_menu.notificacoes': 'Notificações',
-          'user_menu.convidar_amigos': 'Convidar Amigos',
-          'user_menu.sair': 'Sair',
+          'dashboard.bem_vindo': 'Welcome to Kairo, {nome}.',
+          'dashboard.bom_dia': 'Good morning! You have {eventos} appointments, {tarefas} tasks and {habitos} habits today.',
+          'user_menu.email_diario': 'Daily Email',
+          'user_menu.resumo_semanal': 'Weekly Summary',
+          'user_menu.guia': 'Guide',
+          'user_menu.notificacoes': 'Notifications',
+          'user_menu.convidar_amigos': 'Invite Friends',
+          'user_menu.sair': 'Sign Out',
         };
         const val = fallbacks[key] || key;
         return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+      },
+      
+      // Traduz texto usando o dicionário
+      translateText(text) {
+        if (this.locale === 'pt' || !text) return text;
+        // Procura correspondência exata no dicionário
+        if (this.dictionary[text]) return this.dictionary[text];
+        // Procura correspondências parciais
+        let translated = text;
+        for (const [pt, en] of Object.entries(this.dictionary)) {
+          translated = translated.split(pt).join(en);
+        }
+        return translated;
       },
       
       async setLang(lang) {
@@ -89,11 +290,12 @@
         await this.load(lang);
         localStorage.setItem('kairo-lang', lang);
         this.apply();
-        window.dispatchEvent(new CustomEvent('i18n-changed', { detail: { lang } }));
       },
       
       apply() {
         if (!this.loaded) return;
+        
+        // 1. Aplica data-i18n (elementos com keys definidas)
         document.querySelectorAll('[data-i18n]').forEach(el => {
           const key = el.dataset.i18n;
           const vars = {};
@@ -107,9 +309,54 @@
             el.textContent = text;
           }
         });
+        
+        // 2. Aplica data-i18n-html
         document.querySelectorAll('[data-i18n-html]').forEach(el => {
           el.innerHTML = this.t(el.dataset.i18nHtml);
         });
+        
+        // 3. TRADUÇÃO AUTOMÁTICA: labels, placeholders, textos sem data-i18n
+        if (this.locale !== 'pt') {
+          // Traduz todos os labels
+          document.querySelectorAll('label').forEach(el => {
+            if (!el.dataset.i18n && el.textContent.trim()) {
+              el.textContent = this.translateText(el.textContent.trim());
+            }
+          });
+          
+          // Traduz todos os placeholders
+          document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
+            if (!el.dataset.i18n && el.placeholder) {
+              el.placeholder = this.translateText(el.placeholder);
+            }
+          });
+          
+          // Traduz todos os botões que não têm data-i18n
+          document.querySelectorAll('button').forEach(el => {
+            if (!el.dataset.i18n && el.textContent.trim() && !el.querySelector('i, svg, img')) {
+              el.textContent = this.translateText(el.textContent.trim());
+            }
+          });
+          
+          // Traduz options de select
+          document.querySelectorAll('option').forEach(el => {
+            if (el.textContent.trim()) {
+              el.textContent = this.translateText(el.textContent.trim());
+            }
+          });
+          
+          // Traduz títulos de secções (h2, h3, h4 sem data-i18n)
+          document.querySelectorAll('h2, h3, h4, p, span, small, strong').forEach(el => {
+            if (!el.dataset.i18n && !el.closest('[data-i18n]') && el.children.length === 0 && el.textContent.trim()) {
+              const parent = el.parentElement;
+              if (parent && !parent.dataset.i18n) {
+                el.textContent = this.translateText(el.textContent.trim());
+              }
+            }
+          });
+        }
+        
+        // Atualiza label do botão de língua
         const langLabel = document.getElementById('lang-label');
         if (langLabel) langLabel.textContent = this.locale.toUpperCase();
       }
