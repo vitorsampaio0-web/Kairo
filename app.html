@@ -3098,7 +3098,7 @@
         <button onclick="closeTeamModal('create')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
       <div class="team-field">
-        <label>Nome da equipa</label>
+        <label data-i18n="equipa.nome_equipa">Nome da equipa</label>
         <input id="team-create-nome" class="team-input" placeholder="Ex: Marketing, Dev Team, Família...">
       </div>
       <button class="team-save-btn" onclick="createTeam()">Criar Equipa</button>
@@ -3113,10 +3113,10 @@
         <button onclick="closeTeamModal('join')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
       <div class="team-field">
-        <label>Código da equipa</label>
+        <label data-i18n="equipa.codigo">Código da equipa</label>
         <input id="team-join-code" class="team-input" placeholder="Ex: KAIRO-X7K2" style="text-transform:uppercase;letter-spacing:.1em;">
       </div>
-      <button class="team-save-btn" onclick="joinTeam()">Entrar</button>
+      <button class="team-save-btn" onclick="joinTeam()" data-i18n="equipa.entrar">Entrar</button>
       <p id="team-join-note" style="text-align:center;font-size:0.8rem;color:#555;margin-top:10px;"></p>
     </div>
   </div>
@@ -3128,19 +3128,19 @@
         <button onclick="closeTeamModal('task')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
       <div class="team-field">
-        <label>Título</label>
+        <label data-i18n="tarefas.titulo_tarefa">Título</label>
         <input id="team-task-titulo" class="team-input" placeholder="O que precisa de ser feito?">
       </div>
       <div class="team-field">
-        <label>Atribuir a</label>
+        <label data-i18n="equipa.responsavel">Atribuir a</label>
         <select id="team-task-assignee" class="team-input"></select>
       </div>
       <div class="team-field">
-        <label>Prazo</label>
+        <label data-i18n="tarefas.prazo">Prazo</label>
         <input id="team-task-prazo-date" class="team-input" type="date" style="margin-bottom:8px;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();">
         <div style="display:flex;gap:8px;align-items:center;">
           <select id="team-task-prazo-h" class="team-input" style="flex:1;">
-            <option value="">Hora</option>
+            <option value="" data-i18n="tarefas.hora">Hora</option>
             <option value="00">00h</option><option value="01">01h</option><option value="02">02h</option>
             <option value="03">03h</option><option value="04">04h</option><option value="05">05h</option>
             <option value="06">06h</option><option value="07">07h</option><option value="08">08h</option>
@@ -3160,7 +3160,7 @@
         </div>
       </div>
       <div class="team-field">
-        <label>Prioridade</label>
+        <label data-i18n="tarefas.prioridade">Prioridade</label>
         <select id="team-task-prioridade" class="team-input">
           <option value="media">Média</option>
           <option value="alta">Alta</option>
@@ -3252,7 +3252,7 @@
         <button onclick="closeMetaModal()" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
       <div class="meta-field">
-        <label>Título</label>
+        <label data-i18n="tarefas.titulo_tarefa">Título</label>
         <input id="meta-titulo" class="meta-input" placeholder="Ex: Lançar produto, aprender inglês..." maxlength="60">
       </div>
       <div class="meta-field">
@@ -3260,7 +3260,7 @@
         <input id="meta-descricao" class="meta-input" placeholder="O que queres alcançar?">
       </div>
       <div class="meta-field">
-        <label>Duração</label>
+        <label data-i18n="metas.duracao">Duração</label>
         <div class="meta-duration-row">
           <button type="button" class="meta-dur-btn active" data-dur="30" onclick="selectDur(this)">30 dias</button>
           <button type="button" class="meta-dur-btn" data-dur="60" onclick="selectDur(this)">60 dias</button>
@@ -3270,7 +3270,7 @@
         <input id="meta-prazo-custom" class="meta-input" type="date" style="display:none;margin-top:8px;">
       </div>
       <div class="meta-field">
-        <label>Cor</label>
+        <label data-i18n="metas.cor">Cor</label>
         <div class="meta-color-row" id="meta-color-row">
           <div class="meta-color-swatch active" data-color="#7c5cff" style="background:#7c5cff;" onclick="selectMetaColor(this)"></div>
           <div class="meta-color-swatch" data-color="#4ea8ff" style="background:#4ea8ff;" onclick="selectMetaColor(this)"></div>
@@ -3402,11 +3402,11 @@
       </div>
       <input type="hidden" id="edit-habit-id" />
       <div class="modal-field">
-        <label>Nome</label>
+        <label data-i18n="auth.nome">Nome</label>
         <input id="edit-habit-name" class="task-input" type="text" placeholder="Nome do hábito" />
       </div>
       <div class="modal-field">
-        <label>Frequência</label>
+        <label data-i18n="habitos.frequencia">Frequência</label>
         <select id="edit-habit-freq" class="task-select">
           <option value="Diário">Diário</option>
           <option value="Semanal">Semanal</option>
@@ -3481,16 +3481,16 @@
       </div>
       <input type="hidden" id="edit-task-id" />
       <div class="modal-field">
-        <label>Título</label>
+        <label data-i18n="tarefas.titulo_tarefa">Título</label>
         <input id="edit-task-title" class="task-input" type="text" placeholder="Título da tarefa" />
       </div>
       <div class="modal-field">
-        <label>Descrição</label>
+        <label data-i18n="tarefas.descricao">Descrição</label>
         <textarea id="edit-task-desc" class="modal-textarea" placeholder="Descrição da tarefa"></textarea>
       </div>
       <div class="modal-row">
         <div class="modal-field">
-          <label>Prioridade</label>
+          <label data-i18n="tarefas.prioridade">Prioridade</label>
           <select id="edit-task-priority" class="task-select">
             <option value="alta">Alta</option>
             <option value="media">Média</option>
@@ -3498,7 +3498,7 @@
           </select>
         </div>
         <div class="modal-field">
-          <label>Categoria</label>
+          <label data-i18n="tarefas.categoria">Categoria</label>
           <select id="edit-task-category" class="task-select">
             <option value="Trabalho">Trabalho</option>
             <option value="Pessoal">Pessoal</option>
@@ -3509,16 +3509,16 @@
       </div>
       <div class="modal-row">
         <div class="modal-field">
-          <label>Data</label>
+          <label data-i18n="agenda.data">Data</label>
           <input id="edit-task-date" class="task-input" type="date" />
         </div>
         <div class="modal-field">
-          <label>Hora</label>
+          <label data-i18n="agenda.hora">Hora</label>
           <input id="edit-task-time" class="task-input" type="time" />
         </div>
       </div>
       <div class="modal-field">
-        <label>Repetição</label>
+        <label data-i18n="agenda.repeticao">Repetição</label>
         <select id="edit-task-repeat" class="task-select" onchange="toggleDayPicker('edit')">
           <option value="nenhuma">Sem repetição</option>
           <option value="diaria">Repete diariamente</option>
