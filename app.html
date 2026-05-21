@@ -315,26 +315,19 @@
           el.innerHTML = this.t(el.dataset.i18nHtml);
         });
         
-        // 3. TRADUÇÃO AUTOMÁTICA: labels, placeholders, textos sem data-i18n
+        // 3. TRADUÇÃO AUTOMÁTICA: só quando está em EN
         if (this.locale !== 'pt') {
-          // Traduz todos os labels
+          // Traduz labels sem data-i18n
           document.querySelectorAll('label').forEach(el => {
             if (!el.dataset.i18n && el.textContent.trim()) {
               el.textContent = this.translateText(el.textContent.trim());
             }
           });
           
-          // Traduz todos os placeholders
+          // Traduz placeholders
           document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
             if (!el.dataset.i18n && el.placeholder) {
               el.placeholder = this.translateText(el.placeholder);
-            }
-          });
-          
-          // Traduz todos os botões que não têm data-i18n
-          document.querySelectorAll('button').forEach(el => {
-            if (!el.dataset.i18n && el.textContent.trim() && !el.querySelector('i, svg, img')) {
-              el.textContent = this.translateText(el.textContent.trim());
             }
           });
           
@@ -342,16 +335,6 @@
           document.querySelectorAll('option').forEach(el => {
             if (el.textContent.trim()) {
               el.textContent = this.translateText(el.textContent.trim());
-            }
-          });
-          
-          // Traduz títulos de secções (h2, h3, h4 sem data-i18n)
-          document.querySelectorAll('h2, h3, h4, p, span, small, strong').forEach(el => {
-            if (!el.dataset.i18n && !el.closest('[data-i18n]') && el.children.length === 0 && el.textContent.trim()) {
-              const parent = el.parentElement;
-              if (parent && !parent.dataset.i18n) {
-                el.textContent = this.translateText(el.textContent.trim());
-              }
             }
           });
         }
@@ -3013,7 +2996,7 @@
         </div>
         <div class="topbar-meta">
           <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()" title="PT / EN">
-            <span id="lang-label">EN</span>
+            <span id="lang-label">PT</span>
           </button>
           <button class="kairo-chat-btn" id="kairo-chat-btn" title="Kairo AI" style="position:static;animation:none;box-shadow:none;width:40px;height:40px;">
             <i data-lucide="bot" id="kairo-chat-icon"></i>
