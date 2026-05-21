@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "title": "Kairo — Productivity for CEOs",
+    "description": "The command center for leaders who execute. Kairo is the AI-powered productivity app built for CEOs, founders, and C-level executives."
+  },
+  "nav": {
+    "funcionalidades": "Features",
+    "precos": "Pricing",
+    "faq": "FAQ",
+    "entrar": "Sign In"
+  },
+  "hero": {
+    "badge": "Elite Productivity",
+    "titulo": "Execution over intention.",
+    "subtitulo": "The command center for leaders who execute. Tasks, habits, agenda, and decisions — all in one screen.",
+    "cta_principal": "Start Free",
+    "cta_secundario": "See features"
+  },
+  "features": {
+    "titulo": "Everything in one screen",
+    "subtitulo": "No context switching. No endless tabs. Just execution.",
+    "tarefas": {
+      "titulo": "Smart Tasks",
+      "desc": "Automatic prioritization, deadlines, categories, and voice creation."
+    },
+    "habitos": {
+      "titulo": "Habits with Streaks",
+      "desc": "Build elite routines with daily tracking and streaks."
+    },
+    "agenda": {
+      "titulo": "Unified Agenda",
+      "desc": "Events and tasks in a single timeline. No conflicts."
+    },
+    "ai": {
+      "titulo": "Kairo AI",
+      "desc": "Your personal productivity assistant. Suggestions, insights, and summaries."
+    },
+    "equipa": {
+      "titulo": "Teams",
+      "desc": "Collaborate with your team. Delegate tasks and monitor progress."
+    },
+    "decisoes": {
+      "titulo": "Decisions",
+      "desc": "Record and analyze your decisions. Learn from the past."
+    }
+  },
+  "precos": {
+    "titulo": "Simple pricing",
+    "subtitulo": "Start free. Scale when you need.",
+    "free": {
+      "nome": "Free",
+      "preco": "0€",
+      "periodo": "forever",
+      "features": [
+        "Up to 10 tasks",
+        "Up to 6 habits",
+        "Basic agenda",
+        "Goals and decisions"
+      ],
+      "cta": "Start Free"
+    },
+    "pro": {
+      "nome": "Pro",
+      "preco": "9.99€",
+      "periodo": "/month",
+      "features": [
+        "Unlimited tasks",
+        "Unlimited habits",
+        "Kairo AI",
+        "Executive Report PDF",
+        "Export Word",
+        "Unlimited teams",
+        "Push notifications",
+        "Daily and weekly email"
+      ],
+      "cta": "Upgrade"
+    }
+  },
+  "faq": {
+    "titulo": "Frequently Asked Questions",
+    "perguntas": [
+      {
+        "pergunta": "What is Kairo?",
+        "resposta": "Kairo is an elite productivity app for CEOs, founders, and executives. It combines tasks, habits, agenda, and decisions in one screen, with an integrated AI assistant."
+      },
+      {
+        "pergunta": "Can I use it for free?",
+        "resposta": "Yes! The Free plan includes up to 10 tasks, 6 habits, agenda, goals, and decisions. Perfect to get started."
+      },
+      {
+        "pergunta": "How does Kairo AI work?",
+        "resposta": "Kairo AI analyzes your tasks, habits, and agenda to provide personalized suggestions, productivity insights, and daily summaries."
+      },
+      {
+        "pergunta": "Can I cancel my subscription?",
+        "resposta": "Yes, you can cancel anytime. Pro access remains until the end of the paid period."
+      }
+    ]
+  },
+  "cta_final": {
+    "titulo": "Ready to execute?",
+    "subtitulo": "Join thousands of leaders already using Kairo.",
+    "botao": "Start Free"
+  },
+  "footer": {
+    "direitos": "© 2026 Kairo Elite. All rights reserved.",
+    "links": {
+      "privacidade": "Privacy",
+      "termos": "Terms",
+      "contacto": "Contact"
+    }
+  }
+}

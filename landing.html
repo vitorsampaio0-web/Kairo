@@ -1345,12 +1345,15 @@
         <span class="nav-logo-text">Kairo</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#features">Funcionalidades</a></li>
-        <li><a href="#testimonials">Testemunhos</a></li>
-        <li><a href="#pricing">Preços</a></li>
+        <li><a href="#features" data-i18n="nav.funcionalidades">Funcionalidades</a></li>
+        <li><a href="#testimonials" data-i18n="nav.testemunhos">Testemunhos</a></li>
+        <li><a href="#pricing" data-i18n="nav.precos">Preços</a></li>
       </ul>
       <div class="nav-cta">
-        <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary">Obter Kairo</a>
+        <button class="lang-toggle" onclick="toggleLandingLang()" title="PT / EN" style="background:none;border:1px solid rgba(255,255,255,0.2);color:var(--white);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;margin-right:12px;">
+          <span id="landing-lang-label">PT</span>
+        </button>
+        <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary" data-i18n="nav.entrar">Obter Kairo</a>
       </div>
       <div class="hamburger" id="hamburger" aria-label="Open menu">
         <span></span><span></span><span></span>
@@ -1381,14 +1384,14 @@
           <div class="hero-eyebrow">
             <span class="eyebrow"><span class="eyebrow-dot"></span>Usado por mais de 2.000 líderes em todo o mundo</span>
           </div>
-          <p class="hero-sub-headline">Execução acima de intenção.</p>
-          <p class="hero-desc">Para de gerir. Começa a executar. O Kairo é o centro de comando com IA criado para os líderes que entregam — não para os que planeiam entregar.</p>
+          <p class="hero-sub-headline" data-i18n="hero.titulo">Execução acima de intenção.</p>
+          <p class="hero-desc" data-i18n="hero.subtitulo">Para de gerir. Começa a executar. O Kairo é o centro de comando com IA criado para os líderes que entregam — não para os que planeiam entregar.</p>
           <div class="hero-ctas">
-            <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-lg">
+            <a href="https://vitorsampaio0-web.github.io/Kairo/" target="_blank" class="btn btn-primary btn-lg" data-i18n="hero.cta_principal">
               Começar Grátis
               <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
             </a>
-            <a href="#features" class="btn btn-ghost btn-lg">Ver em ação</a>
+            <a href="#features" class="btn btn-ghost btn-lg" data-i18n="hero.cta_secundario">Ver em ação</a>
           </div>
           <div class="hero-social-proof">
             <div class="avatar-stack">
@@ -1589,8 +1592,8 @@
           <div class="feature-icon-wrap" style="background:rgba(107,119,192,0.1);border-color:rgba(107,119,192,0.2);color:var(--indigo);">
             <i data-lucide="sparkles" style="width:22px;height:22px;"></i>
           </div>
-          <h3>Kairo AI</h3>
-          <p>Um assistente que conversa contigo. Analisa tarefas, sugere prioridades, responde em tempo real.</p>
+          <h3 data-i18n="features.ai.titulo">Kairo AI</h3>
+          <p data-i18n="features.ai.desc">Um assistente que conversa contigo. Analisa tarefas, sugere prioridades, responde em tempo real.</p>
           <div class="feature-tags">
             <span class="feature-tag">Sugestão de prioridades</span>
             <span class="feature-tag">Agendamento inteligente</span>
@@ -1615,8 +1618,8 @@
           <div class="feature-icon-wrap" style="background:rgba(40,200,130,0.08);border-color:rgba(40,200,130,0.18);color:#28C882;">
             <i data-lucide="trending-up" style="width:22px;height:22px;"></i>
           </div>
-          <h3>Tarefas Inteligentes</h3>
-          <p>Cria por voz ou texto. Prioridade, data, edição, histórico e exportação para Word.</p>
+          <h3 data-i18n="features.tarefas.titulo">Tarefas Inteligentes</h3>
+          <p data-i18n="features.tarefas.desc">Cria por voz ou texto. Prioridade, data, edição, histórico e exportação para Word.</p>
           <div class="feature-tags">
             <span class="feature-tag">Criação por voz</span>
             <span class="feature-tag">Histórico completo</span>
@@ -2053,6 +2056,86 @@
   <!-- SCRIPTS -->
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    /* ===== LANDING I18N ===== */
+    const LANDING_I18N = {
+      locale: localStorage.getItem('kairo-lang') || 'pt',
+      translations: {},
+      loaded: false,
+      
+      detectLang() {
+        const saved = localStorage.getItem('kairo-lang');
+        if (saved) return saved;
+        const browserLang = navigator.language || navigator.userLanguage;
+        if (browserLang.startsWith('en')) return 'en';
+        return 'pt';
+      },
+      
+      async load(lang) {
+        try {
+          const res = await fetch(`./locales/landing-${lang}.json?v=1`);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          this.translations = await res.json();
+          this.locale = lang;
+          this.loaded = true;
+          document.documentElement.lang = lang === 'pt' ? 'pt' : 'en';
+          return true;
+        } catch (e) {
+          console.warn('[landing-i18n] Falha ao carregar:', lang);
+          this.locale = 'pt';
+          this.loaded = true;
+          return false;
+        }
+      },
+      
+      t(key) {
+        if (!this.loaded) return key;
+        const parts = key.split('.');
+        let val = this.translations;
+        for (const p of parts) {
+          val = val?.[p];
+          if (val === undefined) return key;
+        }
+        return typeof val === 'string' ? val : key;
+      },
+      
+      async setLang(lang) {
+        if (lang === this.locale && this.loaded) return;
+        await this.load(lang);
+        localStorage.setItem('kairo-lang', lang);
+        this.apply();
+      },
+      
+      apply() {
+        if (!this.loaded) return;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          const text = this.t(key);
+          if (el.tagName === 'INPUT') el.placeholder = text;
+          else el.textContent = text;
+        });
+        document.querySelectorAll('[data-i18n-html]').forEach(el => {
+          el.innerHTML = this.t(el.dataset.i18nHtml);
+        });
+        document.title = this.t('meta.title');
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.content = this.t('meta.description');
+      }
+    };
+    
+    (async function initLandingI18N() {
+      const lang = LANDING_I18N.detectLang();
+      await LANDING_I18N.load(lang);
+      LANDING_I18N.apply();
+    })();
+
+    function toggleLandingLang() {
+      const newLang = LANDING_I18N.locale === 'pt' ? 'en' : 'pt';
+      LANDING_I18N.setLang(newLang).then(() => {
+        document.getElementById('landing-lang-label').textContent = newLang.toUpperCase();
+      });
+    }
+  </script>
   <script>
     // Init AOS
     AOS.init({
