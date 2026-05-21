@@ -21,337 +21,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
-  <script>
-    /* ===== I18N ENGINE v3 - Completo ===== */
-    const I18N = {
-      locale: 'pt',
-      translations: {},
-      loaded: false,
-      
-      // Dicionário completo PT → EN para tradução automática
-      dictionary: {
-        // Labels e placeholders
-        'Nome da equipa': 'Team name',
-        'Código da equipa': 'Team code',
-        'Título': 'Title',
-        'Atribuir a': 'Assign to',
-        'Prazo': 'Due date',
-        'Prioridade': 'Priority',
-        'Categoria': 'Category',
-        'Descrição': 'Description',
-        'Data': 'Date',
-        'Hora': 'Time',
-        'Repetição': 'Repeat',
-        'Nome': 'Name',
-        'Frequência': 'Frequency',
-        'Notas': 'Notes',
-        'Horário': 'Time',
-        
-        // Select options
-        'Média': 'Medium',
-        'Alta': 'High',
-        'Baixa': 'Low',
-        'Trabalho': 'Work',
-        'Pessoal': 'Personal',
-        'Saúde': 'Health',
-        'Desporto': 'Sports',
-        'Diário': 'Daily',
-        'Semanal': 'Weekly',
-        'Sem repetição': 'No repeat',
-        'Repete diariamente': 'Repeat daily',
-        'Repete semanalmente': 'Repeat weekly',
-        'Repete mensalmente': 'Repeat monthly',
-        'Dias específicos': 'Specific days',
-        'Hora de envio': 'Send time',
-        'Email de destino': 'Destination email',
-        'Avisar antes da tarefa': 'Alert before task',
-        
-        // Buttons
-        'Entrar': 'Join',
-        'Copiar': 'Copy',
-        'Fechar': 'Close',
-        'Guardar alterações': 'Save changes',
-        
-        // Dashboard
-        'Tudo em dia': 'All caught up',
-        'Clica para ver →': 'Click to view →',
-        'Alta prioridade no radar': 'High priority on radar',
-        'Consistência diária': 'Daily consistency',
-        'Atualizado em tempo real': 'Updated in real-time',
-        'Resumo do dia': 'Daily Summary',
-        'Visão rápida para entrar em execução': 'Quick view to start executing',
-        'Próximo compromisso': 'Next appointment',
-        'Prioridades': 'Priorities',
-        'Agenda': 'Agenda',
-        
-        // Sections
-        'Tarefas': 'Tasks',
-        'Hábitos': 'Habits',
-        'Metas': 'Goals',
-        'Equipa': 'Team',
-        'Decisões': 'Decisions',
-        'Histórico': 'History',
-        
-        // Auth
-        'Entrar com Google': 'Sign in with Google',
-        'Entrar com Email': 'Sign in with Email',
-        'Criar conta': 'Create account',
-        'Já tens conta?': 'Already have an account?',
-        'Não tens conta?': "Don't have an account?",
-        'Os teus dados ficam guardados de forma segura': 'Your data is stored securely',
-        
-        // Misc
-        'Calendário diário e semanal com blocos reais de execução': 'Daily and weekly calendar with real execution blocks',
-        'Execute prioridades com agilidade e clareza': 'Execute priorities with agility and clarity',
-        'Indicadores inteligentes do teu dia': 'Smart indicators of your day',
-        'Mensagens inteligentes': 'Smart messages',
-        'Leitura rápida para a tua execução': 'Quick read for your execution',
-        'Destaques': 'Highlights',
-        'de produtividade': 'of productivity',
-        'Tarefa em foco': 'Task in focus',
-        'Amigos convidados': 'Friends invited',
-        'Pro grátis até': 'Free Pro until',
-        'O teu link de convite': 'Your invite link',
-        'Usado por mais de 2.000 líderes em todo o mundo': 'Used by over 2,000 leaders worldwide',
-        'Execução acima de intenção.': 'Execution over intention.',
-        'Para de gerir. Começa a executar.': 'Stop managing. Start executing.',
-        'Bom dia! Tens': 'Good morning! You have',
-        'compromissos': 'appointments',
-        'tarefas': 'tasks',
-        'hábitos': 'habits',
-        'hoje.': 'today.',
-        
-        // Time options
-        '5 minutos antes': '5 minutes before',
-        '10 minutos antes': '10 minutes before',
-        '15 minutos antes': '15 minutes before',
-        '30 minutos antes': '30 minutes before',
-        '1 hora antes': '1 hour before',
-        
-        // Days
-        'Segunda': 'Monday',
-        'Terça': 'Tuesday',
-        'Quarta': 'Wednesday',
-        'Quinta': 'Thursday',
-        'Sexta': 'Friday',
-        'Sábado': 'Saturday',
-        'Domingo': 'Sunday',
-        'Seg-Sex': 'Mon-Fri',
-        
-        // Status
-        'Pendente': 'Pending',
-        'Em andamento': 'In Progress',
-        'Concluída': 'Completed',
-        'Atrasada': 'Overdue',
-        
-        // Task filters
-        'Todas': 'All',
-        'Minhas': 'Mine',
-        'Atrasadas': 'Overdue',
-        'Concluídas': 'Completed',
-        'Filtrar': 'Filter',
-        'Ordenar': 'Sort',
-        
-        // Modal titles
-        'Nova Tarefa': 'New Task',
-        'Nova Tarefa de Equipa': 'New Team Task',
-        'Editar Tarefa': 'Edit Task',
-        'Novo Evento': 'New Event',
-        'Editar Evento': 'Edit Event',
-        'Novo Hábito': 'New Habit',
-        'Editar Hábito': 'Edit Habit',
-        'Nova Meta': 'New Goal',
-        'Editar Meta': 'Edit Goal',
-        'Nova Decisão': 'New Decision',
-        'Editar Decisão': 'Edit Decision',
-        'Criar Equipa': 'Create Team',
-        'Entrar com código': 'Join with code',
-        
-        // Placeholders
-        'Criar tarefa rápida...': 'Create quick task...',
-        'Pergunta ao Kairo AI...': 'Ask Kairo AI...',
-        'o-teu@email.com': 'your@email.com',
-        
-        // Empty states
-        'Sem eventos para este dia': 'No events for this day',
-        'Sem tarefas para mostrar': 'No tasks to show',
-        'Sem hábitos registados': 'No habits registered',
-        'Sem metas definidas': 'No goals defined',
-        'Sem decisões registadas': 'No decisions recorded',
-        'Sem equipa': 'No team',
-        'Sem atividade registada': 'No activity recorded',
-        
-        // Misc UI
-        'Personalizado': 'Custom',
-        'Ativo': 'Active',
-        'Pronto': 'Ready',
-        'Sincronização encriptada ponta a ponta': 'End-to-end encrypted sync',
-        'Sempre ativo': 'Always active',
-        'Sem ligação necessária': 'No connection needed',
-        'Tarefas concluídas diariamente': 'Tasks completed daily',
-        'Taxa de retenção de utilizadores': 'User retention rate',
-        'Classificação média da app': 'Average app rating',
-        'Líderes a bordo': 'Leaders on board',
-        'O problema': 'The problem',
-        'Funcionalidades': 'Features',
-        'Testemunhos': 'Testimonials',
-        'Preços': 'Pricing',
-        'Começar': 'Get Started',
-        'Construído para a forma\ncomo realmente lideras.': 'Built for how\nyou actually lead.',
-        'Vista global': 'Global view',
-        'Clareza diária': 'Daily clarity',
-        'Zero ruído': 'Zero noise',
-        'Tarefas concluídas hoje': 'Tasks completed today',
-        'Próxima reunião': 'Next meeting',
-        'Pontuação de foco': 'Focus score',
-        'Progresso diário': 'Daily progress',
-        'Sequência semanal': 'Weekly streak',
-        'Sugestão de prioridades': 'Priority suggestions',
-        'Agendamento inteligente': 'Smart scheduling',
-        'Insights contextuais': 'Contextual insights',
-        'Criação por voz': 'Voice creation',
-        'Histórico completo': 'Full history',
-        'Export para Word': 'Export to Word',
-        'Sincronização em tempo real': 'Real-time sync',
-        'Funciona offline': 'Works offline',
-      },
-      
-      // Detecta língua do browser ou usa preferência guardada
-      detectLang() {
-        const saved = localStorage.getItem('kairo-lang');
-        if (saved) return saved;
-        const browserLang = navigator.language || navigator.userLanguage;
-        if (browserLang.startsWith('en')) return 'en';
-        return 'pt';
-      },
-      
-      async load(lang) {
-        try {
-          const res = await fetch(`./locales/${lang}.json?v=3`);
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          this.translations = await res.json();
-          this.locale = lang;
-          this.loaded = true;
-          document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
-          return true;
-        } catch (e) {
-          console.warn('[i18n] Falha ao carregar:', lang, '- usando PT');
-          this.locale = 'pt';
-          this.loaded = true;
-          return false;
-        }
-      },
-      
-      t(key, vars = {}) {
-        if (!this.loaded) return key;
-        const parts = key.split('.');
-        let val = this.translations;
-        for (const p of parts) {
-          val = val?.[p];
-          if (val === undefined) {
-            if (this.locale !== 'pt') return this.tFallback(key, vars);
-            return key;
-          }
-        }
-        if (typeof val !== 'string') return key;
-        return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
-      },
-      
-      tFallback(key, vars) {
-        const fallbacks = {
-          'dashboard.bem_vindo': 'Welcome to Kairo, {nome}.',
-          'dashboard.bom_dia': 'Good morning! You have {eventos} appointments, {tarefas} tasks and {habitos} habits today.',
-          'user_menu.email_diario': 'Daily Email',
-          'user_menu.resumo_semanal': 'Weekly Summary',
-          'user_menu.guia': 'Guide',
-          'user_menu.notificacoes': 'Notifications',
-          'user_menu.convidar_amigos': 'Invite Friends',
-          'user_menu.sair': 'Sign Out',
-        };
-        const val = fallbacks[key] || key;
-        return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
-      },
-      
-      // Traduz texto usando o dicionário
-      translateText(text) {
-        if (this.locale === 'pt' || !text) return text;
-        // Procura correspondência exata no dicionário
-        if (this.dictionary[text]) return this.dictionary[text];
-        // Procura correspondências parciais
-        let translated = text;
-        for (const [pt, en] of Object.entries(this.dictionary)) {
-          translated = translated.split(pt).join(en);
-        }
-        return translated;
-      },
-      
-      async setLang(lang) {
-        if (lang === this.locale && this.loaded) return;
-        await this.load(lang);
-        localStorage.setItem('kairo-lang', lang);
-        this.apply();
-      },
-      
-      apply() {
-        if (!this.loaded) return;
-        
-        // 1. Aplica data-i18n (elementos com keys definidas)
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-          const key = el.dataset.i18n;
-          const vars = {};
-          if (el.dataset.i18nVars) {
-            try { Object.assign(vars, JSON.parse(el.dataset.i18nVars)); } catch {}
-          }
-          const text = this.t(key, vars);
-          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-            el.placeholder = text;
-          } else {
-            el.textContent = text;
-          }
-        });
-        
-        // 2. Aplica data-i18n-html
-        document.querySelectorAll('[data-i18n-html]').forEach(el => {
-          el.innerHTML = this.t(el.dataset.i18nHtml);
-        });
-        
-        // 3. TRADUÇÃO AUTOMÁTICA: só quando está em EN
-        if (this.locale !== 'pt') {
-          // Traduz labels sem data-i18n
-          document.querySelectorAll('label').forEach(el => {
-            if (!el.dataset.i18n && el.textContent.trim()) {
-              el.textContent = this.translateText(el.textContent.trim());
-            }
-          });
-          
-          // Traduz placeholders
-          document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
-            if (!el.dataset.i18n && el.placeholder) {
-              el.placeholder = this.translateText(el.placeholder);
-            }
-          });
-          
-          // Traduz options de select
-          document.querySelectorAll('option').forEach(el => {
-            if (el.textContent.trim()) {
-              el.textContent = this.translateText(el.textContent.trim());
-            }
-          });
-        }
-        
-        // Atualiza label do botão de língua
-        const langLabel = document.getElementById('lang-label');
-        if (langLabel) langLabel.textContent = this.locale.toUpperCase();
-      }
-    };
-    
-    // Inicialização síncrona com PT, depois carrega a língua certa
-    (async function initI18N() {
-      const lang = I18N.detectLang();
-      await I18N.load(lang);
-      I18N.apply();
-    })();
-  </script>
   <style>
     :root {
       --bg: #07111f;
@@ -463,25 +132,6 @@
       margin: 0;
       color: var(--muted);
       font-size: 0.92rem;
-    }
-
-    .lang-toggle {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border);
-      color: var(--muted-strong);
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      transition: all 0.2s ease;
-    }
-    .lang-toggle:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--text);
     }
 
     .topbar-meta {
@@ -2937,7 +2587,7 @@
     <div class="login-box">
       <img src="./logo-kairo.png" alt="Kairo" class="login-logo" />
       <h1 class="login-title">KAIRO</h1>
-      <p class="login-subtitle">Elite Productivity</p>
+      <p class="login-subtitle">Produtividade de Elite</p>
       <button id="google-signin-btn" class="google-btn">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -2957,7 +2607,7 @@
         <input type="password" id="login-confirm-password" placeholder="Confirmar Password" class="login-input login-field-hidden" autocomplete="new-password" />
         <p id="login-error-msg" class="login-error-msg"></p>
         <button id="email-signin-btn" class="email-login-btn">Entrar com Email</button>
-        <p class="login-toggle-link" id="login-toggle-text">Não tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Create account</a></p>
+        <p class="login-toggle-link" id="login-toggle-text">Não tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Criar conta</a></p>
       </div>
       <p class="login-footer">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -2972,7 +2622,7 @@
         <img src="./logo-kairo.png" alt="Kairo" style="height:44px;width:auto;object-fit:contain;border-radius:12px;flex-shrink:0;" />
         <div>
           <h1>Kairo</h1>
-          <p>Elite Productivity</p>
+          <p>Produtividade de Elite</p>
         </div>
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
@@ -2991,13 +2641,10 @@
           <img src="./logo-kairo.png" alt="Kairo" style="height:44px;width:auto;object-fit:contain;border-radius:12px;flex-shrink:0;" />
           <div>
             <h1>Kairo</h1>
-            <p>Daily Performance</p>
+            <p>Performance Diária</p>
           </div>
         </div>
         <div class="topbar-meta">
-          <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()" title="PT / EN">
-            <span id="lang-label">PT</span>
-          </button>
           <button class="kairo-chat-btn" id="kairo-chat-btn" title="Kairo AI" style="position:static;animation:none;box-shadow:none;width:40px;height:40px;">
             <i data-lucide="bot" id="kairo-chat-icon"></i>
             <span id="kairo-chat-lock" style="display:none;position:absolute;bottom:2px;right:2px;width:16px;height:16px;background:var(--warning);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.55rem;">🔒</span>
@@ -3007,12 +2654,12 @@
             <i data-lucide="user" id="topbar-avatar-icon"></i>
           </button>
           <div id="topbar-user-menu" class="topbar-user-menu hidden">
-            <button onclick="openDigestModal()"><i data-lucide="mail"></i> <span data-i18n="user_menu.email_diario">Email Diário</span></button>
-            <button onclick="openWeeklyModal()"><i data-lucide="bar-chart-2"></i> <span data-i18n="user_menu.resumo_semanal">Resumo Semanal</span></button>
-            <button onclick="window.open('kairo-brochure.html','_blank')"><i data-lucide="book-open"></i> <span data-i18n="user_menu.guia">Guia</span></button>
-            <button onclick="openNotifModal()"><i data-lucide="bell"></i> <span data-i18n="user_menu.notificacoes">Notificações</span></button>
-            <button onclick="openReferralModal()"><i data-lucide="gift"></i> <span data-i18n="user_menu.convidar_amigos">Convidar Amigos</span></button>
-            <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> <span data-i18n="user_menu.sair">Sair</span></button>
+            <button onclick="openDigestModal()"><i data-lucide="mail"></i> Email Diário</button>
+            <button onclick="openWeeklyModal()"><i data-lucide="bar-chart-2"></i> Resumo Semanal</button>
+            <button onclick="window.open('kairo-brochure.html','_blank')"><i data-lucide="book-open"></i> Guia</button>
+            <button onclick="openNotifModal()"><i data-lucide="bell"></i> Notificações</button>
+            <button onclick="openReferralModal()"><i data-lucide="gift"></i> Convidar Amigos</button>
+            <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sair</button>
           </div>
 
           <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
@@ -3039,11 +2686,11 @@
     <div class="digest-card">
       <button class="digest-close" onclick="closeNotifModal()"><i data-lucide="x"></i></button>
       <div class="digest-icon"><i data-lucide="bell"></i></div>
-      <h2 data-i18n="notificacoes.titulo">Notificações Push</h2>
+      <h2>Notificações Push</h2>
       <p>Recebe um aviso antes das tuas tarefas, mesmo com o app fechado.</p>
-      <div id="notif-permission-badge" class="notif-badge default"><i data-lucide="circle" style="width:8px;height:8px;"></i> <span data-i18n="notificacoes.estado.verificando">A verificar...</span></div>
+      <div id="notif-permission-badge" class="notif-badge default"><i data-lucide="circle" style="width:8px;height:8px;"></i> A verificar...</div>
       <div class="digest-toggle-row">
-        <span data-i18n="notificacoes.ativar">Ativar notificações</span>
+        <span>Ativar notificações</span>
         <label class="digest-switch">
           <input type="checkbox" id="notif-enabled" onchange="toggleNotifFields()">
           <span class="digest-slider"></span>
@@ -3051,7 +2698,7 @@
       </div>
       <div class="digest-fields" id="notif-fields" style="display:none;">
         <div class="digest-field">
-          <label data-i18n="notificacoes.minutos_antes">Avisar antes da tarefa</label>
+          <label>Avisar antes da tarefa</label>
           <select id="notif-minutos" class="digest-input">
             <option value="5">5 minutos antes</option>
             <option value="10">10 minutos antes</option>
@@ -3061,7 +2708,7 @@
           </select>
         </div>
       </div>
-      <button class="digest-save-btn" onclick="saveNotifSettings()" data-i18n="botoes.guardar">
+      <button class="digest-save-btn" onclick="saveNotifSettings()">
         <i data-lucide="check"></i> Guardar
       </button>
       <p class="digest-note" id="notif-note"></p>
@@ -3081,7 +2728,7 @@
         <button onclick="closeTeamModal('create')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
       <div class="team-field">
-        <label data-i18n="equipa.nome_equipa">Nome da equipa</label>
+        <label>Nome da equipa</label>
         <input id="team-create-nome" class="team-input" placeholder="Ex: Marketing, Dev Team, Família...">
       </div>
       <button class="team-save-btn" onclick="createTeam()">Criar Equipa</button>
@@ -3096,10 +2743,10 @@
         <button onclick="closeTeamModal('join')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
       <div class="team-field">
-        <label data-i18n="equipa.codigo">Código da equipa</label>
+        <label>Código da equipa</label>
         <input id="team-join-code" class="team-input" placeholder="Ex: KAIRO-X7K2" style="text-transform:uppercase;letter-spacing:.1em;">
       </div>
-      <button class="team-save-btn" onclick="joinTeam()" data-i18n="equipa.entrar">Sign In</button>
+      <button class="team-save-btn" onclick="joinTeam()">Entrar</button>
       <p id="team-join-note" style="text-align:center;font-size:0.8rem;color:#555;margin-top:10px;"></p>
     </div>
   </div>
@@ -3111,19 +2758,19 @@
         <button onclick="closeTeamModal('task')" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
       <div class="team-field">
-        <label data-i18n="tarefas.titulo_tarefa">Título</label>
+        <label>Título</label>
         <input id="team-task-titulo" class="team-input" placeholder="O que precisa de ser feito?">
       </div>
       <div class="team-field">
-        <label data-i18n="equipa.responsavel">Atribuir a</label>
+        <label>Atribuir a</label>
         <select id="team-task-assignee" class="team-input"></select>
       </div>
       <div class="team-field">
-        <label data-i18n="tarefas.prazo">Prazo</label>
+        <label>Prazo</label>
         <input id="team-task-prazo-date" class="team-input" type="date" style="margin-bottom:8px;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();">
         <div style="display:flex;gap:8px;align-items:center;">
           <select id="team-task-prazo-h" class="team-input" style="flex:1;">
-            <option value="" data-i18n="tarefas.hora">Hora</option>
+            <option value="">Hora</option>
             <option value="00">00h</option><option value="01">01h</option><option value="02">02h</option>
             <option value="03">03h</option><option value="04">04h</option><option value="05">05h</option>
             <option value="06">06h</option><option value="07">07h</option><option value="08">08h</option>
@@ -3143,7 +2790,7 @@
         </div>
       </div>
       <div class="team-field">
-        <label data-i18n="tarefas.prioridade">Prioridade</label>
+        <label>Prioridade</label>
         <select id="team-task-prioridade" class="team-input">
           <option value="media">Média</option>
           <option value="alta">Alta</option>
@@ -3168,7 +2815,7 @@
       <div class="referral-stats">
         <div class="referral-stat">
           <div class="referral-stat-num" id="ref-total">0</div>
-          <div class="referral-stat-lbl">Friends invited</div>
+          <div class="referral-stat-lbl">Amigos convidados</div>
         </div>
         <div class="referral-stat">
           <div class="referral-stat-num" id="ref-dias">0</div>
@@ -3176,15 +2823,15 @@
         </div>
         <div class="referral-stat" id="ref-expiry-stat" style="display:none;">
           <div class="referral-stat-num" id="ref-expiry" style="font-size:0.95rem;">—</div>
-          <div class="referral-stat-lbl">Free Pro until</div>
+          <div class="referral-stat-lbl">Pro grátis até</div>
         </div>
       </div>
 
       <div class="referral-card">
-        <p style="margin:0 0 4px;font-size:0.78rem;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Your invite link</p>
+        <p style="margin:0 0 4px;font-size:0.78rem;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">O teu link de convite</p>
         <div class="referral-link-row">
           <input class="referral-link-input" id="referral-link-input" readonly>
-          <button class="referral-copy-btn" onclick="copyReferralLink()" id="referral-copy-btn">Copy</button>
+          <button class="referral-copy-btn" onclick="copyReferralLink()" id="referral-copy-btn">Copiar</button>
         </div>
       </div>
 
@@ -3211,7 +2858,7 @@
             <div class="streak-card-fire">🔥</div>
             <div class="streak-card-num" id="share-streak-num">0</div>
             <div class="streak-card-dias">Dias Consecutivos</div>
-            <div class="streak-card-habit" id="share-streak-habit">of productivity</div>
+            <div class="streak-card-habit" id="share-streak-habit">de produtividade</div>
           </div>
           <div class="streak-card-bar" id="share-streak-bar"></div>
           <div class="streak-card-bottom">
@@ -3231,11 +2878,11 @@
   <div class="meta-modal-overlay hidden" id="meta-modal">
     <div class="meta-modal-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <h3 id="meta-modal-title" style="margin:0;">New Goal</h3>
+        <h3 id="meta-modal-title" style="margin:0;">Nova Meta</h3>
         <button onclick="closeMetaModal()" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
       <div class="meta-field">
-        <label data-i18n="tarefas.titulo_tarefa">Título</label>
+        <label>Título</label>
         <input id="meta-titulo" class="meta-input" placeholder="Ex: Lançar produto, aprender inglês..." maxlength="60">
       </div>
       <div class="meta-field">
@@ -3243,17 +2890,17 @@
         <input id="meta-descricao" class="meta-input" placeholder="O que queres alcançar?">
       </div>
       <div class="meta-field">
-        <label data-i18n="metas.duracao">Duração</label>
+        <label>Duração</label>
         <div class="meta-duration-row">
-          <button type="button" class="meta-dur-btn active" data-dur="30" onclick="selectDur(this)">30 days</button>
-          <button type="button" class="meta-dur-btn" data-dur="60" onclick="selectDur(this)">60 days</button>
-          <button type="button" class="meta-dur-btn" data-dur="90" onclick="selectDur(this)">90 days</button>
+          <button type="button" class="meta-dur-btn active" data-dur="30" onclick="selectDur(this)">30 dias</button>
+          <button type="button" class="meta-dur-btn" data-dur="60" onclick="selectDur(this)">60 dias</button>
+          <button type="button" class="meta-dur-btn" data-dur="90" onclick="selectDur(this)">90 dias</button>
           <button type="button" class="meta-dur-btn" data-dur="0" onclick="selectDur(this)">Personalizado</button>
         </div>
         <input id="meta-prazo-custom" class="meta-input" type="date" style="display:none;margin-top:8px;">
       </div>
       <div class="meta-field">
-        <label data-i18n="metas.cor">Cor</label>
+        <label>Cor</label>
         <div class="meta-color-row" id="meta-color-row">
           <div class="meta-color-swatch active" data-color="#7c5cff" style="background:#7c5cff;" onclick="selectMetaColor(this)"></div>
           <div class="meta-color-swatch" data-color="#4ea8ff" style="background:#4ea8ff;" onclick="selectMetaColor(this)"></div>
@@ -3264,17 +2911,17 @@
         </div>
       </div>
       <input type="hidden" id="meta-edit-id">
-      <button class="meta-save-btn" onclick="saveMeta()">Save Goal</button>
+      <button class="meta-save-btn" onclick="saveMeta()">Guardar Meta</button>
     </div>
   </div>
   <div class="digest-overlay hidden" id="weekly-modal">
     <div class="digest-card">
       <button class="digest-close" onclick="closeWeeklyModal()"><i data-lucide="x"></i></button>
       <div class="digest-icon"><i data-lucide="bar-chart-2"></i></div>
-      <h2 data-i18n="resumo_semanal.titulo">Resumo Semanal</h2>
-      <p data-i18n="resumo_semanal.descricao">Recebe um email semanal com as tuas tarefas concluídas, streak e % de produtividade.</p>
+      <h2>Resumo Semanal</h2>
+      <p>Recebe um email semanal com as tuas tarefas concluídas, streak e % de produtividade.</p>
       <div class="digest-toggle-row">
-        <span data-i18n="resumo_semanal.ativar">Ativar resumo semanal</span>
+        <span>Ativar resumo semanal</span>
         <label class="digest-switch">
           <input type="checkbox" id="weekly-enabled" onchange="toggleWeeklyFields()">
           <span class="digest-slider"></span>
@@ -3282,11 +2929,11 @@
       </div>
       <div class="digest-fields" id="weekly-fields" style="display:none;">
         <div class="digest-field">
-          <label data-i18n="email_diario.email">Email</label>
+          <label>Email</label>
           <input type="email" id="weekly-email" class="digest-input" placeholder="o-teu-email@gmail.com">
         </div>
         <div class="digest-field">
-          <label data-i18n="resumo_semanal.dia">Dia da semana</label>
+          <label>Dia da semana</label>
           <select id="weekly-day" class="digest-input">
             <option value="1">Segunda-feira</option>
             <option value="2">Terça-feira</option>
@@ -3336,7 +2983,7 @@
       </div>
     </div>
     <div class="focus-body" id="focus-body">
-      <div class="focus-task-label">Task in focus</div>
+      <div class="focus-task-label">Tarefa em foco</div>
       <div class="focus-task-name" id="focus-task-name">—</div>
       <div class="focus-ring-wrap">
         <div class="focus-ring">
@@ -3385,11 +3032,11 @@
       </div>
       <input type="hidden" id="edit-habit-id" />
       <div class="modal-field">
-        <label data-i18n="auth.nome">Nome</label>
+        <label>Nome</label>
         <input id="edit-habit-name" class="task-input" type="text" placeholder="Nome do hábito" />
       </div>
       <div class="modal-field">
-        <label data-i18n="habitos.frequencia">Frequência</label>
+        <label>Frequência</label>
         <select id="edit-habit-freq" class="task-select">
           <option value="Diário">Diário</option>
           <option value="Semanal">Semanal</option>
@@ -3397,8 +3044,8 @@
         </select>
       </div>
       <div class="modal-actions">
-        <button class="secondary-btn" onclick="closeEditHabitModal()" data-i18n="botoes.cancelar">Cancelar</button>
-        <button class="primary-btn" onclick="saveEditHabit()" data-i18n="botoes.guardar">Guardar</button>
+        <button class="secondary-btn" onclick="closeEditHabitModal()">Cancelar</button>
+        <button class="primary-btn" onclick="saveEditHabit()">Guardar</button>
       </div>
     </div>
   </div>
@@ -3407,11 +3054,11 @@
     <div class="digest-card">
       <button class="digest-close" onclick="closeDigestModal()"><i data-lucide="x"></i></button>
       <div class="digest-icon"><i data-lucide="mail"></i></div>
-      <h2 data-i18n="email_diario.titulo">Email Diário</h2>
-      <p data-i18n="email_diario.descricao">Recebe as tuas tarefas por email todos os dias à hora que escolheres.</p>
+      <h2>Email Diário</h2>
+      <p>Recebe as tuas tarefas por email todos os dias à hora que escolheres.</p>
 
       <div class="digest-toggle-row">
-        <span data-i18n="email_diario.ativar">Ativar email diário</span>
+        <span>Ativar email diário</span>
         <label class="digest-switch">
           <input type="checkbox" id="digest-enabled" onchange="toggleDigestHour()">
           <span class="digest-slider"></span>
@@ -3420,11 +3067,11 @@
 
       <div class="digest-fields" id="digest-fields" style="display:none;">
         <div class="digest-field">
-          <label data-i18n="email_diario.email">Email de destino</label>
+          <label>Email de destino</label>
           <input type="email" id="digest-email" placeholder="o-teu@email.com" class="digest-input" />
         </div>
         <div class="digest-field">
-          <label data-i18n="email_diario.hora">Hora de envio</label>
+          <label>Hora de envio</label>
           <select id="digest-hour" class="digest-input">
             <option value="5">05:00</option>
             <option value="6">06:00</option>
@@ -3464,16 +3111,16 @@
       </div>
       <input type="hidden" id="edit-task-id" />
       <div class="modal-field">
-        <label data-i18n="tarefas.titulo_tarefa">Título</label>
+        <label>Título</label>
         <input id="edit-task-title" class="task-input" type="text" placeholder="Título da tarefa" />
       </div>
       <div class="modal-field">
-        <label data-i18n="tarefas.descricao">Descrição</label>
+        <label>Descrição</label>
         <textarea id="edit-task-desc" class="modal-textarea" placeholder="Descrição da tarefa"></textarea>
       </div>
       <div class="modal-row">
         <div class="modal-field">
-          <label data-i18n="tarefas.prioridade">Prioridade</label>
+          <label>Prioridade</label>
           <select id="edit-task-priority" class="task-select">
             <option value="alta">Alta</option>
             <option value="media">Média</option>
@@ -3481,7 +3128,7 @@
           </select>
         </div>
         <div class="modal-field">
-          <label data-i18n="tarefas.categoria">Categoria</label>
+          <label>Categoria</label>
           <select id="edit-task-category" class="task-select">
             <option value="Trabalho">Trabalho</option>
             <option value="Pessoal">Pessoal</option>
@@ -3492,16 +3139,16 @@
       </div>
       <div class="modal-row">
         <div class="modal-field">
-          <label data-i18n="agenda.data">Data</label>
+          <label>Data</label>
           <input id="edit-task-date" class="task-input" type="date" />
         </div>
         <div class="modal-field">
-          <label data-i18n="agenda.hora">Hora</label>
+          <label>Hora</label>
           <input id="edit-task-time" class="task-input" type="time" />
         </div>
       </div>
       <div class="modal-field">
-        <label data-i18n="agenda.repeticao">Repetição</label>
+        <label>Repetição</label>
         <select id="edit-task-repeat" class="task-select" onchange="toggleDayPicker('edit')">
           <option value="nenhuma">Sem repetição</option>
           <option value="diaria">Repete diariamente</option>
@@ -3520,8 +3167,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="ghost-btn" id="modal-cancel-btn" data-i18n="botoes.cancelar">Cancelar</button>
-        <button class="primary-btn" id="modal-save-btn" data-i18n="botoes.guardar">Guardar alterações</button>
+        <button class="ghost-btn" id="modal-cancel-btn">Cancelar</button>
+        <button class="primary-btn" id="modal-save-btn">Guardar alterações</button>
       </div>
     </div>
   </div>
@@ -3653,14 +3300,6 @@
       document.getElementById("login-screen").classList.add("hidden");
       document.querySelector(".app-shell").style.display = "";
       renderAll();
-    }
-
-    function toggleLang() {
-      const newLang = I18N.locale === 'pt' ? 'en' : 'pt';
-      I18N.setLang(newLang).then(() => {
-        renderNav();
-        renderAll();
-      });
     }
 
     function updateSidebarUser(user) {
@@ -3996,19 +3635,18 @@
 
     function renderNav() {
       const markup = navItems.map(item => {
-        const label = I18N.t('nav.' + item.id) || item.label;
         if (item.action) {
           return `
-            <button class="nav-btn" onclick="${item.action}" title="${label}">
+            <button class="nav-btn" onclick="${item.action}" title="${item.label}">
               <i data-lucide="${item.icon}"></i>
-              <span>${label}</span>
+              <span>${item.label}</span>
             </button>
           `;
         }
         return `
           <button class="nav-btn ${appState.currentView === item.id ? "active" : ""}" data-view="${item.id}">
             <i data-lucide="${item.icon}"></i>
-            <span>${label}</span>
+            <span>${item.label}</span>
           </button>
         `;
       }).join("");
@@ -4034,30 +3672,30 @@
           <div class="hero-content">
             <div class="hero-copy">
               <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
-              <h2 data-i18n="dashboard.bem_vindo" data-i18n-vars='{"nome":"${appState.user.nome}"}'>Bem-vindo ao <strong>Kairo</strong>, ${appState.user.nome}.</h2>
+              <h2>Bem-vindo ao <strong>Kairo</strong>, ${appState.user.nome}.</h2>
               <p>${insights[0].mensagem}</p>
               <p class="subtle">${getBusyDayInsight()}</p>
             </div>
             <div class="hero-grid">
               <div class="metric-card" style="${_overdueCount > 0 ? 'border-color:rgba(255,107,138,0.35);background:linear-gradient(135deg,rgba(255,107,138,0.12),transparent 60%);cursor:pointer;' : ''}" ${_overdueCount > 0 ? 'onclick="appState.taskFilter=\'atrasadas\'; switchView(\'tarefas\');"' : ''}>
-                <small data-i18n="dashboard.tarefas_atrasadas">Tarefas atrasadas</small>
+                <small>Tarefas atrasadas</small>
                 <strong style="${_overdueCount > 0 ? 'color:var(--danger)' : 'color:var(--success)'}">${_overdueCount}</strong>
-                <span class="label" data-i18n="${_overdueCount > 0 ? 'dashboard.clica_ver' : 'dashboard.tudo_dia'}">${_overdueCount > 0 ? 'Clica para ver →' : 'Tudo em dia ✓'}</span>
+                <span class="label">${_overdueCount > 0 ? 'Clica para ver →' : 'Tudo em dia ✓'}</span>
               </div>
               <div class="metric-card">
-                <small data-i18n="dashboard.tarefas_importantes">Tarefas importantes</small>
+                <small>Tarefas importantes</small>
                 <strong>${getImportantTodayCount()}</strong>
-                <span class="label" data-i18n="dashboard.alta_prioridade">Alta prioridade no radar</span>
+                <span class="label">Alta prioridade no radar</span>
               </div>
               <div class="metric-card">
-                <small data-i18n="dashboard.habitos_concluidos">Hábitos concluídos</small>
+                <small>Hábitos concluídos</small>
                 <strong>${getCompletedHabitsToday().length}/${appState.habitos.length}</strong>
-                <span class="label" data-i18n="dashboard.consistencia_diaria">Consistência diária</span>
+                <span class="label">Consistência diária</span>
               </div>
               <div class="metric-card">
-                <small data-i18n="dashboard.produtividade">Produtividade</small>
+                <small>Produtividade</small>
                 <strong>${productivity}%</strong>
-                <span class="label" data-i18n="dashboard.atualizado_tempo_real">Atualizado em tempo real</span>
+                <span class="label">Atualizado em tempo real</span>
               </div>
             </div>
           </div>
@@ -4068,8 +3706,8 @@
             <div class="panel-header">
               <div class="section-heading">
                 <div>
-                  <h3 data-i18n="dashboard.resumo_dia">Resumo do dia</h3>
-                  <p data-i18n="dashboard.visao_rapida">Visão rápida para entrar em execução</p>
+                  <h3>Resumo do dia</h3>
+                  <p>Visão rápida para entrar em execução</p>
                 </div>
               </div>
             </div>
@@ -4097,15 +3735,15 @@
                   </div>
                 </div>
               `).join("")}
-              ${!topTasks.length ? `<div class="empty-state">Everything completed today. Great pace.</div>` : ""}
+              ${!topTasks.length ? `<div class="empty-state">Tudo concluído hoje. Excelente ritmo.</div>` : ""}
             </div>
           </div>
 
           <div class="panel">
             <div class="panel-header">
               <div>
-                <h3>Productivity and Kairo AI</h3>
-                <p>Smart indicators of your day</p>
+                <h3>Produtividade e Kairo AI</h3>
+                <p>Indicadores inteligentes do teu dia</p>
               </div>
             </div>
             <div class="progress-ring" style="--value:${productivity}">
@@ -4115,7 +3753,7 @@
               <div class="ai-card-header">
                 <div class="ai-mark"><i data-lucide="bot"></i></div>
                 <div>
-                  <strong>Kairo AI Suggestion</strong>
+                  <strong>Sugestão Kairo AI</strong>
                   <p class="subtle">${insights[0].tipo}</p>
                 </div>
               </div>
@@ -4138,7 +3776,7 @@
         <div class="panel" style="margin-top: 16px;">
           <div class="panel-header">
             <div>
-              <h3>Smart messages</h3>
+              <h3>Mensagens inteligentes</h3>
               <p>Alertas, priorização e reorganização automática</p>
             </div>
           </div>
@@ -4259,20 +3897,20 @@
         <div class="panel">
           <div class="panel-header">
             <div>
-              <h3 data-i18n="agenda.titulo">Agenda</h3>
-              <p>Daily and weekly calendar with real execution blocks</p>
+              <h3>Agenda</h3>
+              <p>Calendário diário e semanal com blocos reais de execução</p>
             </div>
             <div class="tab-switch">
-              <button class="switch-btn ${appState.agendaMode === "dia" ? "active" : ""}" data-agenda-mode="dia" data-i18n="datas.hoje">Hoje</button>
-              <button class="switch-btn ${appState.agendaMode === "semana" ? "active" : ""}" data-agenda-mode="semana" data-i18n="datas.semana">Semana</button>
+              <button class="switch-btn ${appState.agendaMode === "dia" ? "active" : ""}" data-agenda-mode="dia">Hoje</button>
+              <button class="switch-btn ${appState.agendaMode === "semana" ? "active" : ""}" data-agenda-mode="semana">Semana</button>
             </div>
           </div>
           <div class="agenda-grid">
             <div class="panel">
               <div class="section-heading">
                 <div>
-                  <h3>${appState.agendaMode === "dia" ? 'Agenda do dia' : 'Visão semanal'}</h3>
-                  <p>${appState.agendaMode === "dia" ? 'Compromissos e tarefas de hoje' : 'Distribuição dos eventos e tarefas da semana'}</p>
+                  <h3>${appState.agendaMode === "dia" ? "Agenda do dia" : "Visão semanal"}</h3>
+                  <p>${appState.agendaMode === "dia" ? "Compromissos e tarefas de hoje" : "Distribuição dos eventos e tarefas da semana"}</p>
                 </div>
               </div>
               <div class="timeline-stack">
@@ -4311,7 +3949,7 @@
                           </div>
                         </div>`
                     ).join("")
-                    : `<div class="empty-state">No appointments or tasks today.</div>`)
+                    : `<div class="empty-state">Sem compromissos ou tarefas hoje.</div>`)
                   : weeklyGroups.map(group => `
                     <div class="timeline-block planner-card">
                       <div class="timeline-inner">
@@ -4349,8 +3987,8 @@
             <div class="panel">
               <div class="section-heading">
                 <div>
-                  <h3>Highlights</h3>
-                  <p>Quick read for your execution</p>
+                  <h3>Destaques</h3>
+                  <p>Leitura rápida para a tua execução</p>
                 </div>
               </div>
               <div class="list-stack">
@@ -4397,7 +4035,7 @@
           <div class="panel-header">
             <div>
               <h3>Tarefas</h3>
-              <p>Execute priorities with agility and clarity</p>
+              <p>Execute prioridades com agilidade e clareza</p>
             </div>
             <div class="chips">
               <span class="pill"><i data-lucide="alert-triangle"></i>${getOverdueTasks().length} atrasadas</span>
@@ -4410,8 +4048,8 @@
 
           <div class="task-input-row">
             <div class="task-title-wrapper">
-              <input id="quick-task-title" class="task-input" type="text" data-i18n="tarefas.tarefa_rapida" placeholder="Criar tarefa rápida..." />
-              <button id="voice-task-btn" class="voice-btn" type="button">
+              <input id="quick-task-title" class="task-input" type="text" placeholder="Criar tarefa rápida..." />
+              <button id="voice-task-btn" class="voice-btn" title="Criar tarefa por voz (pt-PT)" type="button">
                 <i data-lucide="mic"></i>
               </button>
             </div>
@@ -4445,7 +4083,7 @@
               <div class="daycal-hint">Clica num dia para selecionar esse dia da semana</div>
               <div class="daycal-selected-days" id="quick-daycal-tags"></div>
             </div>
-            <button id="quick-task-submit" class="primary-btn">Add</button>
+            <button id="quick-task-submit" class="primary-btn">Adicionar</button>
           </div>
 
           <div class="row-between" style="margin-bottom: 14px;">
@@ -4512,7 +4150,7 @@
             <div class="panel-header">
               <div>
                 <h3>Hábitos</h3>
-                <p>Consistency with visual progress and streaks</p>
+                <p>Consistência com progresso visual e streaks</p>
               </div>
               <div style="display:flex;gap:8px;align-items:center;">
                 <button onclick="openShareModal()" style="background:linear-gradient(135deg,#7c5cff,#4ea8ff);border:none;color:#fff;padding:6px 14px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;"><i data-lucide="share-2" style="width:13px;height:13px;"></i> Partilhar Streak</button>
@@ -4526,7 +4164,7 @@
                 <option value="Diário">Diário</option>
                 <option value="Semanal">Semanal</option>
               </select>
-              <button id="quick-habit-submit" class="primary-btn">Add</button>
+              <button id="quick-habit-submit" class="primary-btn">Adicionar</button>
             </div>
 
             <div class="list-stack">
@@ -4565,8 +4203,8 @@
           <div class="panel">
             <div class="panel-header">
               <div>
-                <h3>Weekly progress</h3>
-                <p>Indicators to reinforce routine</p>
+                <h3>Progresso semanal</h3>
+                <p>Indicadores para reforçar rotina</p>
               </div>
             </div>
             <div class="progress-ring" style="--value:${average}">
@@ -4574,16 +4212,16 @@
             </div>
             <div class="list-stack">
               <div class="suggestion-card">
-                <h4>Daily feedback</h4>
+                <h4>Feedback do dia</h4>
                 <p>${getCompletedHabitsToday().length >= 2 ? "Ótimo ritmo. A tua rotina já começou forte hoje." : "Ainda podes elevar a tua consistência com hábitos rápidos nas próximas horas."}</p>
               </div>
               <div class="suggestion-card">
-                <h4>Kairo AI Recommendation</h4>
-                <p>Associate reading with post-lunch and stretching at the end of the last meeting to facilitate adherence.</p>
+                <h4>Recomendação Kairo AI</h4>
+                <p>Associa leitura ao pós-almoço e alongamento ao fim da última reunião para facilitar a adesão.</p>
               </div>
               <div class="suggestion-card">
-                <h4>Automation</h4>
-                <p>When you complete a habit, the streak and weekly progress are updated instantly to reinforce motivation.</p>
+                <h4>Automação</h4>
+                <p>Quando concluis um hábito, o streak e o progresso semanal são atualizados instantaneamente para reforçar a motivação.</p>
               </div>
             </div>
           </div>
@@ -4598,7 +4236,7 @@
       if (!isPro()) {
         view.innerHTML = `
           <div class="panel" style="position:relative;min-height:340px;overflow:hidden;">
-            <div class="panel-header"><div><h3 data-i18n="historico.titulo">Histórico</h3><p>Análise e exportação de registos</p></div></div>
+            <div class="panel-header"><div><h3>Histórico</h3><p>Análise e exportação de registos</p></div></div>
             <div class="pro-overlay">
               <div class="pro-overlay-icon">🔒</div>
               <h4>Histórico Pro</h4>
@@ -4847,9 +4485,6 @@
       renderTeam();
       renderDecisoes();
       renderMiniCalendar();
-
-      // Aplica traduções i18n após renderizar
-      I18N.apply();
 
       Object.entries(viewIds).forEach(([key, id]) => {
         document.getElementById(id).classList.toggle("active", key === appState.currentView);
@@ -5387,14 +5022,14 @@
         btn.textContent = "Criar Conta";
         passwordInput.placeholder = "Password (mín. 6 caracteres)";
         passwordInput.setAttribute("autocomplete", "new-password");
-        toggleText.innerHTML = 'Já tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Sign In</a>';
+        toggleText.innerHTML = 'Já tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Entrar</a>';
       } else {
         nameField.classList.add("login-field-hidden");
         confirmField.classList.add("login-field-hidden");
         btn.textContent = "Entrar com Email";
         passwordInput.placeholder = "Password";
         passwordInput.setAttribute("autocomplete", "current-password");
-        toggleText.innerHTML = 'Não tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Create account</a>';
+        toggleText.innerHTML = 'Não tens conta? <a id="login-toggle-link" onclick="toggleLoginMode()">Criar conta</a>';
       }
     }
 
@@ -6528,7 +6163,7 @@
       el.innerHTML = `
         <div class="metas-header">
           <h2><i data-lucide="target" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;"></i>Metas</h2>
-          <button class="primary-btn" onclick="openNewMeta()" style="padding:8px 16px;font-size:0.85rem;" data-i18n="metas.nova_meta">+ Nova Meta</button>
+          <button class="primary-btn" onclick="openNewMeta()" style="padding:8px 16px;font-size:0.85rem;">+ Nova Meta</button>
         </div>
         ${sorted.length === 0
           ? `<div class="meta-empty">
@@ -7418,7 +7053,7 @@
       el.innerHTML = `
         <div class="section-header">
           <h2 class="section-title">Diário de Decisões</h2>
-          <button class="btn-primary" onclick="openDecisaoModal()" data-i18n="decisoes.nova_decisao">+ Nova Decisão</button>
+          <button class="btn-primary" onclick="openDecisaoModal()">+ Nova Decisão</button>
         </div>
 
         <div class="dec-stats">
@@ -7615,9 +7250,9 @@
           <div class="team-empty">
             <div class="team-empty-icon">👥</div>
             <h3>Sem equipa ainda</h3>
-            <p>Create a team or join an existing one with the invite code.</p>
+            <p>Cria uma equipa ou entra numa existente com o código de convite.</p>
             <div class="team-btn-row">
-              <button class="team-btn-primary" onclick="openTeamModal('create')" data-i18n="equipa.criar_equipa">+ Criar Equipa</button>
+              <button class="team-btn-primary" onclick="openTeamModal('create')">+ Criar Equipa</button>
               <button class="team-btn-secondary" onclick="openTeamModal('join')">Entrar com código</button>
             </div>
           </div>`;
