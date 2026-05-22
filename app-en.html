@@ -4029,6 +4029,7 @@
           : task.status === appState.taskFilter;
         const priorityMatches = appState.priorityFilter === "todas" || task.prioridade === appState.priorityFilter;
         const clientMatches = appState.clientFilter === "todos" ? true
+          : appState.clientFilter === "com_cliente" ? !!task.cliente
           : appState.clientFilter === "sem_cliente" ? !task.cliente
           : task.cliente === appState.clientFilter;
         return taskMatches && priorityMatches && clientMatches;
@@ -4071,6 +4072,9 @@
               <span class="pill"><i data-lucide="circle-check-big"></i>${getCompletedTasks().length} concluídas</span>
               <button class="ghost-btn" id="export-word-tasks-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;">
                 <i data-lucide="download"></i> Export Word
+              </button>
+              <button class="ghost-btn" id="export-excel-tasks-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;">
+                <i data-lucide="download"></i> Export Excel
               </button>
             </div>
           </div>
@@ -4126,8 +4130,9 @@
             </div>
             <div class="filters">
               <select id="client-filter" class="task-select" onchange="appState.clientFilter = this.value; renderAll();" style="margin-right:8px;">
-                <option value="todos">All clients</option>
-                <option value="sem_cliente">No client</option>
+                <option value="todos">Total — Clients + No client</option>
+                <option value="com_cliente">Total Clients — With client only</option>
+                <option value="sem_cliente">Total Tasks — No client</option>
                 ${getUniqueClients().map(c => `<option value="${c}">${c}</option>`).join('')}
               </select>
               <select id="sort-tasks" class="task-select" onchange="appState.taskSort = this.value; renderAll();">
@@ -4421,6 +4426,7 @@
             <thead>
               <tr style="backgrornd:#1a1a2e;color:#ffffff;">
                 <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;">Title</th>
+                <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;">Client</th>
                 <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;white-space:nowrap;">Priority</th>
                 <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;">Category</th>
                 <th style="padding:10px 12px;text-align:left;border:1px solid #d0d0dc;white-space:nowrap;">Deadline</th>
@@ -4433,6 +4439,7 @@
                     <strong style="color:#1a1a2e;">${t.titulo}</strong><br/>
                     <span style="font-size:11px;color:#666;">${t.descricao}</span>
                   </td>
+                  <td style="padding:9px 12px;border:1px solid #d0d0dc;color:#444;">${t.cliente || "—"}</td>
                   <td style="padding:9px 12px;border:1px solid #d0d0dc;">
                     <span style="backgrornd:${priorityBg(t.prioridade)};color:${priorityColor(t.prioridade)};padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600;">${formatPriority(t.prioridade)}</span>
                   </td>
@@ -4477,7 +4484,50 @@
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      showToast("Report exportado com sucesso.");
+      showToast("Report exported successfully.");
+    }
+
+    function exportToExcel(tasks) {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric", timeZone: "Europe/Lisbon" });
+
+      function priorityLabel(p) {
+        if (p === "alta") return "High";
+        if (p === "media") return "Medium";
+        return "Low";
+      }
+      function statusLabel(s) {
+        if (s === "concluida") return "Completed";
+        if (s === "andamento") return "In Progress";
+        return "Pending";
+      }
+
+      const rows = tasks.map(t => [
+        t.titulo,
+        t.descricao || "",
+        t.cliente || "",
+        t.categoria,
+        priorityLabel(t.prioridade),
+        statusLabel(t.status),
+        new Date(t.prazo).toLocaleString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+        t.repeticao && t.repeticao !== "nenhuma" ? t.repeticao : "N/A"
+      ]);
+
+      const headers = ["Title", "Description", "Client", "Category", "Priority", "Status", "Deadline", "Repeat"];
+      const csv = [headers, ...rows]
+        .map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `kairo-tasks-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("Excel report exported successfully.");
     }
 
     function updateSidebarCard() {
@@ -4968,8 +5018,16 @@
       const exportWordTasksBtn = document.getElementById("export-word-tasks-btn");
       if (exportWordTasksBtn) {
         exportWordTasksBtn.onclick = () => {
-          if (!isPro()) { showUpgradeModal("Exportação Word"); return; }
-          exportToWord(appState.tasks);
+          if (!isPro()) { showUpgradeModal("Export Word & Excel"); return; }
+          exportToWord(filteredTasks());
+        };
+      }
+
+      const exportExcelTasksBtn = document.getElementById("export-excel-tasks-btn");
+      if (exportExcelTasksBtn) {
+        exportExcelTasksBtn.onclick = () => {
+          if (!isPro()) { showUpgradeModal("Export Word & Excel"); return; }
+          exportToExcel(filteredTasks());
         };
       }
 
