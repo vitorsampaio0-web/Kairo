@@ -3116,7 +3116,12 @@
       </div>
       <div class="modal-field">
         <label>Description</label>
-        <textarea id="edit-task-desc" class="modal-textarea" placeholder="Description da tarefa"></textarea>
+        <textarea id="edit-task-desc" class="modal-textarea" placeholder="Task description"></textarea>
+      </div>
+      <div class="modal-field">
+        <label>Client (optional)</label>
+        <input id="edit-task-client" class="task-input" type="text" placeholder="Client name" list="client-list" />
+        <datalist id="client-list"></datalist>
       </div>
       <div class="modal-row">
         <div class="modal-field">
@@ -3271,6 +3276,8 @@
       agendaMode: "dia",
       taskFilter: "todas",
       priorityFilter: "todas",
+      clientFilter: "todos",
+      taskSort: "prazo",
       historicoDateInicio: "",
       historicoDateEnd: "",
       historicoCategFilter: "todas",
@@ -4015,14 +4022,34 @@
     }
 
     function filteredTasks() {
-      const overdueSep = new Sep(getOverdueTasks().map(t => t.id));
-      return appState.tasks.filter(task => {
+      const overdueSet = new Set(getOverdueTasks().map(t => t.id));
+      const filtered = appState.tasks.filter(task => {
         const taskMatches = appState.taskFilter === "todas" ? true
-          : appState.taskFilter === "atrasadas" ? overdueSep.has(task.id)
+          : appState.taskFilter === "atrasadas" ? overdueSet.has(task.id)
           : task.status === appState.taskFilter;
         const priorityMatches = appState.priorityFilter === "todas" || task.prioridade === appState.priorityFilter;
-        return taskMatches && priorityMatches;
-      }).sort((a, b) => new Date(a.prazo) - new Date(b.prazo));
+        const clientMatches = appState.clientFilter === "todos" || task.cliente === appState.clientFilter;
+        return taskMatches && priorityMatches && clientMatches;
+      });
+      const sorted = filtered.sort((a, b) => {
+        if (appState.taskSort === "prazo") {
+          return new Date(a.prazo) - new Date(b.prazo);
+        } else if (appState.taskSort === "cliente") {
+          return (a.cliente || "").localeCompare(b.cliente || "") || new Date(a.prazo) - new Date(b.prazo);
+        } else if (appState.taskSort === "titulo") {
+          return a.titulo.localeCompare(b.titulo);
+        }
+        return 0;
+      });
+      return sorted;
+    }
+
+    function getUniqueClients() {
+      const clients = new Set();
+      appState.tasks.forEach(task => {
+        if (task.cliente) clients.add(task.cliente);
+      });
+      return Array.from(clients).sort((a, b) => a.localeCompare(b));
     }
 
     function renderTasks() {
@@ -4049,10 +4076,12 @@
           <div class="task-input-row">
             <div class="task-title-wrapper">
               <input id="quick-task-title" class="task-input" type="text" placeholder="Create quick task..." />
-              <button id="voice-task-btn" class="voice-btn" title="Create task por voz (pt-PT)" type="button">
+              <button id="voice-task-btn" class="voice-btn" title="Create task by voice" type="button">
                 <i data-lucide="mic"></i>
               </button>
             </div>
+            <input id="quick-task-client" class="task-input" type="text" placeholder="Client (optional)" list="quick-client-list" />
+            <datalist id="quick-client-list"></datalist>
             <select id="quick-task-priority" class="task-select">
               <option value="media">Priority média</option>
               <option value="alta">High prioridade</option>
@@ -4094,10 +4123,15 @@
               <button class="chip ${appState.taskFilter === "atrasadas" ? "active" : ""}" data-task-filter="atrasadas" style="color:var(--danger);border-color:${appState.taskFilter === "atrasadas" ? "var(--danger)" : ""};">Overdue</button>
             </div>
             <div class="filters">
-              <button class="chip ${appState.priorityFilter === "todas" ? "active" : ""}" data-priority-filter="todas">All prioridades</button>
-              <button class="chip ${appState.priorityFilter === "alta" ? "active" : ""}" data-priority-filter="alta">High</button>
-              <button class="chip ${appState.priorityFilter === "media" ? "active" : ""}" data-priority-filter="media">Medium</button>
-              <button class="chip ${appState.priorityFilter === "baixa" ? "active" : ""}" data-priority-filter="baixa">Low</button>
+              <select id="client-filter" class="task-select" onchange="appState.clientFilter = this.value; renderAll();" style="margin-right:8px;">
+                <option value="todos">All clients</option>
+                ${getUniqueClients().map(c => `<option value="${c}">${c}</option>`).join('')}
+              </select>
+              <select id="sort-tasks" class="task-select" onchange="appState.taskSort = this.value; renderAll();">
+                <option value="prazo">Sort: Date</option>
+                <option value="cliente">Sort: Client (A-Z)</option>
+                <option value="titulo">Sort: Title (A-Z)</option>
+              </select>
             </div>
           </div>
 
@@ -4116,6 +4150,7 @@
                     <span class="badge status-${task.status}">${formatStatus(task.status)}</span>
                   </div>
                   <div class="task-meta">
+                    ${task.cliente ? `<span class="badge" style="background:rgba(45,127,249,0.2);color:#4ea8ff;border-color:rgba(78,168,255,0.5);"><i data-lucide="user" style="width:11px;height:11px;margin-right:3px;"></i>${task.cliente}</span>` : ""}
                     <span class="badge priority-${task.prioridade}">${formatPriority(task.prioridade)}</span>
                     <span class="badge">${task.categoria}</span>
                     <span class="badge">${new Date(task.prazo).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", horr: "2-digit", minute: "2-digit" })}</span>
@@ -4526,10 +4561,12 @@
       const repeatInput = document.getElementById("quick-task-repeat");
       const repeticao = repeatInput ? repeatInput.value : "nenhuma";
       const daysEspecificos = repeticao === "especifica" ? getSelectedDays("quick") : [];
+      const clientInput = document.getElementById("quick-task-client");
       const newTask = {
         id,
         titulo: title,
         descricao: "",
+        cliente: clientInput && clientInput.value.trim() ? clientInput.value.trim() : null,
         prioridade: priorityInput.value,
         status: "pendente",
         prazo: `${taskDate}T${taskTime}`,
@@ -4541,9 +4578,10 @@
       fsSep("tasks", id, newTask);
 
       titleInput.value = "";
+      if (clientInput) clientInput.value = "";
       renderAll();
       switchView("tasks");
-      showToast(`Task "${title}" criada com sucesso.`);
+      showToast(`Task "${title}" created successfully.`);
     }
 
     function addQuickHabit() {
@@ -4668,6 +4706,7 @@
       document.getElementById("edit-task-id").value = task.id;
       document.getElementById("edit-task-title").value = task.titulo;
       document.getElementById("edit-task-desc").value = task.descricao;
+      document.getElementById("edit-task-client").value = task.cliente || "";
       document.getElementById("edit-task-priority").value = task.prioridade;
       document.getElementById("edit-task-category").value = task.categoria;
       document.getElementById("edit-task-date").value = prazoDate;
@@ -4701,6 +4740,7 @@
 
       task.titulo = title;
       task.descricao = document.getElementById("edit-task-desc").value.trim();
+      task.cliente = document.getElementById("edit-task-client").value.trim() || null;
       task.prioridade = document.getElementById("edit-task-priority").value;
       task.categoria = document.getElementById("edit-task-category").value;
       const date = document.getElementById("edit-task-date").value || appState.today;
