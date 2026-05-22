@@ -4492,39 +4492,116 @@
     function exportToExcel(tasks) {
       const now = new Date();
       const dateStr = now.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric", timeZone: "Europe/Lisbon" });
+      const timeStr = now.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" });
+
+      const concluded = tasks.filter(t => t.status === "concluida");
+      const inProgress = tasks.filter(t => t.status === "andamento");
+      const pending = tasks.filter(t => t.status === "pendente");
 
       function priorityLabel(p) {
         if (p === "alta") return "Alta";
         if (p === "media") return "Média";
         return "Baixa";
       }
+      function priorityBg(p) {
+        if (p === "alta") return "#fde8ec";
+        if (p === "media") return "#fef3e2";
+        return "#e9f9ef";
+      }
+      function priorityColor(p) {
+        if (p === "alta") return "#c0392b";
+        if (p === "media") return "#e67e22";
+        return "#27ae60";
+      }
       function statusLabel(s) {
         if (s === "concluida") return "Concluída";
         if (s === "andamento") return "Em Andamento";
         return "Pendente";
       }
+      function statusColor(s) {
+        if (s === "concluida") return "#31d0aa";
+        if (s === "andamento") return "#00c2ff";
+        return "#ffb84d";
+      }
 
-      const rows = tasks.map(t => [
-        t.titulo,
-        t.descricao || "",
-        t.cliente || "",
-        t.categoria,
-        priorityLabel(t.prioridade),
-        statusLabel(t.status),
-        new Date(t.prazo).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
-        t.repeticao && t.repeticao !== "nenhuma" ? t.repeticao : "N/A"
-      ]);
+      function taskTable(list) {
+        if (!list.length) return `<tr><td colspan="8" style="padding:14px;text-align:center;color:#888;font-style:italic;border:1px solid #d0d0dc;">Nenhuma tarefa nesta secção.</td></tr>`;
+        return list.map((t, i) => `
+          <tr style="background:${i % 2 === 0 ? "#ffffff" : "#f8f9fc"};height:32px;">
+            <td style="padding:8px 10px;border:1px solid #e0e0e8;font-size:12px;color:#1a1a2e;vertical-align:middle;">
+              <strong>${t.titulo}</strong>
+              ${t.descricao ? `<br/><span style="font-size:10px;color:#666;">${t.descricao}</span>` : ""}
+            </td>
+            <td style="padding:8px 10px;border:1px solid #e0e0e8;font-size:12px;color:#4ea8ff;vertical-align:middle;">${t.cliente || "—"}</td>
+            <td style="padding:8px 10px;border:1px solid #e0e0e8;font-size:11px;vertical-align:middle;">
+              <span style="display:inline-block;padding:2px 8px;border-radius:4px;font-weight:600;background:${priorityBg(t.prioridade)};color:${priorityColor(t.prioridade)};">${priorityLabel(t.prioridade)}</span>
+            </td>
+            <td style="padding:8px 10px;border:1px solid #e0e0e8;font-size:12px;color:#444;vertical-align:middle;">${t.categoria}</td>
+            <td style="padding:8px 10px;border:1px solid #e0e0e8;font-size:12px;color:#444;white-space:nowrap;vertical-align:middle;">${statusLabel(t.status)}</td>
+            <td style="padding:8px 10px;border:1px solid #e0e0e8;font-size:11px;color:#444;white-space:nowrap;vertical-align:middle;">${new Date(t.prazo).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
+            <td style="padding:8px 10px;border:1px solid #e0e0e8;font-size:11px;color:#666;white-space:nowrap;vertical-align:middle;">${t.repeticao && t.repeticao !== "nenhuma" ? (t.repeticao === "diaria" ? "Diária" : t.repeticao === "semanal" ? "Semanal" : t.repeticao === "mensal" ? "Mensal" : "Específica") : "—"}</td>
+          </tr>
+        `).join("");
+      }
 
-      const headers = ["Título", "Descrição", "Cliente", "Categoria", "Prioridade", "Estado", "Prazo", "Repetição"];
-      const csv = [headers, ...rows]
-        .map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-        .join("\n");
+      const html = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8"/>
+<meta name=ProgId content=Excel.Sheet>
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Kairo Tasks</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+<style>
+table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, Arial, sans-serif; }
+.header { background: #1a1a2e; color: #ffffff; font-size: 13px; font-weight: 600; padding: 10px; text-align: left; }
+</style>
+</head>
+<body>
+  <table>
+    <tr style="background:#1a1a2e;">
+      <td colspan="8" style="padding:18px 20px;">
+        <div style="font-size:22px;font-weight:700;color:#ffffff;">Kairo — Relatório de Tarefas</div>
+        <div style="font-size:12px;color:#7c5cff;margin-top:4px;">Produtividade de Elite</div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="8" style="padding:10px 20px;font-size:12px;color:#666;border-bottom:2px solid #7c5cff;">
+        Data do relatório: ${dateStr} às ${timeStr} &nbsp;&middot;&nbsp; Total de tarefas: <strong>${tasks.length}</strong>
+      </td>
+    </tr>
+    <tr style="background:#1a1a2e;color:#ffffff;">
+      <td class="header" style="width:28%;">Título / Descrição</td>
+      <td class="header" style="width:12%;">Cliente</td>
+      <td class="header" style="width:10%;text-align:center;">Prioridade</td>
+      <td class="header" style="width:12%;">Categoria</td>
+      <td class="header" style="width:12%;">Estado</td>
+      <td class="header" style="width:14%;white-space:nowrap;">Prazo</td>
+      <td class="header" style="width:12%;">Repetição</td>
+    </tr>
 
-      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+    <tr><td colspan="8" style="padding:10px 14px;font-size:12px;font-weight:700;color:#7c5cff;border-bottom:1px solid #e0e0e8;background:#f8f9fc;">✓ Concluídas (${concluded.length})</td></tr>
+    ${taskTable(concluded)}
+
+    <tr><td colspan="8" style="padding:10px 14px;font-size:12px;font-weight:700;color:#00c2ff;border-bottom:1px solid #e0e0e8;background:#f0f9ff;">▶ Em Andamento (${inProgress.length})</td></tr>
+    ${taskTable(inProgress)}
+
+    <tr><td colspan="8" style="padding:10px 14px;font-size:12px;font-weight:700;color:#e67e22;border-bottom:1px solid #e0e0e8;background:#fff8f0;">○ Pendentes (${pending.length})</td></tr>
+    ${taskTable(pending)}
+
+    <tr style="background:#1a1a2e;color:#ffffff;">
+      <td colspan="8" style="padding:12px 20px;font-size:11px;text-align:center;">
+        Gerado por Kairo Elite · ${dateStr} · www.kairoelite.app
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+      const blob = new Blob([html], { type: "application/vnd.ms-excel" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `kairo-tarefas-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.download = `kairo-tarefas-${new Date().toISOString().slice(0, 10)}.xls`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
