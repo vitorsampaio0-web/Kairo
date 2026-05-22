@@ -4028,7 +4028,9 @@
           : appState.taskFilter === "atrasadas" ? overdueSet.has(task.id)
           : task.status === appState.taskFilter;
         const priorityMatches = appState.priorityFilter === "todas" || task.prioridade === appState.priorityFilter;
-        const clientMatches = appState.clientFilter === "todos" || task.cliente === appState.clientFilter;
+        const clientMatches = appState.clientFilter === "todos" ? true
+          : appState.clientFilter === "sem_cliente" ? !task.cliente
+          : task.cliente === appState.clientFilter;
         return taskMatches && priorityMatches && clientMatches;
       });
       
@@ -4127,6 +4129,7 @@
             <div class="filters">
               <select id="client-filter" class="task-select" onchange="appState.clientFilter = this.value; renderAll();" style="margin-right:8px;">
                 <option value="todos">Todos os clientes</option>
+                <option value="sem_cliente">Sem cliente</option>
                 ${getUniqueClients().map(c => `<option value="${c}">${c}</option>`).join('')}
               </select>
               <select id="sort-tasks" class="task-select" onchange="appState.taskSort = this.value; renderAll();">
