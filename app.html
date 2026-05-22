@@ -4132,10 +4132,10 @@
             </div>
             <div class="filters">
               <select id="client-filter" class="task-select" onchange="appState.clientFilter = this.value; renderAll();" style="margin-right:8px;">
-                <option value="todos">Total — Clientes + Sem clientes</option>
-                <option value="com_cliente">Total Clientes — Só com cliente</option>
-                <option value="sem_cliente">Total Tarefas — Sem cliente</option>
-                ${getUniqueClients().map(c => `<option value="${c}">${c}</option>`).join('')}
+                <option value="todos" ${appState.clientFilter === "todos" ? "selected" : ""}>Total — Clientes + Sem clientes</option>
+                <option value="com_cliente" ${appState.clientFilter === "com_cliente" ? "selected" : ""}>Total Clientes — Só com cliente</option>
+                <option value="sem_cliente" ${appState.clientFilter === "sem_cliente" ? "selected" : ""}>Total Tarefas — Sem cliente</option>
+                ${getUniqueClients().map(c => `<option value="${c}" ${appState.clientFilter === c ? "selected" : ""}>${c}</option>`).join('')}
               </select>
               <select id="sort-tasks" class="task-select" onchange="appState.taskSort = this.value; renderAll();">
                 <option value="prazo">Ordenar: Prazo</option>
