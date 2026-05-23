@@ -2687,7 +2687,6 @@
       </div>
 
       <section id="dashboard-view" class="view active"></section>
-      <section id="agenda-view" class="view"></section>
       <section id="tasks-view" class="view"></section>
       <section id="habitos-view" class="view"></section>
       <section id="historico-view" class="view"></section>
@@ -3502,7 +3501,6 @@
 
     const navItems = [
       { id: "dashboard", label: "Dashboard", icon: "layort-dashboard" },
-      { id: "agenda",    label: "Agenda",    icon: "calendar-range" },
       { id: "tasks",   label: "Tasks",   icon: "check-square" },
       { id: "metas",     label: "Goals",     icon: "target" },
       { id: "equipa",    label: "Team",    icon: "users" },
@@ -3514,7 +3512,6 @@
 
     const viewIds = {
       dashboard: "dashboard-view",
-      agenda:    "agenda-view",
       tasks:   "tasks-view",
       metas:     "metas-view",
       equipa:    "equipa-view",
@@ -3751,6 +3748,49 @@
       const topTasks = todayTasks.slice(0, 3);
       const todayHabits = appState.habitos.slice(0, 3);
       const insights = generateKairoInsights();
+
+      // Agenda data for dashboard (day + week mode)
+      const _todayEvents = getTodayEvents();
+      const _todayAgendaTasks = getTodayTasks();
+      const _agendaOverdueIds = new Set(getOverdueTasks().map(t => t.id));
+      const combinedToday = [
+        ..._todayEvents.map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria, _overdue: false })),
+        ..._todayAgendaTasks.map(t => ({
+          _type: "task",
+          id: t.id,
+          horario: t.prazo.split("T")[1] ? t.prazo.split("T")[1].slice(0, 5) : "00:00",
+          titulo: t.titulo,
+          descricao: t.descricao,
+          categoria: t.categoria,
+          status: t.status,
+          prioridade: t.prioridade,
+          _overdue: _agendaOverdueIds.has(t.id)
+        }))
+      ].sort((a, b) => {
+        if (a._overdue && !b._overdue) return -1;
+        if (!a._overdue && b._overdue) return 1;
+        return a.horario.localeCompare(b.horario);
+      });
+
+      const _weekDates = Array.from({length: 5}, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - d.getDay() + 1 + i);
+        return d.toISOString().split("T")[0];
+      });
+      const weeklyGroups = _weekDates.map(date => {
+        const evts = appState.eventos.filter(e => e.data === date).map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria }));
+        const tsks = appState.tarefas.filter(t => t.prazo.startsWith(date)).map(t => ({
+          _type: "task",
+          horario: t.prazo.split("T")[1] ? t.prazo.split("T")[1].slice(0, 5) : "00:00",
+          titulo: t.titulo,
+          categoria: t.categoria,
+          status: t.status,
+          prioridade: t.prioridade
+        }));
+        const items = [...evts, ...tsks].sort((a, b) => a.horario.localeCompare(b.horario));
+        return { date, items };
+      });
+
       const dashboard = document.getElementById("dashboard-view");
 
       const _overdueColornt = getOverdueTasks().length;
@@ -3795,40 +3835,88 @@
         </div>
 
         <div class="dashboard-grid">
-          <div class="panel">
+          <div class="panel" id="dashboard-agenda-panel">
             <div class="panel-header">
               <div class="section-heading">
                 <div>
-                  <h3>Daily Summary</h3>
-                  <p>Quick view to start executing</p>
+                  <h3>Agenda</h3>
+                  <p>Appointments and tasks — click to view details</p>
+                </div>
+                <div class="tab-switch">
+                  <button class="switch-btn ${appState.agendaMode === "dia" ? "active" : ""}" data-agenda-mode="dia">Today</button>
+                  <button class="switch-btn ${appState.agendaMode === "semana" ? "active" : ""}" data-agenda-mode="semana">Week</button>
                 </div>
               </div>
             </div>
-            ${nextEvent ? `
-              <div class="next-event-card">
-                <div class="row-between">
-                  <div>
-                    <small>Next appointment</small>
-                    <h3>${nextEvent.titulo}</h3>
-                    <p>${nextEvent.horario} · ${nextEvent.categoria}</p>
+            <div class="timeline-stack">
+              <div style="font-weight:600;padding-bottom:6px;">${formatDateLong(appState.today)}</div>
+              ${appState.agendaMode === "dia"
+                ? (combinedToday.length
+                  ? combinedToday.map(item => item._type === "event" ? `
+                      <div class="timeline-block event-card">
+                        <div class="timeline-inner">
+                          <div class="event-top">
+                            <div>
+                              <h4>${item.titulo}</h4>
+                              <p>${item.categoria}</p>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                              <span class="event-time">${item.horario}</span>
+                              <button class="task-action-btn danger" data-delete-event="${item.id}" title="Delete event"><i data-lucide="trash-2"></i></button>
+                            </div>
+                          </div>
+                          <div class="event-meta">${categoryBadge(item.categoria)}</div>
+                        </div>
+                      </div>` : `
+                      <div class="timeline-block event-card ${item.status === "concluida" ? "done" : ""}">
+                        <div class="timeline-inner">
+                          <div class="event-top">
+                            <div>
+                              <h4>${item.titulo}</h4>
+                              <p>${item.descricao || item.categoria}</p>
+                            </div>
+                            <span class="event-time">${item.horario}</span>
+                          </div>
+                          <div class="event-meta">
+                            <span class="badge">Task</span>
+                            <span class="badge priority-${item.prioridade}">${formatPriority(item.prioridade)}</span>
+                            <span class="badge status-${item.status}">${formatStatus(item.status)}</span>
+                          </div>
+                        </div>
+                      </div>`
+                  ).join("")
+                  : `<div class="empty-state">No appointments or tasks today.</div>`)
+                : weeklyGroups.map(group => `
+                  <div class="timeline-block planner-card">
+                    <div class="timeline-inner">
+                      <div class="planner-top">
+                        <div>
+                          <h4>${formatDateLong(group.date)}</h4>
+                          <p>${group.items.length} item${group.items.length !== 1 ? "s" : ""}</p>
+                        </div>
+                        <span class="badge">${group.date === appState.today ? "Today" : "Week"}</span>
+                      </div>
+                      <div class="list-stack">
+                        ${group.items.length ? group.items.map(item => `
+                          <div class="mini-item">
+                            <div>
+                              <h4>${item.horario} · ${item.titulo}</h4>
+                              <p>${item.categoria}${item._type === "task" ? " · Task" : ""}</p>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                              ${item._type === "task"
+                                ? `<span class="badge priority-${item.prioridade}">${formatPriority(item.prioridade)}</span>`
+                                : categoryBadge(item.categoria)}
+                              ${item._type === "event"
+                                ? `<button class="task-action-btn danger" data-delete-event="${item.id}" title="Delete event"><i data-lucide="trash-2"></i></button>`
+                                : ""}
+                            </div>
+                          </div>
+                        `).join("") : `<div class="empty-state">No events or tasks planned.</div>`}
+                      </div>
+                    </div>
                   </div>
-                  <span class="event-time">${nextEvent.horario}</span>
-                </div>
-              </div>
-            ` : ""}
-            <div class="list-stack">
-              ${topTasks.map(task => `
-                <div class="mini-item">
-                  <div>
-                    <h4>${task.titulo}</h4>
-                    <p>${task.descricao}</p>
-                  </div>
-                  <div class="chips">
-                    <span class="badge priority-${task.prioridade}">${formatPriority(task.prioridade)}</span>
-                  </div>
-                </div>
-              `).join("")}
-              ${!topTasks.length ? `<div class="empty-state">Everything completed today. Great pace.</div>` : ""}
+                `).join("")}
             </div>
           </div>
 
@@ -4691,7 +4779,6 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       renderNav();
       await renderDashboard();
-      renderAgenda();
       renderTasks();
       renderHabitos();
       renderHistorico();
