@@ -2784,6 +2784,7 @@
       </div>
 
       <section id="dashboard-view" class="view active"></section>
+      <section id="agenda-view" class="view"></section>
       <section id="tarefas-view" class="view"></section>
       <section id="habitos-view" class="view"></section>
       <section id="historico-view" class="view"></section>
@@ -3598,6 +3599,7 @@
 
     const navItems = [
       { id: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
+      { id: "agenda",    label: "Agenda",    icon: "calendar-range" },
       { id: "tarefas",   label: "Tarefas",   icon: "check-square" },
       { id: "metas",     label: "Metas",     icon: "target" },
       { id: "equipa",    label: "Equipa",    icon: "users" },
@@ -3609,6 +3611,7 @@
 
     const viewIds = {
       dashboard: "dashboard-view",
+      agenda:    "agenda-view",
       tarefas:   "tarefas-view",
       metas:     "metas-view",
       equipa:    "equipa-view",
@@ -4829,6 +4832,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       renderNav();
       await renderDashboard();
+      renderAgenda();
       renderTarefas();
       renderHabitos();
       renderHistorico();
