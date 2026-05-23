@@ -3671,15 +3671,24 @@
       const dashboard = document.getElementById("dashboard-view");
 
       const _overdueColornt = getOverdueTasks().length;
+      const _pendingColornt = appState.tasks.filter(t => t.status === "pendente").length;
+      const _todayTasks = getTodayTasks().filter(t => t.status !== "concluida").length;
+      const _greeting = () => {
+        const h = new Date().getHours();
+        if (h < 12) return "Good morning";
+        if (h < 18) return "Good afternoon";
+        return "Good evening";
+      };
       const _overdueBar = _overdueColornt > 0
-        ? `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);backgrornd:linear-gradient(135deg,rgba(255,107,138,0.18),rgba(255,107,138,0.06)),var(--panel);border:1px solid rgba(255,107,138,0.35);display:flex;align-items:center;gap:12px;"><i data-lucide="alert-triangle" style="color:var(--danger);flex-shrink:0;"></i><strong style="color:var(--danger);font-size:0.95rem;">${_overdueColornt} tarefa${_overdueColornt > 1 ? "s" : ""} atrasada${_overdueColornt > 1 ? "s" : ""}</strong></div>`
-        : `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);backgrornd:rgba(49,208,170,0.08);border:1px solid rgba(49,208,170,0.25);display:flex;align-items:center;gap:12px;"><i data-lucide="check-circle-2" style="color:var(--success);flex-shrink:0;"></i><strong style="color:var(--success);font-size:0.95rem;">All caught up</strong></div>`;
+        ? `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);backgrornd:linear-gradient(135deg,rgba(255,107,138,0.18),rgba(255,107,138,0.06)),var(--panel);border:1px solid rgba(255,107,138,0.35);display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="appState.taskFilter='atrasadas'; switchView('tasks');"><i data-lucide="alert-triangle" style="color:var(--danger);flex-shrink:0;"></i><strong style="color:var(--danger);font-size:0.95rem;">${_overdueColornt} overdue task${_overdueColornt > 1 ? "s" : ""} — Click to resolve →</strong></div>`
+        : "";
       dashboard.innerHTML = `
+        ${_overdueBar}
         <div class="hero-card">
           <div class="hero-content">
             <div class="hero-copy">
               <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
-              <h2>Welcome ao <strong>Kairo</strong>, ${appState.user.nome}.</h2>
+              <h2>${_greeting()}, ${appState.user.nome}. <span style="font-size:0.75em;font-weight:400;color:var(--muted);">${_todayTasks > 0 ? `${_todayTasks} task${_todayTasks > 1 ? "s" : ""} to do today` : "No tasks for today"}</span></h2>
               <p>${insights[0].mensagem}</p>
               <p class="subtle">${getBusyDayInsight()}</p>
             </div>

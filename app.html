@@ -3671,15 +3671,24 @@
       const dashboard = document.getElementById("dashboard-view");
 
       const _overdueCount = getOverdueTasks().length;
+      const _pendingCount = appState.tarefas.filter(t => t.status === "pendente").length;
+      const _todayTasks = getTodayTasks().filter(t => t.status !== "concluida").length;
+      const _greeting = () => {
+        const h = new Date().getHours();
+        if (h < 12) return "Bom dia";
+        if (h < 18) return "Boa tarde";
+        return "Boa noite";
+      };
       const _overdueBar = _overdueCount > 0
-        ? `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(255,107,138,0.18),rgba(255,107,138,0.06)),var(--panel);border:1px solid rgba(255,107,138,0.35);display:flex;align-items:center;gap:12px;"><i data-lucide="alert-triangle" style="color:var(--danger);flex-shrink:0;"></i><strong style="color:var(--danger);font-size:0.95rem;">${_overdueCount} tarefa${_overdueCount > 1 ? "s" : ""} atrasada${_overdueCount > 1 ? "s" : ""}</strong></div>`
-        : `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);background:rgba(49,208,170,0.08);border:1px solid rgba(49,208,170,0.25);display:flex;align-items:center;gap:12px;"><i data-lucide="check-circle-2" style="color:var(--success);flex-shrink:0;"></i><strong style="color:var(--success);font-size:0.95rem;">Tudo em dia</strong></div>`;
+        ? `<div style="margin-bottom:14px;padding:14px 18px;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(255,107,138,0.18),rgba(255,107,138,0.06)),var(--panel);border:1px solid rgba(255,107,138,0.35);display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="appState.taskFilter='atrasadas'; switchView('tarefas');"><i data-lucide="alert-triangle" style="color:var(--danger);flex-shrink:0;"></i><strong style="color:var(--danger);font-size:0.95rem;">${_overdueCount} tarefa${_overdueCount > 1 ? "s" : ""} atrasada${_overdueCount > 1 ? "s" : ""} — Clica para resolver →</strong></div>`
+        : "";
       dashboard.innerHTML = `
+        ${_overdueBar}
         <div class="hero-card">
           <div class="hero-content">
             <div class="hero-copy">
               <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
-              <h2>Bem-vindo ao <strong>Kairo</strong>, ${appState.user.nome}.</h2>
+              <h2>${_greeting()}, ${appState.user.nome}. <span style="font-size:0.75em;font-weight:400;color:var(--muted);">${_todayTasks > 0 ? `${_todayTasks} tarefa${_todayTasks > 1 ? "s" : ""} por fazer hoje` : "Nenhuma tarefa para hoje"}</span></h2>
               <p>${insights[0].mensagem}</p>
               <p class="subtle">${getBusyDayInsight()}</p>
             </div>
