@@ -3651,6 +3651,10 @@
       return appState.tarefas.filter(task => task.status === "concluida");
     }
 
+    function getImportantTodayCount() {
+      return getTodayTasks().filter(task => task.prioridade === "alta" && task.status !== "concluida").length;
+    }
+
     function getPendingHabits() {
       return appState.habitos.filter(habit => !habit.concluidoHoje);
     }
