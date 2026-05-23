@@ -3689,10 +3689,6 @@
       return Math.min(100, Math.round(taskScore + habitScore));
     }
 
-    function getCompletedHabitsToday() {
-      return appState.habitos.filter(habit => habit.concluidoHoje);
-    }
-
     async function saveDailyScoreSeNecessario() {
       if (!currentUser) return;
       const uid = currentUser.uid;
