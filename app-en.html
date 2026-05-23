@@ -3818,20 +3818,20 @@
                 <strong style="${_overdueColornt > 0 ? 'color:var(--danger)' : 'color:var(--success)'}">${_overdueColornt}</strong>
                 <span class="label">${_overdueColornt > 0 ? 'Click to view →' : 'All caught up ✓'}</span>
               </div>
-              <div class="metric-card">
+              <div class="metric-card" style="cursor:pointer;" onclick="appState.priorityFilter='alta'; appState.taskFilter='todas'; switchView('tasks');">
                 <small>Tasks importantes</small>
                 <strong>${getImportantTodayColornt()}</strong>
-                <span class="label">High prioridade no radar</span>
+                <span class="label">Click to view →</span>
               </div>
-              <div class="metric-card">
+              <div class="metric-card" style="cursor:pointer;" onclick="switchView('habitos');">
                 <small>Habits concluídos</small>
                 <strong>${getCompletedHabitsToday().length}/${appState.habitos.length}</strong>
-                <span class="label">Daily consistency</span>
+                <span class="label">Click to view →</span>
               </div>
-              <div class="metric-card">
-                <small>Productivity</small>
-                <strong>${todayScore}%</strong>
-                <span class="label">Today's real score</span>
+              <div class="metric-card" style="cursor:pointer;" onclick="appState.taskFilter='todas'; switchView('tasks');">
+                <small>Tasks today</small>
+                <strong>${getTodayTasks().length}</strong>
+                <span class="label">Click to view →</span>
               </div>
             </div>
           </div>

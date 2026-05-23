@@ -3933,20 +3933,20 @@
                 <strong style="${_overdueCount > 0 ? 'color:var(--danger)' : 'color:var(--success)'}">${_overdueCount}</strong>
                 <span class="label">${_overdueCount > 0 ? 'Clica para ver →' : 'Tudo em dia ✓'}</span>
               </div>
-              <div class="metric-card">
+              <div class="metric-card" style="cursor:pointer;" onclick="appState.priorityFilter='alta'; appState.taskFilter='todas'; switchView('tarefas');">
                 <small>Tarefas importantes</small>
                 <strong>${getImportantTodayCount()}</strong>
-                <span class="label">Alta prioridade no radar</span>
+                <span class="label">Clica para ver →</span>
               </div>
-              <div class="metric-card">
+              <div class="metric-card" style="cursor:pointer;" onclick="switchView('habitos');">
                 <small>Hábitos concluídos</small>
                 <strong>${getCompletedHabitsToday().length}/${appState.habitos.length}</strong>
-                <span class="label">Consistência diária</span>
+                <span class="label">Clica para ver →</span>
               </div>
-              <div class="metric-card">
-                <small>Produtividade</small>
-                <strong>${todayScore}%</strong>
-                <span class="label">Score real de hoje</span>
+              <div class="metric-card" style="cursor:pointer;" onclick="appState.taskFilter='todas'; switchView('tarefas');">
+                <small>Tarefas dia</small>
+                <strong>${getTodayTasks().length}</strong>
+                <span class="label">Clica para ver →</span>
               </div>
             </div>
           </div>
