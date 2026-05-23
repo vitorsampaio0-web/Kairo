@@ -3817,10 +3817,10 @@
               <h2>${_greeting()}, ${appState.user.nome}.</h2>
             </div>
             <div class="hero-grid">
-              <div class="metric-card" style="cursor:pointer;" onclick="switchView('equipa');">
-                <small>Team</small>
-                <strong>${(appState.equipa || []).length}</strong>
-                <span class="label">${(appState.equipa || []).length > 0 ? 'Click to view →' : 'No members'}</span>
+              <div class="metric-card" style="${_overdueColornt > 0 ? 'border-color:rgba(255,107,138,0.35);background:linear-gradient(135deg,rgba(255,107,138,0.12),transparent 60%);cursor:pointer;' : 'cursor:pointer;' }" ${_overdueColornt > 0 ? 'onclick="appState.taskFilter=\'atrasadas\'; switchView(\'tasks\');"' : 'onclick="appState.taskFilter=\'atrasadas\'; switchView(\'tasks\');"' }>
+                <small>Tasks atrasadas</small>
+                <strong style="${_overdueColornt > 0 ? 'color:var(--danger)' : 'color:var(--success)'}">${_overdueColornt}</strong>
+                <span class="label">${_overdueColornt > 0 ? 'Click to view →' : 'All caught up ✓'}</span>
               </div>
               <div class="metric-card" style="cursor:pointer;" onclick="appState.priorityFilter='alta'; appState.taskFilter='todas'; switchView('tasks');">
                 <small>Tasks importantes</small>

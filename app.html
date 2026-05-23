@@ -3928,10 +3928,10 @@
               <h2>${_greeting()}, ${appState.user.nome}.</h2>
             </div>
             <div class="hero-grid">
-              <div class="metric-card" style="cursor:pointer;" onclick="switchView('equipa');">
-                <small>Equipa</small>
-                <strong>${(appState.equipa || []).length}</strong>
-                <span class="label">${(appState.equipa || []).length > 0 ? 'Clica para ver →' : 'Nenhum membro'}</span>
+              <div class="metric-card" style="${_overdueCount > 0 ? 'border-color:rgba(255,107,138,0.35);background:linear-gradient(135deg,rgba(255,107,138,0.12),transparent 60%);cursor:pointer;' : 'cursor:pointer;' }" ${_overdueCount > 0 ? 'onclick="appState.taskFilter=\'atrasadas\'; switchView(\'tarefas\');"' : 'onclick="appState.taskFilter=\'atrasadas\'; switchView(\'tarefas\');"' }>
+                <small>Tarefas atrasadas</small>
+                <strong style="${_overdueCount > 0 ? 'color:var(--danger)' : 'color:var(--success)'}">${_overdueCount}</strong>
+                <span class="label">${_overdueCount > 0 ? 'Clica para ver →' : 'Tudo em dia ✓'}</span>
               </div>
               <div class="metric-card" style="cursor:pointer;" onclick="appState.priorityFilter='alta'; appState.taskFilter='todas'; switchView('tarefas');">
                 <small>Tarefas importantes</small>
