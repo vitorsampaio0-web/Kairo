@@ -2579,6 +2579,122 @@
     /* ---- End Login Email Form ---- */
 
     /* ---- End Login Screen ---- */
+
+    /* ---- Panel Produtividade Executivo ---- */
+    .exec-prod-panel {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 22px;
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      margin-bottom: 16px;
+    }
+    .exec-prod-ring-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .exec-prod-ring {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: conic-gradient(var(--success) calc(var(--value) * 1%), rgba(255,255,255,0.06) 0);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .exec-prod-ring::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      background: var(--panel);
+    }
+    .exec-prod-ring-val {
+      position: relative;
+      z-index: 1;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .exec-prod-body { flex: 1; }
+    .exec-prod-title {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .exec-prod-title .badge-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .badge-trend.up {
+      background: rgba(49,208,170,0.15);
+      color: var(--success);
+      border: 1px solid rgba(49,208,170,0.3);
+    }
+    .badge-trend.down {
+      background: rgba(255,107,138,0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255,107,138,0.3);
+    }
+    .badge-trend.flat {
+      background: rgba(154,170,196,0.1);
+      color: var(--muted);
+      border: 1px solid rgba(154,170,196,0.2);
+    }
+    .exec-prod-sub {
+      margin: 6px 0 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .exec-prod-sub span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .exec-prod-spark {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .exec-prod-week-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .exec-prod-days {
+      display: flex;
+      gap: 6px;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    @media (max-width: 640px) {
+      .exec-prod-panel { flex-direction: column; text-align: center; }
+      .exec-prod-body { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -3561,8 +3677,103 @@
       return Math.min(100, Math.round(taskScore + habitScore));
     }
 
-    function getImportantTodayCount() {
-      return getTodayTasks().filter(task => task.prioridade === "alta" && task.status !== "concluida").length;
+    function getTodayScore() {
+      const todayTasks = getTodayTasks();
+      const taskScore = todayTasks.length > 0
+        ? (todayTasks.filter(t => t.status === "concluida").length / todayTasks.length) * 65
+        : 0;
+      const todayHabits = appState.habitos;
+      const habitScore = todayHabits.length > 0
+        ? (getCompletedHabitsToday().length / todayHabits.length) * 35
+        : 0;
+      return Math.min(100, Math.round(taskScore + habitScore));
+    }
+
+    function getCompletedHabitsToday() {
+      return appState.habitos.filter(habit => habit.concluidoHoje);
+    }
+
+    async function saveDailyScoreSeNecessario() {
+      if (!currentUser) return;
+      const uid = currentUser.uid;
+      const hojeStr = appState.today;
+      const ref = db.collection(`users/${uid}/dailyScores`).doc(hojeStr);
+      const snap = await ref.get();
+      if (snap.exists) return;
+      const todayTasks = getTodayTasks();
+      const todayHabits = appState.habitos;
+      await ref.set({
+        date: hojeStr,
+        taskScore: todayTasks.length > 0
+          ? Math.round((todayTasks.filter(t => t.status === "concluida").length / todayTasks.length) * 100)
+          : 0,
+        habitScore: todayHabits.length > 0
+          ? Math.round((getCompletedHabitsToday().length / todayHabits.length) * 100)
+          : 0,
+        overall: getTodayScore(),
+        tasksCompleted: todayTasks.filter(t => t.status === "concluida").length,
+        tasksTotal: todayTasks.length,
+        habitsCompleted: getCompletedHabitsToday().length,
+        habitsTotal: todayHabits.length,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    async function getWeeklyScores() {
+      if (!currentUser) return [];
+      const uid = currentUser.uid;
+      const scores = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const s = d.toLocaleDateString('en-CA', { timeZone: 'Europe/Lisbon' });
+        scores.push(s);
+      }
+      const snaps = await Promise.all(
+        scores.map(s => db.collection(`users/${uid}/dailyScores`).doc(s).get())
+      );
+      return snaps.map(snap => {
+        if (!snap.exists) return null;
+        const d = snap.data();
+        return { date: d.date, overall: d.overall || 0 };
+      });
+    }
+
+    function renderSparkline(weekly, todayScore) {
+      const h = 40, w = 140, pad = 4;
+      const vals = weekly.map(d => d ? d.overall : 0);
+      const maxV = Math.max(...vals, 40, todayScore);
+      const pathPoints = vals.map((v, i) => {
+        const x = pad + (i / 6) * (w - pad * 2);
+        const y = h - pad - (v / maxV) * (h - pad * 2);
+        return `${x},${y}`;
+      });
+      return `<svg width="${w}" height="${h}" style="overflow:visible;">
+        <defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c5cff" stop-opacity="0.35"/><stop offset="100%" stop-color="#7c5cff" stop-opacity="0"/></linearGradient></defs>
+        <polyline points="${pathPoints.join(' ')}" fill="none" stroke="#7c5cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="${pathPoints[6].split(',')[0]}" cy="${pathPoints[6].split(',')[1]}" r="4" fill="#00c2ff" stroke="#7c5cff" stroke-width="2"/>
+        ${vals.map((v, i) => `<circle cx="${pathPoints[i].split(',')[0]}" cy="${pathPoints[i].split(',')[1]}" r="2.5" fill="${v > 0 ? '#7c5cff' : '#2a2a4a'}"/>`).join('')}
+      </svg>`;
+    }
+
+    function getLastSundayDateStr() {
+      const d = new Date();
+      const day = d.getDay();
+      const diff = d.getDate() - day;
+      d.setDate(diff);
+      return d.toLocaleDateString('en-CA', { timeZone: 'Europe/Lisbon' });
+    }
+
+    function getWeeklyAverage(weekly) {
+      const valid = weekly.filter(d => d && d.overall !== undefined);
+      if (!valid.length) return 0;
+      return Math.round(valid.reduce((s, d) => s + d.overall, 0) / valid.length);
+    }
+
+    function formatSparkDate(dateStr) {
+      const d = new Date(dateStr + 'T12:00:00');
+      const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      return dias[d.getDay()];
     }
 
     function getBusyDayInsight() {
@@ -3661,12 +3872,22 @@
       document.getElementById("bottom-nav").innerHTML = markup;
     }
 
-    function renderDashboard() {
+    async function renderDashboard() {
       const nextEvent = getNextEvent();
       const todayTasks = getTodayTasks().filter(task => task.status !== "concluida");
       const topTasks = todayTasks.slice(0, 3);
       const todayHabits = appState.habitos.slice(0, 3);
-      const productivity = getProductivityScore();
+      const todayScore = getTodayScore();
+      const weeklyScores = await getWeeklyScores();
+      const weeklyAvg = getWeeklyAverage(weeklyScores);
+      const prevDay = weeklyScores[5];
+      const trendVal = prevDay && prevDay.overall > 0 ? todayScore - prevDay.overall : 0;
+      const trendBadge = trendVal > 5
+        ? `<span class="badge-trend up">▲ +${trendVal}% vs ontem</span>`
+        : trendVal < -5
+          ? `<span class="badge-trend down">▼ ${trendVal}% vs ontem</span>`
+          : `<span class="badge-trend flat">▬ vs ontem</span>`;
+      const trendArrowText = trendVal > 5 ? "+${trendVal}%" : trendVal < -5 ? "${trendVal}%" : "estável";
       const insights = generateKairoInsights();
       const dashboard = document.getElementById("dashboard-view");
 
@@ -3754,14 +3975,44 @@
           <div class="panel">
             <div class="panel-header">
               <div>
-                <h3>Produtividade e Kairo AI</h3>
-                <p>Indicadores inteligentes do teu dia</p>
+                <h3>Produtividade Executivo</h3>
+                <p>Score de hoje e tendência da semana</p>
               </div>
             </div>
-            <div class="progress-ring" style="--value:${productivity}">
-              <strong>${productivity}%</strong>
+
+            <div class="exec-prod-panel">
+              <div class="exec-prod-ring-wrap">
+                <div class="exec-prod-ring" style="--value:${todayScore}">
+                  <span class="exec-prod-ring-val">${todayScore}%</span>
+                </div>
+                <span style="font-size:0.72rem;color:var(--muted);font-weight:500;">Hoje</span>
+              </div>
+
+              <div class="exec-prod-body">
+                <div class="exec-prod-title">
+                  <span>Produtividade do dia</span>
+                  ${trendBadge}
+                </div>
+
+                <p class="exec-prod-sub">
+                  <span><i data-lucide="check-circle-2" style="width:13px;height:13px;color:var(--success);"></i> ${getTodayTasks().filter(t => t.status === "concluida").length}/${getTodayTasks().length} tarefas</span>
+                  <span><i data-lucide="flame" style="width:13px;height:13px;color:var(--warning);"></i> ${getCompletedHabitsToday().length}/${appState.habitos.length} hábitos</span>
+                  <span><i data-lucide="trending-up" style="width:13px;height:13px;color:var(--primary-2);"></i> Semana: ${weeklyAvg}%</span>
+                </p>
+
+                <div class="exec-prod-spark">
+                  ${renderSparkline(weeklyScores, todayScore)}
+                  <div>
+                    <span class="exec-prod-week-label">7 dias</span>
+                    <div class="exec-prod-days">
+                      ${weeklyScores.map(d => `<span>${d ? formatSparkDate(d.date) : '—'}</span>`).join('')}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="ai-card">
+
+            <div class="ai-card" style="margin-top:12px;">
               <div class="ai-card-header">
                 <div class="ai-mark"><i data-lucide="bot"></i></div>
                 <div>
@@ -3771,6 +4022,7 @@
               </div>
               <p>${insights[0].acaoRecomendada}</p>
             </div>
+
             <div class="list-stack" style="margin-top: 14px;">
               ${todayHabits.map(habit => `
                 <div class="mini-item">
@@ -4642,13 +4894,13 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       `;
     }
 
-    function renderAll() {
+    async function renderAll() {
       const dynamicInsights = generateKairoInsights();
       const aiCopyEl = document.getElementById("sidebar-ai-copy");
       if (aiCopyEl) aiCopyEl.textContent = dynamicInsights[0].acaoRecomendada;
 
       renderNav();
-      renderDashboard();
+      await renderDashboard();
       renderAgenda();
       renderTarefas();
       renderHabitos();
@@ -5300,6 +5552,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const tBadge = document.getElementById('topbar-plan-badge');
         if (tBadge) tBadge.style.display = 'inline-flex';
         await loadUserData(user.uid);
+        // Gravar score diário (se necessário) para histórico
+        try { await saveDailyScoreSeNecessario(); } catch(e) { console.error("[DailyScore]", e); }
         showApp(user);
         // Carregar subscription (onSnapshot em tempo real)
         loadSubscription(user.uid);
