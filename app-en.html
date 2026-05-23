@@ -3675,9 +3675,6 @@
     }
 
     function generateKairoInsights() {
-      const events = getTodayEvents().length;
-      const tasks = getTodayTasks().filter(task => task.status !== "concluida").length;
-      const habits = getPendingHabits().length;
       const overdue = getOverdueTasks().length;
       const highPriorityTask = appState.tasks
         .filter(task => task.status !== "concluida")
@@ -3686,44 +3683,14 @@
           return priorityWeight[b.prioridade] - priorityWeight[a.prioridade] || new Date(a.prazo) - new Date(b.prazo);
         })[0];
 
-      const insights = [];
-      insights.push({
-        id: "dynamic-summary",
-        tipo: "summary",
-        mensagem: `Good morning! Yor have ${events} appointments, ${tasks} tasks e ${habits} habits today.`,
-        acaoRecomendada: highPriorityTask ? `Prioritize "${highPriorityTask.titulo}" in the next available block.` : "O teu ritmo está sob controlo today."
-      });
-
-      if (overdue) {
-        insights.push({
-          id: "dynamic-overdue",
-          tipo: "alerta",
-          mensagem: `Tens ${overdue} tarefa${overdue > 1 ? "s" : ""} atrasada${overdue > 1 ? "s" : ""}.`,
-          acaoRecomendada: "Reorganiza os itens de baixa prioridade e fecha as pendências mais antigas antes das 11h."
-        });
+      if (overdue > 0) {
+        return [{ tipo: "alerta", acaoRecomendada: `You have ${overdue} overdue task${overdue > 1 ? "s" : ""}. Close critical pending items before starting new tasks.` }];
       }
-
-      if (events >= 4) {
-        insights.push({
-          id: "dynamic-load",
-          tipo: "carga",
-          mensagem: "O teu dia está denso com reuniões e blocos de execução.",
-          acaoRecomendada: "Mantém uma pausa curta entrand thes 15h and thes 16h para preservar energia cognitiva."
-        });
+      if (highPriorityTask) {
+        return [{ tipo: "foco", acaoRecomendada: `Prioritize "${highPriorityTask.titulo}" in the next available block.` }];
       }
-
-      if (getPendingHabits().length >= 2) {
-        insights.push({
-          id: "dynamic-habit",
-          tipo: "habito",
-          mensagem: "Podes reforçar a tua consistência hoje com um hábito rápido.",
-          acaoRecomendada: "Marca leitura or alongamento logo após o teu próximo compromisso."
-        });
-      }
-
-      return insights;
+      return [{ tipo: "equilibrio", acaoRecomendada: "Day is balanced. Use Focus Mode to advance important tasks." }];
     }
-
     function categoryBadge(category) {
       return `<span class="badge">${category}</span>`;
     }
@@ -3801,7 +3768,6 @@
             <div class="hero-copy">
               <div class="pill"><i data-lucide="calendar-days"></i><span id="today-label"></span></div>
               <h2>${_greeting()}, ${appState.user.nome}. <span style="font-size:0.75em;font-weight:400;color:var(--muted);">${_todayTasks > 0 ? `${_todayTasks} task${_todayTasks > 1 ? "s" : ""} to do today` : "No tasks for today"}</span></h2>
-              <p>${insights[0].mensagem}</p>
               <p class="subtle">${getBusyDayInsight()}</p>
             </div>
             <div class="hero-grid">
@@ -3975,8 +3941,6 @@
             </div>` : ""}
           </div>
         </div>
-
-        ${renderIAPanel()}
       `;
 
       // Atualiza a data no hero card após renderizar o HTML
