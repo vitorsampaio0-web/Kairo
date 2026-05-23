@@ -26,6 +26,9 @@ service cloud.firestore {
       match /decisoes/{id} {
         allow read, write: if request.auth != null && request.auth.uid == uid;
       }
+      match /dailyScores/{id} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
     }
 
     // Teams: só membros podem ler os dados da equipa

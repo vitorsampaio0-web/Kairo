@@ -3873,21 +3873,30 @@
     }
 
     async function renderDashboard() {
+      let weeklyScores = [];
+      let weeklyAvg = 0;
+      let prevDay = null;
+      let trendVal = 0;
+      let trendBadge = '<span class="badge-trend flat">▬ vs ontem</span>';
+      let todayScore = 0;
+      try {
+        todayScore = getTodayScore();
+        weeklyScores = await getWeeklyScores();
+        weeklyAvg = getWeeklyAverage(weeklyScores);
+        prevDay = weeklyScores[5];
+        trendVal = prevDay && prevDay.overall > 0 ? todayScore - prevDay.overall : 0;
+        trendBadge = trendVal > 5
+          ? `<span class="badge-trend up">▲ +${trendVal}% vs ontem</span>`
+          : trendVal < -5
+            ? `<span class="badge-trend down">▼ ${trendVal}% vs ontem</span>`
+            : `<span class="badge-trend flat">▬ vs ontem</span>`;
+      } catch(e) {
+        console.error("[Dashboard] Erro ao carregar weeklyScores:", e);
+      }
       const nextEvent = getNextEvent();
       const todayTasks = getTodayTasks().filter(task => task.status !== "concluida");
       const topTasks = todayTasks.slice(0, 3);
       const todayHabits = appState.habitos.slice(0, 3);
-      const todayScore = getTodayScore();
-      const weeklyScores = await getWeeklyScores();
-      const weeklyAvg = getWeeklyAverage(weeklyScores);
-      const prevDay = weeklyScores[5];
-      const trendVal = prevDay && prevDay.overall > 0 ? todayScore - prevDay.overall : 0;
-      const trendBadge = trendVal > 5
-        ? `<span class="badge-trend up">▲ +${trendVal}% vs ontem</span>`
-        : trendVal < -5
-          ? `<span class="badge-trend down">▼ ${trendVal}% vs ontem</span>`
-          : `<span class="badge-trend flat">▬ vs ontem</span>`;
-      const trendArrowText = trendVal > 5 ? "+${trendVal}%" : trendVal < -5 ? "${trendVal}%" : "estável";
       const insights = generateKairoInsights();
       const dashboard = document.getElementById("dashboard-view");
 
@@ -3927,8 +3936,8 @@
               </div>
               <div class="metric-card">
                 <small>Produtividade</small>
-                <strong>${productivity}%</strong>
-                <span class="label">Atualizado em tempo real</span>
+                <strong>${todayScore}%</strong>
+                <span class="label">Score real de hoje</span>
               </div>
             </div>
           </div>
