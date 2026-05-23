@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -3835,90 +3835,26 @@
         </div>
 
         <div class="dashboard-grid">
-          <div class="panel" id="dashboard-agenda-panel">
+          
+          <div class="panel">
             <div class="panel-header">
               <div class="section-heading">
                 <div>
-                  <h3>Agenda</h3>
-                  <p>Appointments and tasks — click to view details</p>
-                </div>
-                <div class="tab-switch">
-                  <button class="switch-btn ${appState.agendaMode === "dia" ? "active" : ""}" data-agenda-mode="dia">Today</button>
-                  <button class="switch-btn ${appState.agendaMode === "semana" ? "active" : ""}" data-agenda-mode="semana">Week</button>
+                  <h3>Monthly Calendar</h3>
+                  <p>Click a day to view tasks for that day</p>
                 </div>
               </div>
             </div>
-            <div class="timeline-stack">
-              <div style="font-weight:600;padding-bottom:6px;">${formatDateLong(appState.today)}</div>
-              ${appState.agendaMode === "dia"
-                ? (combinedToday.length
-                  ? combinedToday.map(item => item._type === "event" ? `
-                      <div class="timeline-block event-card">
-                        <div class="timeline-inner">
-                          <div class="event-top">
-                            <div>
-                              <h4>${item.titulo}</h4>
-                              <p>${item.categoria}</p>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                              <span class="event-time">${item.horario}</span>
-                              <button class="task-action-btn danger" data-delete-event="${item.id}" title="Delete event"><i data-lucide="trash-2"></i></button>
-                            </div>
-                          </div>
-                          <div class="event-meta">${categoryBadge(item.categoria)}</div>
-                        </div>
-                      </div>` : `
-                      <div class="timeline-block event-card ${item.status === "concluida" ? "done" : ""}">
-                        <div class="timeline-inner">
-                          <div class="event-top">
-                            <div>
-                              <h4>${item.titulo}</h4>
-                              <p>${item.descricao || item.categoria}</p>
-                            </div>
-                            <span class="event-time">${item.horario}</span>
-                          </div>
-                          <div class="event-meta">
-                            <span class="badge">Task</span>
-                            <span class="badge priority-${item.prioridade}">${formatPriority(item.prioridade)}</span>
-                            <span class="badge status-${item.status}">${formatStatus(item.status)}</span>
-                          </div>
-                        </div>
-                      </div>`
-                  ).join("")
-                  : `<div class="empty-state">No appointments or tasks today.</div>`)
-                : weeklyGroups.map(group => `
-                  <div class="timeline-block planner-card">
-                    <div class="timeline-inner">
-                      <div class="planner-top">
-                        <div>
-                          <h4>${formatDateLong(group.date)}</h4>
-                          <p>${group.items.length} item${group.items.length !== 1 ? "s" : ""}</p>
-                        </div>
-                        <span class="badge">${group.date === appState.today ? "Today" : "Week"}</span>
-                      </div>
-                      <div class="list-stack">
-                        ${group.items.length ? group.items.map(item => `
-                          <div class="mini-item">
-                            <div>
-                              <h4>${item.horario} · ${item.titulo}</h4>
-                              <p>${item.categoria}${item._type === "task" ? " · Task" : ""}</p>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                              ${item._type === "task"
-                                ? `<span class="badge priority-${item.prioridade}">${formatPriority(item.prioridade)}</span>`
-                                : categoryBadge(item.categoria)}
-                              ${item._type === "event"
-                                ? `<button class="task-action-btn danger" data-delete-event="${item.id}" title="Delete event"><i data-lucide="trash-2"></i></button>`
-                                : ""}
-                            </div>
-                          </div>
-                        `).join("") : `<div class="empty-state">No events or tasks planned.</div>`}
-                      </div>
-                    </div>
-                  </div>
-                `).join("")}
+            <div class="mini-cal" id="mini-cal-container">
+              <div class="mini-cal-header">
+                <button class="mini-cal-nav" id="cal-prev"><i data-lucide="chevron-left"></i></button>
+                <span id="cal-month-label"></span>
+                <button class="mini-cal-nav" id="cal-next"><i data-lucide="chevron-right"></i></button>
+              </div>
+              <div class="mini-cal-grid" id="mini-cal-grid"></div>
             </div>
           </div>
+
 
           <div class="panel">
             <div class="panel-header">
