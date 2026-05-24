@@ -2598,6 +2598,27 @@
     .exec-prod-week-label { font-size:0.72rem; color:var(--muted); font-weight:500; }
     .exec-prod-days { display:flex; gap:6px; font-size:0.65rem; color:var(--muted); margin-top:4px; }
     @media (max-width:640px) { .exec-prod-panel { flex-direction:column; text-align:center; } .exec-prod-body { width:100%; } }
+    .file-attach-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:8px 0 14px; }
+    .file-attach-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border:1px dashed rgba(124,92,255,0.35); border-radius:8px; cursor:pointer; background:transparent; color:var(--primary); font-size:0.8rem; font-weight:500; transition:all 0.2s; }
+    .file-attach-btn:hover { background:rgba(124,92,255,0.08); border-color:var(--primary); }
+    .file-attach-hint { font-size:0.72rem; color:var(--muted); }
+    .file-chips-wrap { display:flex; gap:6px; flex-wrap:wrap; }
+    .file-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; background:rgba(124,92,255,0.08); border-radius:6px; font-size:0.75rem; color:var(--text); }
+    .file-chip .file-remove { background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.85rem; padding:0 2px; }
+    .task-anexos { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    .anexo-chip { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; background:rgba(124,92,255,0.06); border-radius:10px; font-size:0.76rem; cursor:pointer; border:1px solid rgba(124,92,255,0.1); transition:all 0.2s; }
+    .anexo-chip:hover { background:rgba(124,92,255,0.12); border-color:rgba(124,92,255,0.25); }
+    .anexo-thumb { width:28px; height:28px; object-fit:cover; border-radius:4px; }
+    .anexo-icon { width:14px; height:14px; color:var(--primary); }
+    .anexo-info { display:flex; flex-direction:column; }
+    .anexo-name { font-weight:500; color:var(--text); max-width:110px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .anexo-size { font-size:0.68rem; color:var(--muted); }
+    .anexo-download, .anexo-delete { background:none; border:none; color:var(--muted); cursor:pointer; padding:3px; display:flex; align-items:center; }
+    .anexo-download:hover { color:var(--primary); }
+    .anexo-delete:hover { color:var(--danger); }
+    .quota-alert { margin-bottom:14px; border-left:3px solid; padding:10px 14px; background:rgba(0,0,0,0.18); border-radius:8px; font-size:0.78rem; display:flex; align-items:center; gap:8px; }
+    .quota-bar-bg { width:100%; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; margin-top:6px; overflow:hidden; }
+    .quota-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
   </style>
 </head>
 <body>
@@ -3233,6 +3254,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     db.enablePersistence({ synchronizeTabs: true })
       .catch(err => {
@@ -3523,6 +3545,169 @@
       decisoes:  "decisoes-view"
     };
 
+    function formatBytes(bytes) { return bytes < 1024 ? bytes + ' B' : bytes < 1024 * 1024 ? (bytes / 1024).toFixed(1) + ' KB' : (bytes / (1024 * 1024)).toFixed(1) + ' MB'; }
+
+    function validarAnexo(file) {
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+      const allowedExts = ['pdf', 'jpg', 'jpeg', 'png', 'xls', 'xlsx'];
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!allowedExts.includes(ext) || !allowedTypes.includes(file.type)) {
+        return { ok: false, msg: 'File type not allowed. Use PDF, Excel, JPG or PNG.' };
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        return { ok: false, msg: 'File too large. Max: 10 MB.' };
+      }
+      return { ok: true };
+    }
+
+    async function verificarQuota(bytesToAdd) {
+      if (isPro()) return true;
+      const now = new Date();
+      const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const docRef = db.collection(`users/${currentUser.uid}/usage/monthly`).doc(monthKey);
+      try {
+        const doc = await docRef.get();
+        const used = doc.exists ? (doc.data().storageBytes || 0) : 0;
+        const limit = 500 * 1024 * 1024;
+        if (used + bytesToAdd > limit) {
+          showToast('500 MB monthly quota reached. Upgrade to Pro.');
+          return false;
+        }
+        return true;
+      } catch(e) { console.error('[Quota]', e); return true; }
+    }
+
+    async function incrementarQuota(bytes) {
+      if (isPro()) return;
+      const now = new Date();
+      const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const docRef = db.collection(`users/${currentUser.uid}/usage/monthly`).doc(monthKey);
+      try {
+        const doc = await docRef.get();
+        const current = doc.exists ? (doc.data().storageBytes || 0) : 0;
+        await docRef.set({ storageBytes: current + bytes }, { merge: true });
+      } catch(e) { console.error('[Quota]', e); }
+    }
+
+    async function decrementarQuota(bytes) {
+      if (isPro()) return;
+      const now = new Date();
+      const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const docRef = db.collection(`users/${currentUser.uid}/usage/monthly`).doc(monthKey);
+      try {
+        const doc = await docRef.get();
+        const current = doc.exists ? (doc.data().storageBytes || 0) : 0;
+        await docRef.update({ storageBytes: Math.max(0, current - bytes) });
+      } catch(e) { console.error('[Quota]', e); }
+    }
+
+    async function getQuotaUsedThisMonth() {
+      if (!currentUser) return 0;
+      const now = new Date();
+      const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      try {
+        const doc = await db.collection(`users/${currentUser.uid}/usage/monthly`).doc(monthKey).get();
+        return doc.exists ? (doc.data().storageBytes || 0) : 0;
+      } catch(e) { return 0; }
+    }
+
+    async function submeterAnexo(taskId, file) {
+      const uid = currentUser.uid;
+      const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').substring(0, 60);
+      const fileName = `${taskId}_${Date.now()}_${safeName}`;
+      const filePath = `attachments/${uid}/${fileName}`;
+      
+      const canUpload = await verificarQuota(file.size);
+      if (!canUpload) return null;
+      
+      const fileRef = storage.ref(filePath);
+      try {
+        const snapshot = await fileRef.put(file);
+        const url = await snapshot.ref.getDownloadURL();
+        await incrementarQuota(file.size);
+        return {
+          id: fileName,
+          nome: file.name,
+          url,
+          tipo: file.type,
+          tamanho: file.size,
+          storagePath: filePath
+        };
+      } catch(e) {
+        console.error('[Anexo upload]', e);
+        showToast('Error uploading file. Please try again.');
+        return null;
+      }
+    }
+
+    async function eliminarAnexo(taskId, anexo) {
+      if (!anexo || !anexo.storagePath) return;
+      try {
+        await storage.ref(anexo.storagePath).delete();
+        const task = appState.tasks.find(t => String(t.id) === String(taskId));
+        if (task && task.anexos) {
+          const updated = task.anexos.filter(a => a.storagePath !== anexo.storagePath);
+          await fsUpdate('tasks', taskId, { anexos: updated });
+          task.anexos = updated;
+        }
+        await decrementarQuota(anexo.tamanho);
+        renderAll();
+        showToast(`Attachment "${anexo.nome}" deleted.`);
+      } catch(e) {
+        console.error('[Anexo delete]', e);
+        showToast('Error deleting file.');
+      }
+    }
+
+    function renderAnexoPreview(anexo, taskId) {
+      const isImg = anexo.tipo?.startsWith('image/');
+      const isPdf = anexo.tipo === 'application/pdf';
+      const iconName = isImg ? 'image' : isPdf ? 'file-text' : 'file-spreadsheet';
+      return `
+        <div class="anexo-chip" data-url="${anexo.url}" onclick="window.open('${anexo.url}','_blank')">
+          ${isImg ? `<img src="${anexo.url}" class="anexo-thumb" loading="lazy" alt="">` : `<i data-lucide="${iconName}" class="anexo-icon"></i>`}
+          <div class="anexo-info">
+            <span class="anexo-name">${anexo.nome}</span>
+            <span class="anexo-size">${formatBytes(anexo.tamanho)}</span>
+          </div>
+          <a href="${anexo.url}" download="${anexo.nome}" class="anexo-download" title="Download" onclick="event.stopPropagation();">
+            <i data-lucide="download"></i>
+          </a>
+          <button class="anexo-delete" onclick="event.stopPropagation();eliminarAnexo(${taskId},${JSON.stringify(JSON.stringify(anexo))});">
+            <i data-lucide="trash-2"></i>
+          </button>
+        </div>
+      `;
+    }
+
+    function handleTaskFileSelect(input, context) {
+      const file = input.files[0];
+      if (!file) return;
+      const val = validarAnexo(file);
+      if (!val.ok) { showToast(val.msg); input.value = ''; return; }
+      window._pendingTaskFiles = window._pendingTaskFiles || [];
+      const maxFiles = isPro() ? 999 : 1;
+      if (window._pendingTaskFiles.length >= maxFiles) {
+        showToast(isPro() ? 'You can attach multiple files (Pro).' : 'Only 1 attachment per task on the Free plan.');
+        input.value = ''; return;
+      }
+      window._pendingTaskFiles.push(file);
+      renderFileChips(context);
+      input.value = '';
+    }
+
+    function renderFileChips(context) {
+      const container = document.getElementById(`${context}-file-chips`);
+      if (!container) return;
+      const files = window._pendingTaskFiles || [];
+      container.innerHTML = files.map((f, i) => `
+        <span class="file-chip">
+          ${f.name.substring(0, 25)}${f.name.length > 25 ? '…' : ''} · ${formatBytes(f.size)}
+          <button class="file-remove" onclick="window._pendingTaskFiles.splice(${i},1);renderFileChips('${context}');">×</button>
+        </span>
+      `).join('');
+    }
+
     function formatDateLong(dateString) {
       const date = new Date(dateString + "T12:00:00");
       const parts = new Intl.DateTimeFormat("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric", timeZone: "Europe/Lisbon" }).formatToParts(date);
@@ -3809,7 +3994,26 @@
         if (h < 18) return "Good afternoon";
         return "Good evening";
       };
+      const quotaBanner = !isPro() ? (() => {
+        const used = appState._quotaUsed;
+        if (!used && used !== 0) return '';
+        const limit = 500 * 1024 * 1024;
+        const pct = Math.min((used / limit) * 100, 100);
+        const color = pct < 50 ? 'var(--success)' : pct < 75 ? 'var(--warning)' : 'var(--danger)';
+        if (pct < 25) return '';
+        return `
+          <div class="quota-alert" style="border-color:${color};color:${color};">
+            <i data-lucide="hard-drive"></i>
+            <div style="flex:1;">
+              <div>Attachment space: ${(used/1024/1024).toFixed(0)} / 500 MB (${pct.toFixed(0)}%)</div>
+              <div class="quota-bar-bg"><div class="quota-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+            </div>
+            ${pct >= 90 ? '<span>Upgrade to Pro</span>' : ''}
+          </div>
+        `;
+      })() : '';
       dashboard.innerHTML = `
+        ${quotaBanner}
         <div class="hero-card">
           <div class="hero-content">
             <div class="hero-copy">
@@ -4200,6 +4404,14 @@
             </div>
             <button id="quick-task-submit" class="primary-btn">Add</button>
           </div>
+          <div class="file-attach-row">
+            <label class="file-attach-btn" for="quick-task-file" id="quick-attach-label">
+              <i data-lucide="paperclip"></i> Attach file
+            </label>
+            <input type="file" id="quick-task-file" accept=".pdf,.xls,.xlsx,.jpg,.jpeg,.png" style="display:none;" onchange="handleTaskFileSelect(this,'quick')">
+            <span id="quick-file-chips" class="file-chips-wrap"></span>
+            <span class="file-attach-hint">Max: 10 MB · ${isPro() ? 'Unlimited' : '1 attachment'}</span>
+          </div>
 
           <div class="row-between" style="margin-bottom: 14px;">
             <div class="filters">
@@ -4245,6 +4457,11 @@
                     ${overdueIds.has(task.id) ? `<span class="badge high">Overdue</span>` : ""}
                     ${task.repeticao && task.repeticao !== "nenhuma" ? `<span class="badge" style="color:var(--gold);border-color:rgba(124,92,255,0.3);"><i data-lucide="repeat" style="width:11px;height:11px;margin-right:3px;"></i>${task.repeticao === "diaria" ? "Diária" : task.repeticao === "semanal" ? "Weekly" : "Monthly"}</span>` : ""}
                   </div>
+                  ${(task.anexos || []).length ? `
+                  <div class="task-anexos">
+                    ${(task.anexos || []).map(anexo => renderAnexoPreview(anexo, task.id)).join('')}
+                  </div>
+                  ` : ''}
                 </div>
                 <div class="task-actions">
                   ${task.status !== "concluida" ? `<button class="focus-ctrl-btn" data-start-focus="${task.id}" title="Modo Foco"><i data-lucide="timer"></i></button>` : ""}
@@ -4716,6 +4933,13 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     }
 
     async function renderAll() {
+      window._pendingTaskFiles = [];
+
+      // Carregar quota mensal (free users)
+      if (!isPro() && currentUser) {
+        appState._quotaUsed = await getQuotaUsedThisMonth();
+      }
+
       const dynamicInsights = generateKairoInsights();
       const aiCopyEl = document.getElementById("sidebar-ai-copy");
       if (aiCopyEl) aiCopyEl.textContent = dynamicInsights[0].acaoRecomendada;
@@ -4745,7 +4969,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       renderAll();
     }
 
-    function addQuickTask() {
+    async function addQuickTask() {
       const titleInput = document.getElementById("quick-task-title");
       const priorityInput = document.getElementById("quick-task-priority");
       const categoryInput = document.getElementById("quick-task-category");
@@ -4782,10 +5006,29 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         prazo: `${taskDate}T${taskTime}`,
         categoria: categoryInput.value,
         repeticao,
-        daysEspecificos
+        daysEspecificos,
+        anexos: []
       };
       appState.tasks.unshift(newTask);
       fsSep("tasks", id, newTask);
+
+      const pendingFiles = window._pendingTaskFiles || [];
+      if (pendingFiles.length > 0) {
+        const uploaded = [];
+        for (const file of pendingFiles) {
+          const anexo = await submeterAnexo(id, file);
+          if (anexo) uploaded.push(anexo);
+        }
+        if (uploaded.length > 0) {
+          const updatedTask = appState.tasks.find(t => String(t.id) === String(id));
+          if (updatedTask) {
+            updatedTask.anexos = uploaded;
+            fsSet("tasks", id, updatedTask);
+          }
+          showToast(`${uploaded.length} attachment(s) uploaded successfully.`);
+        }
+        window._pendingTaskFiles = [];
+      }
 
       titleInput.value = "";
       if (clientInput) clientInput.value = "";

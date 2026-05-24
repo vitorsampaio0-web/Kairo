@@ -3,7 +3,6 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Users: cada utilizador acede apenas aos seus dados
-    // Admins podem ler qualquer utilizador (para o painel admin)
     match /users/{uid} {
       allow read: if request.auth != null && (
         request.auth.uid == uid ||
@@ -29,11 +28,15 @@ service cloud.firestore {
       match /dailyScores/{id} {
         allow read, write: if request.auth != null && request.auth.uid == uid;
       }
+      match /attachments/{id} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+      match /usage/monthly/{monthDoc} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
     }
 
     // Teams: só membros podem ler os dados da equipa
-    // Qualquer autenticado pode LISTAR apenas pelo campo 'codigo' (via query where)
-    // Escrita protegida: só membros ou quem se está a adicionar
     match /teams/{teamId} {
       allow read: if request.auth != null && (
         request.auth.uid in resource.data.membrosUids ||
@@ -61,7 +64,6 @@ service cloud.firestore {
     }
 
     // Referrals: só o dono do código pode ler os seus dados
-    // Qualquer autenticado pode validar um código específico (para referral)
     match /referrals/{code} {
       allow read: if request.auth != null && (
         request.auth.uid == resource.data.uid ||
