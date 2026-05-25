@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -2620,6 +2620,55 @@
     .quota-alert { margin-bottom:14px; border-left:3px solid; padding:10px 14px; background:rgba(0,0,0,0.18); border-radius:8px; font-size:0.78rem; display:flex; align-items:center; gap:8px; }
     .quota-bar-bg { width:100%; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; margin-top:6px; overflow:hidden; }
     .quota-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+
+    /* ---- Notas ---- */
+    .notas-wrapper { display:flex; gap:16px; height: calc(100vh - 160px); min-height: 480px; }
+    .notas-sidebar { width: 320px; flex-shrink:0; display:flex; flex-direction:column; gap:12px; background:var(--card-bg); border-radius:12px; border:1px solid rgba(124,92,255,0.06); padding:16px; overflow:hidden; }
+    .notas-header h3 { font-size:1.05rem; margin:0; }
+    .notas-header p { font-size:0.75rem; color:var(--muted); margin:2px 0 0; }
+    .notas-search { display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(124,92,255,0.04); border-radius:8px; border:1px solid rgba(124,92,255,0.08); }
+    .notas-search input { flex:1; background:transparent; border:none; color:var(--text); font-size:0.8rem; outline:none; }
+    .notas-search input::placeholder { color:var(--muted); }
+    .notas-nova-btn { display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; background:var(--primary); border-radius:10px; color:white; font-size:0.85rem; font-weight:600; cursor:pointer; transition:opacity 0.2s; }
+    .notas-nova-btn:hover { opacity:0.85; }
+    .notas-lista { flex:1; display:flex; flex-direction:column; gap:6px; overflow-y:auto; padding-right:4px; }
+    .nota-item { padding:10px 12px; background:rgba(124,92,255,0.04); border-radius:8px; cursor:pointer; border:1px solid transparent; transition:all 0.15s; }
+    .nota-item:hover { background:rgba(124,92,255,0.08); border-color:rgba(124,92,255,0.12); }
+    .nota-item.active { background:rgba(124,92,255,0.12); border-color:var(--primary); }
+    .nota-item-titulo { font-size:0.85rem; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .nota-item-meta { font-size:0.68rem; color:var(--muted); margin-top:3px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .nota-tag-chip { padding:1px 6px; background:rgba(124,92,255,0.1); border-radius:4px; font-size:0.65rem; color:var(--primary); }
+    .notas-editor { flex:1; display:flex; flex-direction:column; gap:12px; background:var(--card-bg); border-radius:12px; border:1px solid rgba(124,92,255,0.06); padding:20px; min-width:0; overflow:hidden; }
+    .notas-editor-vazio { flex:1; display:flex; align-items:center; justify-content:center; }
+    .notas-editor-barra { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .notas-editor-titulo { flex:1; min-width:200px; background:transparent; border:none; border-bottom:1px solid rgba(124,92,255,0.15); color:var(--text); font-size:1.1rem; font-weight:600; padding:4px 0; outline:none; }
+    .notas-editor-titulo::placeholder { color:var(--muted); }
+    .notas-editor-acoes { display:flex; gap:8px; }
+    .notas-editor-btn { display:flex; align-items:center; gap:6px; padding:7px 14px; background:rgba(124,92,255,0.08); border-radius:8px; color:var(--primary); font-size:0.78rem; font-weight:500; cursor:pointer; border:none; transition:all 0.15s; }
+    .notas-editor-btn:hover { background:rgba(124,92,255,0.15); }
+    .notas-editor-btn.green { background:rgba(34,197,94,0.12); color:var(--success); animation:pulse 1.5s infinite; }
+    .notas-editor-btn.danger { color:var(--danger); background:rgba(255,107,138,0.08); }
+    .notas-editor-btn.danger:hover { background:rgba(255,107,138,0.15); }
+    .notas-editor-btn.secondary { background:rgba(148,163,184,0.08); color:var(--muted); }
+    .notas-editor-btn.secondary:hover { background:rgba(148,163,184,0.15); }
+    .notas-tags-row { display:flex; }
+    .notas-tags-input { flex:1; background:transparent; border:1px solid rgba(124,92,255,0.08); border-radius:6px; padding:6px 10px; color:var(--text); font-size:0.76rem; outline:none; }
+    .notas-tags-input::placeholder { color:var(--muted); }
+    .notas-editor-conteudo { flex:1; resize:none; background:transparent; border:1px solid rgba(124,92,255,0.08); border-radius:10px; padding:14px; color:var(--text); font-size:0.85rem; line-height:1.6; outline:none; }
+    .notas-editor-conteudo::placeholder { color:var(--muted); }
+    .notas-editor-pes { display:flex; gap:8px; padding-top:6px; }
+    .nota-pill { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; background:rgba(124,92,255,0.06); border-radius:6px; font-size:0.72rem; color:var(--muted); }
+    .nota-shared-badge { font-size:0.75rem; color:var(--primary); display:flex; align-items:center; gap:5px; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+    .toast-bar { padding:10px 14px; border-radius:8px; font-size:0.78rem; display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+    .toast-bar.warning { background:rgba(234,179,8,0.1); color:var(--warning); border:1px solid rgba(234,179,8,0.2); }
+    .share-list label { transition:background 0.15s; }
+    .share-list label:hover { background:rgba(124,92,255,0.04); }
+    .share-list input[type="checkbox"] { accent-color:var(--primary); }
+    @media (max-width: 900px) {
+      .notas-wrapper { flex-direction:column; height:auto; }
+      .notas-sidebar { width:100%; max-height:300px; }
+    }
   </style>
 </head>
 <body>
@@ -2709,7 +2758,7 @@
       </div>
 
       <section id="dashboard-view" class="view active"></section>
-      <section id="agenda-view" class="view"></section>
+      <section id="notas-view" class="view"></section>
       <section id="tasks-view" class="view"></section>
       <section id="habitos-view" class="view"></section>
       <section id="historico-view" class="view"></section>
@@ -3315,7 +3364,10 @@
 
     const appState = {
       currentView: "dashboard",
-      agendaMode: "dia",
+      notas: [],
+      notaSelecionada: null,
+      notasSearch: "",
+      isRecordingNote: false,
       taskFilter: "todas",
       priorityFilter: "todas",
       clientFilter: "todos",
@@ -3462,6 +3514,11 @@
         renderAll();
       }, err => console.error("[Firestore] metas onSnapshot:", err));
 
+      const unsubNotas = db.collection(`users/${uid}/notas`).onSnapshot(snap => {
+        appState.notas = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        renderAll();
+      }, err => console.error("[Firestore] notas onSnapshot:", err));
+
       // Listener para equipas do utilizador
       let _teamTaskUnsub = null;
       let _teamFeedUnsub = null;
@@ -3491,7 +3548,7 @@
           renderTeam();
         }, err => console.error("[Firestore] teams onSnapshot:", err));
 
-      _firestoreUnsubs = [unsub1, unsub2, unsub3, unsub4, unsub5];
+      _firestoreUnsubs = [unsub1, unsub2, unsub3, unsub4, unsubNotas, unsub5];
 
       // Listener para decisões
       const unsub6 = db.collection("users").doc(uid).collection("decisoes")
@@ -3504,7 +3561,7 @@
       _firestoreUnsubs.push(unsub6);
     }
 
-    function fsSep(col, id, data) {
+    function fsSet(col, id, data) {
       if (!currentUser) return;
       db.collection(fsPath(col)).doc(String(id)).set(data)
         .catch(err => console.error(`[Firestore] set ${col}/${id}:`, err));
@@ -3525,7 +3582,7 @@
 
     const navItems = [
       { id: "dashboard", label: "Dashboard", icon: "layort-dashboard" },
-      { id: "agenda",    label: "Agenda",    icon: "calendar-range" },
+      { id: "notas",    label: "Notes",    icon: "book-marked" },
       { id: "tasks",   label: "Tasks",   icon: "check-square" },
       { id: "metas",     label: "Goals",     icon: "target" },
       { id: "equipa",    label: "Team",    icon: "users" },
@@ -3537,7 +3594,7 @@
 
     const viewIds = {
       dashboard: "dashboard-view",
-      agenda:    "agenda-view",
+      notas:    "notas-view",
       tasks:   "tasks-view",
       metas:     "metas-view",
       equipa:    "equipa-view",
@@ -3707,6 +3764,114 @@
           <button class="file-remove" onclick="window._pendingTaskFiles.splice(${i},1);renderFileChips('${context}');">×</button>
         </span>
       `).join('');
+    }
+
+    function formatDateHora(dateString) {
+      const d = new Date(dateString + "T12:00:00");
+      const parts = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" }).formatToParts(d);
+      const day = parts.find(p => p.type === "day").value;
+      const month = parts.find(p => p.type === "month").value;
+      const hour = parts.find(p => p.type === "hour").value;
+      const minute = parts.find(p => p.type === "minute").value;
+      return `${day} ${month}, ${hour}:${minute}`;
+    }
+
+    function getVisibleNotas() {
+      const notas = appState.notas || [];
+      const shared = notas.filter(n => n.sharedWith && n.sharedWith.includes(currentUser && currentUser.uid));
+      const minhas = notas.filter(n => n.userId === (currentUser && currentUser.uid) && (!n.sharedWith || n.sharedWith.length === 0));
+      const todas = [...minhas, ...shared];
+      const search = (appState.notasSearch || "").toLowerCase();
+      return search ? todas.filter(n => (n.titulo || "").toLowerCase().includes(search) || (n.conteudo || "").toLowerCase().includes(search) || (n.tags || []).some(t => t.toLowerCase().includes(search))) : todas;
+    }
+
+    async function criarNota() {
+      const id = generateId();
+      const agora = new Date().toISOString();
+      const nova = { id, titulo: "", conteudo: "", tags: [], userId: currentUser.uid, createdAt: agora, updatedAt: agora };
+      appState.notas.push(nova);
+      appState.notaSelecionada = nova;
+      fsSet("notas", id, nova);
+      renderNotas();
+      setTimeout(() => document.getElementById("nota-editor-titulo")?.focus(), 50);
+    }
+
+    async function guardarNota() {
+      if (!appState.notaSelecionada) return;
+      const n = appState.notaSelecionada;
+      const titulo = document.getElementById("nota-editor-titulo")?.value || "";
+      const conteudo = document.getElementById("nota-editor-conteudo")?.value || "";
+      const tagsRaw = document.getElementById("nota-editor-tags")?.value || "";
+      const tags = tagsRaw.split(",").map(t => t.trim()).filter(Boolean);
+      const updated = { ...n, titulo, conteudo, tags, updatedAt: new Date().toISOString() };
+      appState.notaSelecionada = updated;
+      const idx = appState.notas.findIndex(x => x.id === n.id);
+      if (idx !== -1) appState.notas[idx] = updated;
+      fsUpdate("notas", n.id, { titulo, conteudo, tags, updatedAt: updated.updatedAt });
+      renderNotas();
+    }
+
+    async function eliminarNota(id) {
+      appState.notas = appState.notas.filter(n => n.id !== id);
+      appState.notaSelecionada = null;
+      renderNotas();
+      fsDelete("notas", id);
+    }
+
+    async function abrirModalPartilha() {
+      const modal = document.getElementById("nota-share-modal");
+      if (modal) { modal.classList.remove("hidden"); lucide.createIcons(); }
+    }
+
+    async function executarPartilha() {
+      const checkboxes = document.querySelectorAll("[data-share-member]:checked");
+      if (!checkboxes.length) { showToast("Select at least one member."); return; }
+      const ids = Array.from(checkboxes).map(cb => cb.value);
+      if (!appState.notaSelecionada) return;
+      const n = appState.notaSelecionada;
+      const shared = [...new Set([...(n.sharedWith || []), ...ids])];
+      n.sharedWith = shared;
+      const idx = appState.notas.findIndex(x => x.id === n.id);
+      if (idx !== -1) appState.notas[idx].sharedWith = shared;
+      fsUpdate("notas", n.id, { sharedWith: shared });
+      document.getElementById("nota-share-modal")?.classList.add("hidden");
+      showToast("Note shared successfully.");
+      renderNotas();
+    }
+
+    let _recognition = null;
+    function toggleDitarVoz() {
+      if (!window.webkitSpeechRecognition && !window.SpeechRecognition) { showToast("Voice dictation not supported."); return; }
+      if (appState.isRecordingNote) { stopVoiceNote(); return; }
+      startVoiceNote();
+    }
+
+    function startVoiceNote() {
+      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      _recognition = new Recognition();
+      _recognition.lang = "en-US";
+      _recognition.continuous = true;
+      _recognition.interimResults = true;
+      appState.isRecordingNote = true;
+      let textoAtual = document.getElementById("nota-editor-conteudo")?.value || "";
+
+      _recognition.onresult = (e) => {
+        const transcript = Array.from(e.results).map(r => r[0].transcript).join("");
+        const area = document.getElementById("nota-editor-conteudo");
+        if (area) area.value = textoAtual + " " + transcript;
+      };
+
+      _recognition.onend = () => { appState.isRecordingNote = false; renderNotas(); guardarNota(); };
+      _recognition.onerror = () => { appState.isRecordingNote = false; renderNotas(); showToast("Voice recognition error."); };
+
+      _recognition.start();
+      renderNotas();
+    }
+
+    function stopVoiceNote() {
+      if (_recognition) _recognition.stop();
+      appState.isRecordingNote = false;
+      renderNotas();
     }
 
     function formatDateLong(dateString) {
@@ -4117,193 +4282,110 @@
       if (todayLabel) todayLabel.textContent = formatDateLong(appState.today);
     }
 
-    function renderAgenda() {
-      const agenda = document.getElementById("agenda-view");
-      const todayEvents = getTodayEvents();
-      // Ler tasks de hoje directamente dand theppState.tasks — sem cópias separadas
-      const todayTasks = getTodayTasks();
+    async function renderNotas() {
+      const notasView = document.getElementById("notas-view");
+      if (!notasView) return;
+      const notas = appState.notas || [];
+      const equipaNomes = (appState.equipa || []).filter(m => m.userId !== (currentUser && currentUser.uid)).map(m => ({ id: m.userId, nome: m.nome, email: m.email }));
+      const sharedWithMe = notas.filter(n => n.sharedWith && n.sharedWith.includes(currentUser && currentUser.uid)).sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+      const minhas = notas.filter(n => n.userId === (currentUser && currentUser.uid) && (!n.sharedWith || n.sharedWith.length === 0)).sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+      const todas = [...minhas, ...sharedWithMe];
+      const searchTerm = (appState.notasSearch || "").toLowerCase();
+      const filtered = searchTerm ? todas.filter(n => (n.titulo || "").toLowerCase().includes(searchTerm) || (n.conteudo || "").toLowerCase().includes(searchTerm) || (n.tags || []).some(t => t.toLowerCase().includes(searchTerm))) : todas;
+      const msg = window.webkitSpeechRecognition || window.SpeechRecognition ? null : { tipo: "warning", txt: "Your browser doesn't support voice dictation. Use Chrome, Edge or Safari." };
 
-      // Combinar eventos e tasks do dia, ordenados por hora
-      const _agendaOverdueIds = new Sep(getOverdueTasks().map(t => t.id));
-      const combinedToday = [
-        ...todayEvents.map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria, _overdue: false })),
-        ...todayTasks.map(t => ({
-          _type: "task",
-          id: t.id,
-          horario: t.prazo.split("T")[1] ? t.prazo.split("T")[1].slice(0, 5) : "00:00",
-          titulo: t.titulo,
-          descricao: t.descricao,
-          categoria: t.categoria,
-          status: t.status,
-          prioridade: t.prioridade,
-          _overdue: _agendaOverdueIds.has(t.id)
-        }))
-      ].sort((a, b) => {
-        if (a._overdue && !b._overdue) return -1;
-        if (!a._overdue && b._overdue) return 1;
-        return a.horario.localeCompare(b.horario);
-      });
-
-      const weekDates = ["2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15"];
-      // Para a vista semanal, combinar eventos e tasks por data — lendo sempre dand theppState.tasks
-      const weeklyGrorps = weekDates.map(date => {
-        const evts = appState.eventos.filter(e => e.data === date).map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria }));
-        const tsks = appState.tasks.filter(t => t.prazo.startsWith(date)).map(t => ({
-          _type: "task",
-          horario: t.prazo.split("T")[1] ? t.prazo.split("T")[1].slice(0, 5) : "00:00",
-          titulo: t.titulo,
-          categoria: t.categoria,
-          status: t.status,
-          prioridade: t.prioridade
-        }));
-        const items = [...evts, ...tsks].sort((a, b) => a.horario.localeCompare(b.horario));
-        return { date, items };
-      });
-
-      // Highlights dinâmicos baseados no estado actual
-      const _todayOpenTasks = getTodayTasks().filter(t => t.status !== "concluida");
-      const _overdueNow = getOverdueTasks();
-      const _pendingHabitsNow = getPendingHabits();
-      const _highPriToday = _todayOpenTasks.filter(t => t.prioridade === "alta");
-      const destaquesCards = [];
-      if (todayEvents.length === 0 && _todayOpenTasks.length === 0) {
-        destaquesCards.push({ h: "Clean agenda", p: "No appointments or tasks today. Great window for deep work or recovery." });
-      } else {
-        if (_highPriToday.length) {
-          destaquesCards.push({ h: "High prioridade em aberto", p: `${_highPriToday.length} tarefa${_highPriToday.length > 1 ? "s" : ""} dand thelta prioridade hoje: ${_highPriToday.slice(0, 2).map(t => '"' + t.titulo + '"').join(", ")}.` });
-        }
-        if (_overdueNow.length) {
-          destaquesCards.push({ h: "Tasks atrasadas", p: `${_overdueNow.length} tarefa${_overdueNow.length > 1 ? "s" : ""} atrasada${_overdueNow.length > 1 ? "s" : ""}. Fecha as pendências críticas antes de iniciar novas tasks.` });
-        } else if (todayEvents.length >= 3) {
-          destaquesCards.push({ h: "Dia cheio detectado", p: `${todayEvents.length} appointments today. Protege blocos de foco entre reuniões para manter a produtividade.` });
-        }
-        if (_pendingHabitsNow.length >= 2) {
-          destaquesCards.push({ h: "Kairo AI Recommendation", p: `${_pendingHabitsNow.length} hábito${_pendingHabitsNow.length > 1 ? "s" : ""} pendente${_pendingHabitsNow.length > 1 ? "s" : ""} today. Aproveita as pausas entrand theppointments para os manter.` });
-        }
-        if (!destaquesCards.length) {
-          destaquesCards.push({ h: "Ritmo equilibrado", p: "O teu dia está bem distribuído. Mantém os blocos de foco e preserva a rotina de habits." });
-        }
-      }
-
-      agenda.innerHTML = `
-        <div class="panel">
-          <div class="panel-header">
-            <div>
-              <h3>Agenda</h3>
-              <p>Daily and weekly calendar with real execution blocks</p>
+      notasView.innerHTML = `
+        <div class="notas-wrapper">
+          <div class="notas-sidebar">
+            <div class="notas-header">
+              <h3>My notes</h3>
+              <p>${filtered.length} note${filtered.length !== 1 ? "s" : ""}</p>
             </div>
-            <div class="tab-switch">
-              <button class="switch-btn ${appState.agendaMode === "dia" ? "active" : ""}" data-agenda-mode="dia">Today</button>
-              <button class="switch-btn ${appState.agendaMode === "semana" ? "active" : ""}" data-agenda-mode="semana">Week</button>
+            <div class="notas-search">
+              <i data-lucide="search"></i>
+              <input id="notas-search-input" type="text" placeholder="Search notes..." value="${appState.notasSearch || ""}">
+            </div>
+            <div class="notas-nova-btn" id="nota-nova-btn">
+              <i data-lucide="plus"></i> New note
+            </div>
+            <div class="notas-lista" id="notas-lista">
+              ${filtered.length ? filtered.map((n, idx) => `
+                <div class="nota-item ${(appState.notaSelecionada && appState.notaSelecionada.id === n.id) ? "active" : ""}" data-nota-index="${idx}">
+                  <div class="nota-item-titulo">${n.titulo || "Untitled note"}</div>
+                  <div class="nota-item-meta">${formatDateHora(n.updatedAt || n.createdAt)}${(n.tags || []).length ? ' &middot; ' + (n.tags || []).slice(0, 2).map(t => `<span class="nota-tag-chip">${t}</span>`).join("") : ""}</div>
+                </div>
+              `).join("") : `<div class="empty-state">No notes yet. Create your first note above.</div>`}
             </div>
           </div>
-          <div class="agenda-grid">
-            <div class="panel">
-              <div class="section-heading">
-                <div>
-                  <h3>${appState.agendaMode === "dia" ? "Day Agenda" : "Visão semanal"}</h3>
-                  <p>${appState.agendaMode === "dia" ? "Appointments and tasks for today" : "Distribuição dos eventos e tasks da semana"}</p>
-                </div>
-              </div>
-              <div class="timeline-stack">
-                ${appState.agendaMode === "dia"
-                  ? (combinedToday.length
-                    ? combinedToday.map(item => item._type === "event" ? `
-                        <div class="timeline-block event-card">
-                          <div class="timeline-inner">
-                            <div class="event-top">
-                              <div>
-                                <h4>${item.titulo}</h4>
-                                <p>${item.categoria}</p>
-                              </div>
-                              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                                <span class="event-time">${item.horario}</span>
-                                <button class="task-action-btn danger" data-delete-event="${item.id}" title="Apagar evento"><i data-lucide="trash-2"></i></button>
-                              </div>
-                            </div>
-                            <div class="event-meta">${categoryBadge(item.categoria)}</div>
-                          </div>
-                        </div>` : `
-                        <div class="timeline-block event-card ${item.status === "concluida" ? "done" : ""}">
-                          <div class="timeline-inner">
-                            <div class="event-top">
-                              <div>
-                                <h4>${item.titulo}</h4>
-                                <p>${item.descricao || item.categoria}</p>
-                              </div>
-                              <span class="event-time">${item.horario}</span>
-                            </div>
-                            <div class="event-meta">
-                              <span class="badge">Task</span>
-                              <span class="badge priority-${item.prioridade}">${formatPriority(item.prioridade)}</span>
-                              <span class="badge status-${item.status}">${formatStatus(item.status)}</span>
-                            </div>
-                          </div>
-                        </div>`
-                    ).join("")
-                    : `<div class="empty-state">Sem appointments or tasks today.</div>`)
-                  : weeklyGrorps.map(grorp => `
-                    <div class="timeline-block planner-card">
-                      <div class="timeline-inner">
-                        <div class="planner-top">
-                          <div>
-                            <h4>${formatDateLong(grorp.date)}</h4>
-                            <p>${grorp.items.length} item${grorp.items.length !== 1 ? "s" : ""}</p>
-                          </div>
-                          <span class="badge">${grorp.date === appState.today ? "Today" : "Week"}</span>
-                        </div>
-                        <div class="list-stack">
-                          ${grorp.items.length ? grorp.items.map(item => `
-                            <div class="mini-item">
-                              <div>
-                                <h4>${item.horario} · ${item.titulo}</h4>
-                                <p>${item.categoria}${item._type === "task" ? " · Task" : ""}</p>
-                              </div>
-                              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                                ${item._type === "task"
-                                  ? `<span class="badge priority-${item.prioridade}">${formatPriority(item.prioridade)}</span>`
-                                  : categoryBadge(item.categoria)}
-                                ${item._type === "event"
-                                  ? `<button class="task-action-btn danger" data-delete-event="${item.id}" title="Apagar evento"><i data-lucide="trash-2"></i></button>`
-                                  : ""}
-                              </div>
-                            </div>
-                          `).join("") : `<div class="empty-state">Sem eventos or tasks planeados.</div>`}
-                        </div>
-                      </div>
-                    </div>
-                  `).join("")}
-              </div>
-            </div>
-
-            <div class="panel">
-              <div class="section-heading">
-                <div>
-                  <h3>Highlights</h3>
-                  <p>Quick read for yorr execution</p>
-                </div>
-              </div>
-              <div class="list-stack">
-                ${destaquesCards.map(c => `
-                  <div class="suggestion-card">
-                    <h4>${c.h}</h4>
-                    <p>${c.p}</p>
+          <div class="notas-editor" id="notas-editor">
+            ${appState.notaSelecionada ? (() => {
+              const n = appState.notaSelecionada;
+              return `
+                <div class="notas-editor-barra">
+                  <input class="notas-editor-titulo" id="nota-editor-titulo" value="${n.titulo || ""}" placeholder="Note title">
+                  <div class="notas-editor-acoes">
+                    ${n.userId === (currentUser && currentUser.uid) ? `
+                    <button class="notas-editor-btn ${appState.isRecordingNote ? "green" : ""}" id="nota-ditar-btn" title="Dictate">
+                      <i data-lucide="${appState.isRecordingNote ? 'mic-off' : 'mic'}"></i> ${appState.isRecordingNote ? "Listening..." : "Dictate"}
+                    </button>
+                    <button class="notas-editor-btn secondary" id="nota-partilhar-btn" title="Share with team">
+                      <i data-lucide="share-2"></i> Share
+                    </button>
+                    <button class="notas-editor-btn danger" id="nota-eliminar-btn" title="Delete note">
+                      <i data-lucide="trash-2"></i>
+                    </button>` : `<span class="nota-shared-badge"><i data-lucide="users"></i> Shared with you</span>`}
                   </div>
-                `).join("")}
-              </div>
-
-              <div class="mini-cal" id="mini-cal-container">
-                <div class="mini-cal-header">
-                  <button class="mini-cal-nav" id="cal-prev"><i data-lucide="chevron-left"></i></button>
-                  <span id="cal-month-label"></span>
-                  <button class="mini-cal-nav" id="cal-next"><i data-lucide="chevron-right"></i></button>
                 </div>
-                <div class="mini-cal-grid" id="mini-cal-grid"></div>
+                <div class="notas-tags-row">
+                  <input class="notas-tags-input" id="nota-editor-tags" placeholder="Tags (comma separated)" value="${(n.tags || []).join(", ")}">
+                </div>
+                <textarea class="notas-editor-conteudo" id="nota-editor-conteudo" placeholder="Write your note here...">${n.conteudo || ""}</textarea>
+                <div class="notas-editor-pes">${n.audioTranscrito ? `<span class="nota-pill"><i data-lucide="mic"></i> Voice transcribed &middot; ${formatDateHora(n.updatedAt || n.createdAt)}</span>` : `<span class="nota-pill">${formatDateHora(n.updatedAt || n.createdAt)}</span>`}</div>
+              `;
+            })() : `
+              <div class="notas-editor-vazio">
+                <div style="text-align:center;opacity:0.4;">
+                  <i data-lucide="book-marked" style="width:56px;height:56px;margin-bottom:14px;"></i>
+                  <h4>Select a note on the left or create a new one</h4>
+                  <p>Your notes are synced in real-time</p>
+                </div>
               </div>
-            </div>
+            `}
           </div>
         </div>
+
+        ${msg ? `<div class="toast-bar ${msg.tipo}">${msg.txt}</div>` : ""}
       `;
+
+      if (!document.getElementById("nota-share-modal")) {
+        const modal = document.createElement("div");
+        modal.id = "nota-share-modal";
+        modal.className = "modal-overlay hidden";
+        modal.innerHTML = `
+          <div class="modal-card" style="max-width:420px;">
+            <div class="modal-head">
+              <h3>Share note</h3>
+              <button class="close-modal" data-close-modal><i data-lucide="x"></i></button>
+            </div>
+            <div style="padding:16px;">
+              <p style="margin-bottom:12px;font-size:0.82rem;color:var(--muted);">Select the team members you want to share this note with:</p>
+              <div class="share-list" id="share-members-list" style="max-height:240px;overflow-y:auto;">
+                ${equipaNomes.length ? equipaNomes.map(m => `
+                  <label style="display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;border-bottom:1px solid rgba(124,92,255,0.08);">
+                    <input type="checkbox" value="${m.id}" data-share-member>
+                    <span style="font-size:0.8rem;">${m.nome || m.email}</span>
+                  </label>
+                `).join("") : `<div class="empty-state" style="padding:20px 0;">No team members.</div>`}
+              </div>
+              <div style="display:flex;justify_content:flex-end;gap:10px;margin-top:16px;">
+                <button class="ghost-btn" data-close-modal>Cancel</button>
+                <button class="primary-btn" id="btn-confirmar-share">Share</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
     }
 
     function filteredTasks() {
@@ -4952,7 +5034,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       renderNav();
       await renderDashboard();
-      renderAgenda();
+      renderNotas();
       renderTasks();
       renderHabitos();
       renderHistorico();
@@ -5310,15 +5392,62 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     }
 
     function bindEvents() {
-      document.querySelectorAll("[data-view]").forEach(button => {
-        button.onclick = () => switchView(button.dataset.view);
+      // Notas events
+      const notaNovaBtn = document.getElementById("nota-nova-btn");
+      if (notaNovaBtn) notaNovaBtn.addEventListener("click", criarNota);
+
+      const notasLista = document.getElementById("notas-lista");
+      if (notasLista) {
+        notasLista.addEventListener("click", e => {
+          const item = e.target.closest(".nota-item");
+          if (!item) return;
+          const idx = Number(item.dataset.notaIndex);
+          const visible = getVisibleNotas();
+          appState.notaSelecionada = visible[idx];
+          renderNotas();
+          lucide.createIcons();
+        });
+      }
+
+      const notaEditorTitulo = document.getElementById("nota-editor-titulo");
+      const notaEditorConteudo = document.getElementById("nota-editor-conteudo");
+      const notaEditorTags = document.getElementById("nota-editor-tags");
+      [notaEditorTitulo, notaEditorConteudo, notaEditorTags].forEach(el => {
+        if (el) el.addEventListener("input", debounce(() => guardarNota(), 600));
+      });
+      if (notaEditorConteudo) {
+        notaEditorConteudo.addEventListener("keydown", e => {
+          if (e.key === "Tab") { e.preventDefault(); document.execCommand("insertText", false, "\t"); }
+        });
+      }
+
+      const ditarBtn = document.getElementById("nota-ditar-btn");
+      if (ditarBtn) ditarBtn.addEventListener("click", toggleDitarVoz);
+
+      const partilharBtn = document.getElementById("nota-partilhar-btn");
+      if (partilharBtn) partilharBtn.addEventListener("click", abrirModalPartilha);
+
+      const eliminarNotaBtn = document.getElementById("nota-eliminar-btn");
+      if (eliminarNotaBtn) eliminarNotaBtn.addEventListener("click", () => {
+        const n = appState.notaSelecionada;
+        if (!n) return;
+        if (confirm("Delete this note?")) eliminarNota(n.id);
       });
 
-      document.querySelectorAll("[data-agenda-mode]").forEach(button => {
-        button.onclick = () => {
-          appState.agendaMode = button.dataset.agendaMode;
-          renderAll();
-        };
+      const confirmarShare = document.getElementById("btn-confirmar-share");
+      if (confirmarShare) confirmarShare.addEventListener("click", executarPartilha);
+
+      const notasSearchInput = document.getElementById("notas-search-input");
+      if (notasSearchInput) {
+        notasSearchInput.addEventListener("input", e => {
+          appState.notasSearch = e.target.value;
+          renderNotas();
+          lucide.createIcons();
+        });
+      }
+
+      document.querySelectorAll("[data-view]").forEach(button => {
+        button.onclick = () => switchView(button.dataset.view);
       });
 
       document.querySelectorAll("[data-task-filter]").forEach(button => {
