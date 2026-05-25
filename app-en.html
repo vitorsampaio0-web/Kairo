@@ -3771,7 +3771,9 @@
     }
 
     function formatDateHora(dateString) {
+      if (!dateString || dateString === "undefined") return "—";
       const d = new Date(dateString + "T12:00:00");
+      if (isNaN(d.getTime())) return "—";
       const parts = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" }).formatToParts(d);
       const day = parts.find(p => p.type === "day").value;
       const month = parts.find(p => p.type === "month").value;
