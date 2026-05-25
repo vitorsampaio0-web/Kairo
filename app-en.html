@@ -3459,7 +3459,6 @@
         }
 
         subscribeRealtime(uid);
-        limparNotasCorrompidas();
       } catch (err) {
         console.error("[Firestore] Error ao carregar dados:", err);
         // Offline or erro: usar dados do MOCK_DATA como fallback
