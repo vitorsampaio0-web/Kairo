@@ -3521,14 +3521,13 @@
       const unsubNotas = db.collection(`users/${uid}/notas`).onSnapshot(snap => {
         appState.notas = snap.docs.map(d => {
           const data = d.data();
-          return {
-            ...data,
-            id: d.id,
-            createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
-            updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt
-          };
-        }).sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
-        renderAll();
+          let createdAt = data.createdAt;
+          let updatedAt = data.updatedAt;
+          if (createdAt && typeof createdAt.toDate === 'function') createdAt = createdAt.toDate().toISOString();
+          if (updatedAt && typeof updatedAt.toDate === 'function') updatedAt = updatedAt.toDate().toISOString();
+          return { ...data, id: d.id, createdAt, updatedAt };
+        }).filter(n => n.createdAt && n.updatedAt && typeof n.createdAt === 'string' && typeof n.updatedAt === 'string').sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        renderNotas();
       }, err => console.error("[Firestore] notas onSnapshot:", err));
 
       // Listener para equipas do utilizador

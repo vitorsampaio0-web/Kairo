@@ -3879,20 +3879,12 @@
       if (!currentUser) return;
       const snap = await db.collection(`users/${currentUser.uid}/notas`).get();
       const batch = db.batch();
-      let count = 0;
       snap.docs.forEach(d => {
-        const data = d.data();
-        const ca = data.createdAt;
-        const ua = data.updatedAt;
-        const isCorrompido = !ca || !ua || (typeof ca !== 'string') || (typeof ua !== 'string');
-        if (isCorrompido) {
-          batch.delete(db.doc(`users/${currentUser.uid}/notas/${d.id}`));
-          count++;
-        }
+        batch.delete(db.doc(`users/${currentUser.uid}/notas/${d.id}`));
       });
-      if (count > 0) {
+      if (snap.docs.length > 0) {
         await batch.commit();
-        console.log(`[Notas] ${count} nota(s) corrompida(s) eliminada(s).`);
+        console.log(`[Notas] ${snap.docs.length} nota(s) eliminada(s).`);
       }
     }
 
