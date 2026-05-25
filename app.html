@@ -3622,7 +3622,7 @@
       }, err => console.error("[Firestore] metas onSnapshot:", err));
 
       const unsubNotas = db.collection(`users/${uid}/notas`).onSnapshot(snap => {
-        appState.notas = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        appState.notas = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
         renderAll();
       }, err => console.error("[Firestore] notas onSnapshot:", err));
 
@@ -3655,7 +3655,7 @@
           renderTeam();
         }, err => console.error("[Firestore] teams onSnapshot:", err));
 
-      _firestoreUnsubs = [unsub1, unsub2, unsub3, unsub4, unsub5];
+      _firestoreUnsubs = [unsub1, unsub2, unsub3, unsub4, unsubNotas, unsub5];
 
       // Listener para decisões
       const unsub6 = db.collection("users").doc(uid).collection("decisoes")
