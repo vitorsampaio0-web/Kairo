@@ -4404,13 +4404,13 @@
             </div>
             <button id="quick-task-submit" class="primary-btn">Add</button>
           </div>
-          <div class="file-attach-row">
+          <div class="file-attach-row" style="display:flex !important;visibility:visible !important;opacity:1 !important;">
             <label class="file-attach-btn" for="quick-task-file" id="quick-attach-label">
               <i data-lucide="paperclip"></i> Attach file
             </label>
             <input type="file" id="quick-task-file" accept=".pdf,.xls,.xlsx,.jpg,.jpeg,.png" style="display:none;" onchange="handleTaskFileSelect(this,'quick')">
             <span id="quick-file-chips" class="file-chips-wrap"></span>
-            <span class="file-attach-hint">Max: 10 MB · ${isPro() ? 'Unlimited' : '1 attachment'}</span>
+            <span class="file-attach-hint">Max: 10 MB · 1 attachment</span>
           </div>
 
           <div class="row-between" style="margin-bottom: 14px;">
