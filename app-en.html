@@ -3392,6 +3392,10 @@
       return `users/${currentUser.uid}/${col}`;
     }
 
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
     function showLoginScreen() {
       document.getElementById("login-screen").classList.remove("hidden");
       document.querySelector(".app-shell").style.display = "none";
@@ -5412,9 +5416,11 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const notaEditorTitulo = document.getElementById("nota-editor-titulo");
       const notaEditorConteudo = document.getElementById("nota-editor-conteudo");
       const notaEditorTags = document.getElementById("nota-editor-tags");
-      [notaEditorTitulo, notaEditorConteudo, notaEditorTags].forEach(el => {
-        if (el) el.addEventListener("input", debounce(() => guardarNota(), 600));
-      });
+      let saveTimer = null;
+      const debouncedSave = () => clearTimeout(saveTimer) & (saveTimer = setTimeout(guardarNota, 600));
+      if (notaEditorTitulo) notaEditorTitulo.addEventListener("input", debouncedSave);
+      if (notaEditorConteudo) notaEditorConteudo.addEventListener("input", debouncedSave);
+      if (notaEditorTags) notaEditorTags.addEventListener("input", debouncedSave);
       if (notaEditorConteudo) {
         notaEditorConteudo.addEventListener("keydown", e => {
           if (e.key === "Tab") { e.preventDefault(); document.execCommand("insertText", false, "\t"); }

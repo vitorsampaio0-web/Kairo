@@ -3495,6 +3495,10 @@
       return `users/${currentUser.uid}/${col}`;
     }
 
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
     function showLoginScreen() {
       document.getElementById("login-screen").classList.remove("hidden");
       document.querySelector(".app-shell").style.display = "none";
