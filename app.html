@@ -4151,7 +4151,7 @@
                 <strong>${getCompletedHabitsToday().length}/${appState.habitos.length}</strong>
                 <span class="label">Clica para ver →</span>
               </div>
-              <div class="metric-card" style="cursor:pointer;" onclick="appState.taskFilter='todas'; switchView('tarefas');">
+              <div class="metric-card" style="cursor:pointer;" onclick="appState.taskFilter='hoje'; switchView('tarefas');">
                 <small>Tarefas dia</small>
                 <strong>${getTodayTasks().length}</strong>
                 <span class="label">Clica para ver →</span>
@@ -4422,6 +4422,7 @@
       const filtered = appState.tarefas.filter(task => {
         const taskMatches = appState.taskFilter === "todas" ? true
           : appState.taskFilter === "atrasadas" ? overdueSet.has(task.id)
+          : appState.taskFilter === "hoje" ? task.prazo.startsWith(appState.today) && task.status !== "concluida"
           : task.status === appState.taskFilter;
         const priorityMatches = appState.priorityFilter === "todas" || task.prioridade === appState.priorityFilter;
         const clientMatches = appState.clientFilter === "todos" ? true
@@ -4531,6 +4532,7 @@
           <div class="row-between" style="margin-bottom: 14px;">
             <div class="filters">
               <button class="chip ${appState.taskFilter === "todas" ? "active" : ""}" data-task-filter="todas">Todas</button>
+              <button class="chip ${appState.taskFilter === "hoje" ? "active" : ""}" data-task-filter="hoje">Hoje</button>
               <button class="chip ${appState.taskFilter === "pendente" ? "active" : ""}" data-task-filter="pendente">Pendentes</button>
               <button class="chip ${appState.taskFilter === "concluida" ? "active" : ""}" data-task-filter="concluida">Concluídas</button>
               <button class="chip ${appState.taskFilter === "atrasadas" ? "active" : ""}" data-task-filter="atrasadas" style="color:var(--danger);border-color:${appState.taskFilter === "atrasadas" ? "var(--danger)" : ""};">Atrasadas</button>
@@ -5048,6 +5050,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     }
 
     async function renderAll() {
+      // Atualizar data de hoje
+      appState.today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Lisbon' });
+      
       window._pendingTaskFiles = [];
 
       // Carregar quota mensal (free users)
