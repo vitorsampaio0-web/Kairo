@@ -2745,6 +2745,8 @@
     .notas-editor-acoes { display:flex; gap:8px; }
     .notas-editor-btn { display:flex; align-items:center; gap:6px; padding:7px 14px; background:rgba(124,92,255,0.08); border-radius:8px; color:var(--primary); font-size:0.78rem; font-weight:500; cursor:pointer; border:none; transition:all 0.15s; }
     .notas-editor-btn:hover { background:rgba(124,92,255,0.15); }
+    .notas-editor-btn.primary { background:var(--primary); color:white; }
+    .notas-editor-btn.primary:hover { opacity:0.85; }
     .notas-editor-btn.green { background:rgba(34,197,94,0.12); color:var(--success); animation:pulse 1.5s infinite; }
     .notas-editor-btn.danger { color:var(--danger); background:rgba(255,107,138,0.08); }
     .notas-editor-btn.danger:hover { background:rgba(255,107,138,0.15); }
@@ -4468,6 +4470,9 @@
                   <input class="notas-editor-titulo" id="nota-editor-titulo" value="${n.titulo || ""}" placeholder="Título da nota">
                   <div class="notas-editor-acoes">
                     ${n.userId === (currentUser && currentUser.uid) ? `
+                    <button class="notas-editor-btn primary" id="nota-guardar-btn" title="Guardar nota">
+                      <i data-lucide="save"></i> Guardar
+                    </button>
                     <button class="notas-editor-btn ${appState.isRecordingNote ? "green" : ""}" id="nota-ditar-btn" title="Ditar por voz">
                       <i data-lucide="${appState.isRecordingNote ? 'mic-off' : 'mic'}"></i> ${appState.isRecordingNote ? "A ouvir..." : "Ditar"}
                     </button>
@@ -4475,7 +4480,7 @@
                       <i data-lucide="share-2"></i> Partilhar
                     </button>
                     <button class="notas-editor-btn danger" id="nota-eliminar-btn" title="Eliminar nota">
-                      <i data-lucide="trash-2"></i>
+                      <i data-lucide="trash-2"></i> Eliminar
                     </button>` : `<span class="nota-shared-badge"><i data-lucide="users"></i> Partilhada contigo</span>`}
                   </div>
                 </div>
@@ -5567,6 +5572,12 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       const ditarBtn = document.getElementById("nota-ditar-btn");
       if (ditarBtn) ditarBtn.addEventListener("click", toggleDitarVoz);
+
+      const guardarBtn = document.getElementById("nota-guardar-btn");
+      if (guardarBtn) guardarBtn.addEventListener("click", () => {
+        guardarNota();
+        showToast("Nota guardada com sucesso.");
+      });
 
       const partilharBtn = document.getElementById("nota-partilhar-btn");
       if (partilharBtn) partilharBtn.addEventListener("click", abrirModalPartilha);
