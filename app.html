@@ -3622,7 +3622,15 @@
       }, err => console.error("[Firestore] metas onSnapshot:", err));
 
       const unsubNotas = db.collection(`users/${uid}/notas`).onSnapshot(snap => {
-        appState.notas = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
+        appState.notas = snap.docs.map(d => {
+          const data = d.data();
+          return {
+            ...data,
+            id: d.id,
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
+            updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt
+          };
+        }).sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
         renderAll();
       }, err => console.error("[Firestore] notas onSnapshot:", err));
 
