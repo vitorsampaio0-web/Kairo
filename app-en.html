@@ -3526,7 +3526,7 @@
           if (createdAt && typeof createdAt.toDate === 'function') createdAt = createdAt.toDate().toISOString();
           if (updatedAt && typeof updatedAt.toDate === 'function') updatedAt = updatedAt.toDate().toISOString();
           return { ...data, id: d.id, createdAt, updatedAt };
-        }).filter(n => n.createdAt && n.updatedAt && typeof n.createdAt === 'string' && typeof n.updatedAt === 'string').sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        }).filter(n => n.createdAt && n.updatedAt && typeof n.createdAt === 'string' && typeof n.updatedAt === 'string' && (n.titulo || n.conteudo)).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         renderNotas();
       }, err => console.error("[Firestore] notas onSnapshot:", err));
 
