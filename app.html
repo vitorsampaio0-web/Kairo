@@ -4444,6 +4444,7 @@
             <input class="notas-editor-titulo" id="nota-editor-titulo" value="${escapeHtml(sel.titulo)}" placeholder="Título">
             <div class="notas-editor-acoes">
               <button class="notas-editor-btn primary" id="nota-guardar-btn"><i data-lucide="save"></i> Guardar</button>
+              <button class="notas-editor-btn ${appState.isRecordingNote ? 'green' : ''}" id="nota-ditar-btn"><i data-lucide="${appState.isRecordingNote ? 'mic-off' : 'mic'}"></i> ${appState.isRecordingNote ? 'A ouvir...' : 'Ditar'}</button>
               <button class="notas-editor-btn danger" id="nota-eliminar-btn"><i data-lucide="trash-2"></i> Eliminar</button>
             </div>
           </div>
@@ -4463,6 +4464,7 @@
       // Eventos
       document.getElementById('nota-nova-btn')?.addEventListener('click', criarNota);
       document.getElementById('nota-guardar-btn')?.addEventListener('click', () => { guardarNota(); renderNotas(); showToast('Guardado.'); });
+      document.getElementById('nota-ditar-btn')?.addEventListener('click', toggleDitarVoz);
       document.getElementById('nota-eliminar-btn')?.addEventListener('click', () => { eliminarNota(appState.notaSelecionada?.id); });
       document.getElementById('notas-search-input')?.addEventListener('input', e => { appState.notasSearch = e.target.value; renderNotas(); });
       document.querySelectorAll('.nota-item').forEach(el => {
