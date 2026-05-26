@@ -4463,7 +4463,7 @@
       // Eventos
       document.getElementById('nota-nova-btn')?.addEventListener('click', criarNota);
       document.getElementById('nota-guardar-btn')?.addEventListener('click', () => { guardarNota(); renderNotas(); showToast('Guardado.'); });
-      document.getElementById('nota-eliminar-btn')?.addEventListener('click', () => { eliminarNota(); });
+      document.getElementById('nota-eliminar-btn')?.addEventListener('click', () => { eliminarNota(appState.notaSelecionada?.id); });
       document.getElementById('notas-search-input')?.addEventListener('input', e => { appState.notasSearch = e.target.value; renderNotas(); });
       document.querySelectorAll('.nota-item').forEach(el => {
         el.addEventListener('click', () => { appState.notaSelecionada = filtered[el.dataset.idx]; renderNotas(); });
