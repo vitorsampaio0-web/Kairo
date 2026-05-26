@@ -3624,27 +3624,14 @@
       }, err => console.error("[Firestore] metas onSnapshot:", err));
 
       const unsubNotas = db.collection(`users/${uid}/notas`).onSnapshot(snap => {
-        const firestoreNotas = snap.docs.map(d => {
+        appState.notas = snap.docs.map(d => {
           const data = d.data();
           let createdAt = data.createdAt;
           let updatedAt = data.updatedAt;
           if (createdAt && typeof createdAt.toDate === 'function') createdAt = createdAt.toDate().toISOString();
           if (updatedAt && typeof updatedAt.toDate === 'function') updatedAt = updatedAt.toDate().toISOString();
           return { ...data, id: d.id, createdAt, updatedAt };
-        }).filter(n => n.createdAt && n.updatedAt && typeof n.createdAt === 'string' && typeof n.updatedAt === 'string');
-        
-        // Merge: manter notas locais mais recentes que as do Firestore
-        const merged = [...firestoreNotas];
-        appState.notas.forEach(local => {
-          const idx = merged.findIndex(f => f.id === local.id);
-          if (idx === -1) {
-            merged.push(local);
-          } else if (new Date(local.updatedAt) > new Date(merged[idx].updatedAt)) {
-            merged[idx] = local;
-          }
-        });
-        
-        appState.notas = merged.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        }).filter(n => n.createdAt && n.updatedAt).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         renderNotas();
       }, err => console.error("[Firestore] notas onSnapshot:", err));
 
