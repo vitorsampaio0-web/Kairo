@@ -3133,6 +3133,10 @@
           <option value="Mon-Fri">Mon-Fri</option>
         </select>
       </div>
+      <div class="modal-field">
+        <label>Reminder (time)</label>
+        <input id="edit-habit-reminder" class="task-input" type="time" />
+      </div>
       <div class="modal-actions">
         <button class="secondary-btn" onclick="closeEditHabitModal()">Cancel</button>
         <button class="primary-btn" onclick="saveEditHabit()">Save</button>
@@ -3399,6 +3403,7 @@
     function showLoginScreen() {
       document.getElementById("login-screen").classList.remove("hidden");
       document.querySelector(".app-shell").style.display = "none";
+      pararLembretesHabitos();
     }
 
     function showApp(user) {
@@ -3899,6 +3904,36 @@
       if (_recognition) _recognition.stop();
       appState.isRecordingNote = false;
       renderNotas();
+    }
+
+    /* ---------- In-app habit reminders ---------- */
+    let _habitoReminderInterval = null;
+    const _habitoRemindersShown = new Set();
+
+    function iniciarLembretesHabitos() {
+      if (_habitoReminderInterval) clearInterval(_habitoReminderInterval);
+      _habitoReminderInterval = setInterval(verificarLembretesHabitos, 30000);
+      verificarLembretesHabitos();
+    }
+
+    function pararLembretesHabitos() {
+      if (_habitoReminderInterval) { clearInterval(_habitoReminderInterval); _habitoReminderInterval = null; }
+      _habitoRemindersShown.clear();
+    }
+
+    function verificarLembretesHabitos() {
+      const agora = new Date();
+      const horaAtual = String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2, '0');
+      const hojeKey = agora.toISOString().split('T')[0];
+
+      appState.habitos.forEach(habit => {
+        if (!habit.lembrete || habit.concluidoToday) return;
+        const key = habit.id + '-' + hojeKey + '-' + habit.lembrete;
+        if (habit.lembrete === horaAtual && !_habitoRemindersShown.has(key)) {
+          _habitoRemindersShown.add(key);
+          showToast(`🔔 Reminder: ${habit.nome} at ${habit.lembrete}`, 6000);
+        }
+      });
     }
 
     function formatDateLong(dateString) {
@@ -4625,7 +4660,7 @@
                   <div class="habit-top">
                     <div>
                       <h4>${habit.nome}</h4>
-                      <p>${habit.frequencia} · current streak of ${habit.streak} days</p>
+                      <p>${habit.frequencia}${habit.lembrete ? ' · 🔔 ' + habit.lembrete : ''} · current streak of ${habit.streak} days</p>
                     </div>
                     <div style="display:flex; gap:8px; align-items:flex-start; flex-shrink:0;">
                       <button class="habit-action" data-complete-habit="${habit.id}" ${habit.concluidoToday ? "disabled" : ""}>
@@ -5405,17 +5440,19 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     }
     // ---- End voice recognition ----
 
-    function showToast(message) {
+    function showToast(message, duracao) {
       const wrap = document.getElementById("toast-wrap");
       const toast = document.createElement("div");
       toast.className = "toast";
       toast.textContent = message;
       wrap.appendChild(toast);
-      setTimeort(() => {
+      const fade = duracao > 0 ? duracao - 600 : 2600;
+      const remove = duracao > 0 ? duracao : 3200;
+      setTimeout(() => {
         toast.style.opacity = "0";
         toast.style.transform = "translateX(12px)";
-      }, 2600);
-      setTimeort(() => toast.remove(), 3200);
+      }, fade);
+      setTimeout(() => toast.remove(), remove);
     }
 
     function bindEvents() {
@@ -5782,6 +5819,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         await loadUserDate(user.uid);
         try { await saveDailyScoreSeNecessario(); } catch(e) { console.error("[DailyScore]", e); }
         showApp(user);
+        // Start in-app habit reminders
+        iniciarLembretesHabitos();
         // Carregar subscription (onSnapshot em tempo real)
         loadSubscription(user.uid);
         // Detectar retorno do Stripe Checkort
@@ -6289,6 +6328,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!habit) return;
       document.getElementById("edit-habit-id").value = habitId;
       document.getElementById("edit-habit-name").value = habit.nome;
+      document.getElementById("edit-habit-reminder").value = habit.lembrete || "";
       document.getElementById("edit-habit-freq").value = habit.frequencia;
       document.getElementById("edit-habit-modal").classList.remove("hidden");
       lucide.createIcons();
@@ -6302,12 +6342,14 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const id = Number(document.getElementById("edit-habit-id").value);
       const nome = document.getElementById("edit-habit-name").value.trim();
       const frequencia = document.getElementById("edit-habit-freq").value;
+      const lembrete = document.getElementById("edit-habit-reminder").value;
       if (!nome) { showToast("O nome não pode estar vazio."); return; }
       const habit = appState.habitos.find(h => h.id === id);
       if (!habit) return;
       habit.nome = nome;
       habit.frequencia = frequencia;
-      fsUpdate("habitos", id, { nome, frequencia });
+      habit.lembrete = lembrete;
+      fsUpdate("habitos", id, { nome, frequencia, lembrete });
       closeEditHabitModal();
       renderAll();
       showToast(`Habit "${nome}" atualizado.`);
