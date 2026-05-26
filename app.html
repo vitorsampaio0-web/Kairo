@@ -3882,38 +3882,23 @@
 
     function getVisibleNotas() {
       const notas = appState.notas || [];
-      const shared = notas.filter(n => n.sharedWith && n.sharedWith.includes(currentUser && currentUser.uid));
-      const minhas = notas.filter(n => n.userId === (currentUser && currentUser.uid) && (!n.sharedWith || n.sharedWith.length === 0));
-      const todas = [...minhas, ...shared];
       const search = (appState.notasSearch || "").toLowerCase();
-      return search ? todas.filter(n => (n.titulo || "").toLowerCase().includes(search) || (n.conteudo || "").toLowerCase().includes(search) || (n.tags || []).some(t => t.toLowerCase().includes(search))) : todas;
-    }
-
-    async function limparNotasCorrompidas() {
-      if (!currentUser) return;
-      const snap = await db.collection(`users/${currentUser.uid}/notas`).get();
-      const batch = db.batch();
-      snap.docs.forEach(d => {
-        batch.delete(db.doc(`users/${currentUser.uid}/notas/${d.id}`));
-      });
-      if (snap.docs.length > 0) {
-        await batch.commit();
-        console.log(`[Notas] ${snap.docs.length} nota(s) eliminada(s).`);
-      }
+      const filtradas = search ? notas.filter(n => (n.titulo || "").toLowerCase().includes(search) || (n.conteudo || "").toLowerCase().includes(search)) : notas;
+      return filtradas.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
     }
 
     async function criarNota() {
-      const id = generateId();
+      const id = Date.now().toString();
       const agora = new Date().toISOString();
       const nova = { id, titulo: "", conteudo: "", tags: [], userId: currentUser.uid, createdAt: agora, updatedAt: agora };
-      appState.notas.push(nova);
+      appState.notas.unshift(nova);
       appState.notaSelecionada = nova;
       fsSet("notas", id, nova);
       renderNotas();
       setTimeout(() => document.getElementById("nota-editor-titulo")?.focus(), 50);
     }
 
-    async function guardarNota() {
+    function guardarNota() {
       if (!appState.notaSelecionada) return;
       const n = appState.notaSelecionada;
       const titulo = document.getElementById("nota-editor-titulo")?.value || "";
@@ -3921,26 +3906,28 @@
       const tagsRaw = document.getElementById("nota-editor-tags")?.value || "";
       const tags = tagsRaw.split(",").map(t => t.trim()).filter(Boolean);
       const updatedAt = new Date().toISOString();
-      const updated = { ...n, titulo, conteudo, tags, updatedAt };
-      appState.notaSelecionada = updated;
-      const idx = appState.notas.findIndex(x => x.id === n.id);
-      if (idx !== -1) appState.notas[idx] = updated;
+      n.titulo = titulo;
+      n.conteudo = conteudo;
+      n.tags = tags;
+      n.updatedAt = updatedAt;
       fsUpdate("notas", n.id, { titulo, conteudo, tags, updatedAt });
     }
 
-    async function eliminarNota(id) {
+    function eliminarNota(id) {
+      if (!id || !confirm("Eliminar esta nota?")) return;
       appState.notas = appState.notas.filter(n => n.id !== id);
-      appState.notaSelecionada = null;
-      renderNotas();
+      if (appState.notaSelecionada?.id === id) appState.notaSelecionada = null;
       fsDelete("notas", id);
+      renderNotas();
+      showToast("Nota eliminada.");
     }
 
-    async function abrirModalPartilha() {
+    function abrirModalPartilha() {
       const modal = document.getElementById("nota-share-modal");
-      if (modal) { modal.classList.remove("hidden"); lucide.createIcons(); }
+      if (modal) modal.classList.remove("hidden");
     }
 
-    async function executarPartilha() {
+    function executarPartilha() {
       const checkboxes = document.querySelectorAll("[data-share-member]:checked");
       if (!checkboxes.length) { showToast("Seleciona pelo menos um membro."); return; }
       const ids = Array.from(checkboxes).map(cb => cb.value);
@@ -3948,17 +3935,15 @@
       const n = appState.notaSelecionada;
       const shared = [...new Set([...(n.sharedWith || []), ...ids])];
       n.sharedWith = shared;
-      const idx = appState.notas.findIndex(x => x.id === n.id);
-      if (idx !== -1) appState.notas[idx].sharedWith = shared;
       fsUpdate("notas", n.id, { sharedWith: shared });
       document.getElementById("nota-share-modal")?.classList.add("hidden");
-      showToast("Nota partilhada com sucesso.");
+      showToast("Nota partilhada.");
       renderNotas();
     }
 
     let _recognition = null;
     function toggleDitarVoz() {
-      if (!window.webkitSpeechRecognition && !window.SpeechRecognition) { showToast("Ditado de voz não suportado."); return; }
+      if (!window.webkitSpeechRecognition && !window.SpeechRecognition) { showToast("Ditado não suportado."); return; }
       if (appState.isRecordingNote) { stopVoiceNote(); return; }
       startVoiceNote();
     }
@@ -3971,24 +3956,19 @@
       _recognition.interimResults = true;
       appState.isRecordingNote = true;
       let textoAtual = document.getElementById("nota-editor-conteudo")?.value || "";
-
       _recognition.onresult = (e) => {
         const transcript = Array.from(e.results).map(r => r[0].transcript).join("");
         const area = document.getElementById("nota-editor-conteudo");
         if (area) area.value = textoAtual + " " + transcript;
       };
-
       _recognition.onend = () => { appState.isRecordingNote = false; guardarNota(); };
-      _recognition.onerror = () => { appState.isRecordingNote = false; showToast("Erro no reconhecimento de voz."); };
-
+      _recognition.onerror = () => { appState.isRecordingNote = false; showToast("Erro no ditado."); };
       _recognition.start();
-      renderNotas();
     }
 
     function stopVoiceNote() {
       if (_recognition) _recognition.stop();
       appState.isRecordingNote = false;
-      renderNotas();
     }
 
     function formatDateLong(dateString) {
@@ -5596,11 +5576,16 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (partilharBtn) partilharBtn.addEventListener("click", abrirModalPartilha);
 
       const eliminarNotaBtn = document.getElementById("nota-eliminar-btn");
-      if (eliminarNotaBtn) eliminarNotaBtn.addEventListener("click", () => {
-        if (!appState.notaSelecionada) return;
-        if (!confirm("Eliminar esta nota permanentemente?")) return;
-        eliminarNota(appState.notaSelecionada.id);
-      });
+      if (eliminarNotaBtn) {
+        console.log("[bindEvents] eliminarNotaBtn encontrado");
+        eliminarNotaBtn.addEventListener("click", () => {
+          console.log("[eliminarNotaBtn] click");
+          if (!appState.notaSelecionada) { console.log("[eliminarNotaBtn] sem notaSelecionada"); return; }
+          if (!confirm("Eliminar esta nota permanentemente?")) return;
+          console.log("[eliminarNotaBtn] confirm OK, id:", appState.notaSelecionada.id);
+          eliminarNota(appState.notaSelecionada.id);
+        });
+      }
 
       const confirmarShare = document.getElementById("btn-confirmar-share");
       if (confirmarShare) confirmarShare.addEventListener("click", executarPartilha);
