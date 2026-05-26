@@ -3920,12 +3920,12 @@
       const conteudo = document.getElementById("nota-editor-conteudo")?.value || "";
       const tagsRaw = document.getElementById("nota-editor-tags")?.value || "";
       const tags = tagsRaw.split(",").map(t => t.trim()).filter(Boolean);
-      const updated = { ...n, titulo, conteudo, tags, updatedAt: new Date().toISOString() };
+      const updatedAt = new Date().toISOString();
+      const updated = { ...n, titulo, conteudo, tags, updatedAt };
       appState.notaSelecionada = updated;
       const idx = appState.notas.findIndex(x => x.id === n.id);
       if (idx !== -1) appState.notas[idx] = updated;
-      fsUpdate("notas", n.id, { titulo, conteudo, tags, updatedAt: updated.updatedAt });
-      renderNotas();
+      fsUpdate("notas", n.id, { titulo, conteudo, tags, updatedAt });
     }
 
     async function eliminarNota(id) {
@@ -3978,8 +3978,8 @@
         if (area) area.value = textoAtual + " " + transcript;
       };
 
-      _recognition.onend = () => { appState.isRecordingNote = false; renderNotas(); guardarNota(); };
-      _recognition.onerror = () => { appState.isRecordingNote = false; renderNotas(); showToast("Erro no reconhecimento de voz."); };
+      _recognition.onend = () => { appState.isRecordingNote = false; guardarNota(); };
+      _recognition.onerror = () => { appState.isRecordingNote = false; showToast("Erro no reconhecimento de voz."); };
 
       _recognition.start();
       renderNotas();
@@ -5588,6 +5588,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const guardarBtn = document.getElementById("nota-guardar-btn");
       if (guardarBtn) guardarBtn.addEventListener("click", () => {
         guardarNota();
+        renderNotas();
         showToast("Nota guardada com sucesso.");
       });
 
@@ -5596,6 +5597,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       const eliminarNotaBtn = document.getElementById("nota-eliminar-btn");
       if (eliminarNotaBtn) eliminarNotaBtn.addEventListener("click", () => {
+        if (!appState.notaSelecionada) return;
         if (!confirm("Eliminar esta nota permanentemente?")) return;
         eliminarNota(appState.notaSelecionada.id);
       });
