@@ -4878,6 +4878,9 @@
               <button class="ghost-btn" id="export-word-hist-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;">
                 <i data-lucide="download"></i> Exportar Word
               </button>
+              <button class="ghost-btn" id="export-excel-hist-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;">
+                <i data-lucide="download"></i> Exportar Excel
+              </button>
             </div>
           </div>
 
@@ -5757,6 +5760,22 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
             return (!di || td >= di) && (!df || td <= df) && (cat === "todas" || task.categoria === cat) && (st === "todas" || task.status === st);
           });
           exportToWord(toExport);
+        };
+      }
+
+      const exportExcelHistBtn = document.getElementById("export-excel-hist-btn");
+      if (exportExcelHistBtn) {
+        exportExcelHistBtn.onclick = () => {
+          if (!isPro()) { showUpgradeModal("Exportação Excel"); return; }
+          const di = appState.historicoDateInicio;
+          const df = appState.historicoDateFim;
+          const cat = appState.historicoCategFilter;
+          const st = appState.historicoStatusFilter;
+          const toExport = appState.tarefas.filter(task => {
+            const td = task.prazo.slice(0, 10);
+            return (!di || td >= di) && (!df || td <= df) && (cat === "todas" || task.categoria === cat) && (st === "todas" || task.status === st);
+          });
+          exportToExcel(toExport);
         };
       }
 
