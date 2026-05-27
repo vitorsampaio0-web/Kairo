@@ -3076,6 +3076,18 @@
         <h3 id="meta-modal-title" style="margin:0;">New Goal</h3>
         <button onclick="closeGoalModal()" style="backgrornd:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
+
+      <div class="meta-field" style="margin-bottom:8px;">
+        <label style="font-size:0.7rem;color:var(--muted);margin-bottom:8px;display:block;">Quick templates</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button type="button" class="meta-dur-btn" onclick="applyMetaTemplate('perder5kg')" style="font-size:0.68rem;padding:5px 10px;">Lose 5kg</button>
+          <button type="button" class="meta-dur-btn" onclick="applyMetaTemplate('ler12livros')" style="font-size:0.68rem;padding:5px 10px;">Read 12 books</button>
+          <button type="button" class="meta-dur-btn" onclick="applyMetaTemplate('faturar100k')" style="font-size:0.68rem;padding:5px 10px;">Earn 100k</button>
+          <button type="button" class="meta-dur-btn" onclick="applyMetaTemplate('lancarwebsite')" style="font-size:0.68rem;padding:5px 10px;">Launch website</button>
+          <button type="button" class="meta-dur-btn" onclick="applyMetaTemplate('correr5km')" style="font-size:0.68rem;padding:5px 10px;">Run 5km</button>
+        </div>
+      </div>
+
       <div class="meta-field">
         <label>Title</label>
         <input id="meta-titulo" class="meta-input" placeholder="Ex: Launch product, learn English..." maxlength="60">
@@ -3340,6 +3352,12 @@
             <option value="Sports">Sports</option>
           </select>
         </div>
+      </div>
+      <div class="modal-field">
+        <label>Link to goal</label>
+        <select id="edit-task-meta" class="task-select">
+          <option value="">None</option>
+        </select>
       </div>
       <div class="modal-row">
         <div class="modal-field">
@@ -5471,6 +5489,27 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         task.status = "concluida";
         fsUpdate("tasks", taskId, { status: "concluida" });
 
+        // Update linked goal progress
+        if (task.metaId) {
+          const meta = appState.metas.find(m => m.id == task.metaId);
+          if (meta) {
+            const tasksMeta = appState.tasks.filter(t => t.metaId == meta.id);
+            const completedMeta = tasksMeta.filter(t => t.status === 'concluida').length;
+            const totalMeta = tasksMeta.length;
+            const newProgress = totalMeta > 0 ? Math.round((completedMeta / totalMeta) * 100) : 0;
+            const oldProgress = meta.progresso || 0;
+            meta.progresso = newProgress;
+            meta.current = Math.round((meta.target * newProgress) / 100);
+            fsUpdate("metas", meta.id, { progresso: newProgress, current: meta.current });
+            // Milestone notification
+            if (newProgress >= 90 && oldProgress < 90) {
+              showToast(`🎯 Goal "${meta.titulo}" is at ${newProgress}%!`, 5000);
+            } else if (newProgress >= 50 && oldProgress < 50) {
+              showToast(`🎯 Goal "${meta.titulo}" is halfway! (${newProgress}%)`, 4000);
+            }
+          }
+        }
+
         if (task.repeticao && task.repeticao !== "nenhuma") {
           const nextId = Date.now();
           const nextDeadline = calcNextDeadline(task.prazo, task.repeticao, task.daysEspecificos);
@@ -5512,6 +5551,17 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       document.getElementById("edit-task-client").value = task.cliente || "";
       document.getElementById("edit-task-priority").value = task.prioridade;
       document.getElementById("edit-task-category").value = task.categoria;
+
+      // Fill meta dropdown
+      const metaSelect = document.getElementById("edit-task-meta");
+      if (metaSelect) {
+        let opts = '<option value="">None</option>';
+        appState.metas.forEach(m => {
+          opts += `<option value="${m.id}" ${task.metaId == m.id ? 'selected' : ''}>${m.titulo}</option>`;
+        });
+        metaSelect.innerHTML = opts;
+      }
+
       document.getElementById("edit-task-date").value = prazoDate;
       document.getElementById("edit-task-time").value = prazoTime;
       const repeatSel = document.getElementById("edit-task-repeat");
@@ -5546,6 +5596,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       task.cliente = document.getElementById("edit-task-client").value.trim() || null;
       task.prioridade = document.getElementById("edit-task-priority").value;
       task.categoria = document.getElementById("edit-task-category").value;
+      task.metaId = document.getElementById("edit-task-meta")?.value || null;
       const date = document.getElementById("edit-task-date").value || appState.today;
       const time = document.getElementById("edit-task-time").value || "18:00";
       task.prazo = `${date}T${time}`;
@@ -7180,6 +7231,29 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     function selectGoalColor(el) {
       document.querySelectorAll(".meta-color-swatch").forEach(s => s.classList.remove("active"));
       el.classList.add("active");
+    }
+
+    async function applyMetaTemplate(key) {
+      const templates = {
+        perder5kg: { titulo: 'Lose 5kg of weight', duracao: 90, cor: '#4ade80', descricao: 'Health goal: lose 5 kilos sustainably' },
+        ler12livros: { titulo: 'Read 12 books this year', duracao: 365, cor: '#4ea8ff', descricao: 'Self-growth: read 1 book per month' },
+        faturar100k: { titulo: 'Earn €100,000', duracao: 365, cor: '#f59e0b', descricao: 'Financial: reach €100k revenue' },
+        lancarwebsite: { titulo: 'Launch a website', duracao: 60, cor: '#7c5cff', descricao: 'Professional: launch a successful website' },
+        correr5km: { titulo: 'Run 5km without stopping', duracao: 90, cor: '#f87171', descricao: 'Sports: run 5km continuously' }
+      };
+      const t = templates[key];
+      if (!t) return;
+      document.getElementById("meta-titulo").value = t.titulo;
+      document.getElementById("meta-descricao").value = t.descricao;
+      document.querySelectorAll('.meta-dur-btn').forEach(btn => {
+        if (parseInt(btn.dataset.dur, 10) === t.duracao) { btn.classList.add('active'); }
+        else { btn.classList.remove('active'); }
+      });
+      document.querySelectorAll('.meta-color-swatch').forEach(sw => {
+        if (sw.dataset.color === t.cor) { sw.classList.add('active'); }
+        else { sw.classList.remove('active'); }
+      });
+      document.getElementById("meta-prazo-custom").style.display = 'none';
     }
 
     async function saveGoal() {
