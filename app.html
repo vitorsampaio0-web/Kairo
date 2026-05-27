@@ -653,6 +653,71 @@
       transform: scale(1.2);
     }
 
+    /* ---- Weekly Highlights Card ---- */
+    .weekly-highlights {
+      background: linear-gradient(135deg, rgba(124, 92, 255, 0.08), rgba(0, 194, 255, 0.04));
+      border: 1px solid rgba(124, 92, 255, 0.15);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 18px;
+    }
+
+    .weekly-highlights-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .weekly-highlights-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .weekly-highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 12px;
+    }
+
+    .weekly-highlight-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .weekly-highlight-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .weekly-highlight-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .weekly-highlights-share {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border: none;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
     .agenda-grid .panel,
     .planning-grid .panel {
       height: 100%;
@@ -4824,12 +4889,73 @@
       `;
     }
 
+    function getWeeklyHighlights() {
+      const hoje = new Date();
+      const diaSemana = hoje.getDay();
+      const offset = diaSemana === 0 ? -6 : 1 - diaSemana;
+      const segunda = new Date(hoje);
+      segunda.setDate(hoje.getDate() + offset);
+      const domingo = new Date(segunda);
+      domingo.setDate(segunda.getDate() + 6);
+
+      const semanaStr = segunda.toISOString().split('T')[0];
+      const domingoStr = domingo.toISOString().split('T')[0];
+
+      const tarefasSemana = appState.tarefas.filter(t => {
+        const d = t.prazo.slice(0, 10);
+        return d >= semanaStr && d <= domingoStr;
+      });
+
+      const concluidas = tarefasSemana.filter(t => t.status === 'concluida');
+      const taxa = tarefasSemana.length > 0 ? Math.round((concluidas.length / tarefasSemana.length) * 100) : 0;
+
+      const porCategoria = {};
+      concluidas.forEach(t => {
+        porCategoria[t.categoria] = (porCategoria[t.categoria] || 0) + 1;
+      });
+      const topCategoria = Object.entries(porCategoria).sort((a, b) => b[1] - a[1])[0];
+
+      const habitosSemana = appState.habitos.filter(h => {
+        const hist = h.historico || {};
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(segunda);
+          d.setDate(segunda.getDate() + i);
+          if (hist[d.toISOString().split('T')[0]]) return true;
+        }
+        return false;
+      });
+
+      return {
+        total: tarefasSemana.length,
+        concluidas: concluidas.length,
+        taxa,
+        topCategoria: topCategoria ? topCategoria[0] : null,
+        topCategoriaCount: topCategoria ? topCategoria[1] : 0,
+        habitosAtivos: habitosSemana.length,
+        melhorStreak: appState.habitos.reduce((max, h) => Math.max(max, h.streak), 0)
+      };
+    }
+
+    function shareHighlights() {
+      const h = getWeeklyHighlights();
+      const semana = new Date().toLocaleDateString('pt-PT', { week: 'numeric', year: 'numeric' }).replace('Semana ', 'S');
+      const texto = `🔥 Destaques da Semana ${semana} — Kairo\n\n✅ ${h.concluidas}/${h.total} tarefas concluídas (${h.taxa}%)\n🏆 Top categoria: ${h.topCategoria || '-'} (${h.topCategoriaCount})\n🔥 ${h.habitosAtivos} hábitos ativos\n⚡ Melhor streak: ${h.melhorStreak} dias\n\n#Kairo #Produtividade`;
+
+      if (navigator.share) {
+        navigator.share({ title: 'Destaques da Semana — Kairo', text: texto });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(texto).then(() => showToast('Copiado para a área de transferência!'));
+      } else {
+        showToast(texto);
+      }
+    }
+
     function renderHistorico() {
       const view = document.getElementById("historico-view");
 
       // Feature gate: histórico é Pro
       if (!isPro()) {
-        view.innerHTML = `
+        view.innerHTML = `...
           <div class="panel" style="position:relative;min-height:340px;overflow:hidden;">
             <div class="panel-header"><div><h3>Histórico</h3><p>Análise e exportação de registos</p></div></div>
             <div class="pro-overlay">
@@ -4883,6 +5009,37 @@
               </button>
             </div>
           </div>
+
+          ${(() => {
+            const h = getWeeklyHighlights();
+            return `
+            <div class="weekly-highlights">
+              <div class="weekly-highlights-header">
+                <span class="weekly-highlights-title"><i data-lucide="trophy" style="width:16px;height:16px;color:var(--gold);"></i> Destaques da Semana</span>
+                <button class="weekly-highlights-share" id="share-highlights-btn">
+                  <i data-lucide="share-2" style="width:13px;height:13px;"></i> Partilhar
+                </button>
+              </div>
+              <div class="weekly-highlights-grid">
+                <div class="weekly-highlight-item">
+                  <div class="weekly-highlight-value">${h.concluidas}</div>
+                  <div class="weekly-highlight-label">Tarefas feitas</div>
+                </div>
+                <div class="weekly-highlight-item">
+                  <div class="weekly-highlight-value">${h.taxa}%</div>
+                  <div class="weekly-highlight-label">Taxa de sucesso</div>
+                </div>
+                <div class="weekly-highlight-item">
+                  <div class="weekly-highlight-value">${h.melhorStreak}</div>
+                  <div class="weekly-highlight-label">Melhor streak</div>
+                </div>
+                <div class="weekly-highlight-item">
+                  <div class="weekly-highlight-value">${h.habitosAtivos}</div>
+                  <div class="weekly-highlight-label">Hábitos ativos</div>
+                </div>
+              </div>
+            </div>`;
+          })()}
 
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end;">
             <div style="display:flex;flex-direction:column;gap:5px;">
@@ -5777,6 +5934,11 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           });
           exportToExcel(toExport);
         };
+      }
+
+      const shareHighlightsBtn = document.getElementById("share-highlights-btn");
+      if (shareHighlightsBtn) {
+        shareHighlightsBtn.onclick = shareHighlights;
       }
 
       const exportWordTasksBtn = document.getElementById("export-word-tasks-btn");
