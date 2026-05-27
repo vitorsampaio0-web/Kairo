@@ -613,6 +613,46 @@
       background: linear-gradient(90deg, var(--primary), var(--primary-2));
     }
 
+    /* ---- Habit Weekly Grid (GitHub style) ---- */
+    .habit-week-grid {
+      display: flex;
+      gap: 5px;
+      margin: 10px 0 8px;
+      align-items: center;
+    }
+
+    .habit-week-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      width: 28px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .habit-week-days {
+      display: flex;
+      gap: 4px;
+    }
+
+    .habit-week-day {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: transform 0.15s ease;
+    }
+
+    .habit-week-day.done {
+      background: linear-gradient(135deg, var(--success), #4fe3bc);
+      border-color: transparent;
+      box-shadow: 0 0 6px rgba(49, 208, 170, 0.25);
+    }
+
+    .habit-week-day:hover {
+      transform: scale(1.2);
+    }
+
     .agenda-grid .panel,
     .planning-grid .panel {
       height: 100%;
@@ -4741,6 +4781,7 @@
                       </button>
                     </div>
                   </div>
+                  ${renderHabitWeekGrid(habit)}
                   <div class="progress-bar">
                     <div class="progress-fill" style="width:${habit.progresso}%"></div>
                   </div>
@@ -5435,13 +5476,41 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       habit.ultimaValidacao = today;
       habit.streak += 1;
       habit.progresso = Math.min(100, habit.progresso + 12);
+      // Guardar histórico semanal para grid
+      if (!habit.historico) habit.historico = {};
+      habit.historico[today] = true;
       fsUpdate("habitos", habitId, {
         ultimaValidacao: today,
         streak: habit.streak,
-        progresso: habit.progresso
+        progresso: habit.progresso,
+        historico: habit.historico
       });
       renderAll();
       showToast(`Streak atualizado: ${habit.nome} agora está em ${habit.streak} dias.`);
+    }
+
+    function renderHabitWeekGrid(habit) {
+      const historico = habit.historico || {};
+      const dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+      const hoje = new Date();
+      // começar na segunda desta semana
+      const diaSemana = hoje.getDay(); // 0=Dom, 1=Seg, ..., 6=Sab
+      const offset = diaSemana === 0 ? -6 : 1 - diaSemana;
+      const segunda = new Date(hoje);
+      segunda.setDate(hoje.getDate() + offset);
+
+      let html = '<div class="habit-week-grid">';
+      html += '<span class="habit-week-label">7d</span>';
+      html += '<div class="habit-week-days">';
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(segunda);
+        d.setDate(segunda.getDate() + i);
+        const dataStr = d.toISOString().split('T')[0];
+        const feito = historico[dataStr];
+        html += `<div class="habit-week-day ${feito ? 'done' : ''}" title="${dias[i]} ${dataStr}"></div>`;
+      }
+      html += '</div></div>';
+      return html;
     }
 
     // ---- Voice recognition ----
