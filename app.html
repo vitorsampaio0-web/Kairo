@@ -6209,6 +6209,13 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           showToast('Pagamento cancelado. Podes tentar novamente quando quiseres.');
           window.history.replaceState({}, '', '/app.html');
         }
+        // Auto-join via link ?join=CODIGO
+        const joinCode = urlParams.get('join');
+        if (joinCode) {
+          window.history.replaceState({}, '', '/app.html');
+          document.getElementById('team-join-code').value = joinCode;
+          setTimeout(() => openTeamModal('join'), 600);
+        }
         // Abrir modal de upgrade se vindo da landing com ?upgrade=pro
         if (urlParams.get('upgrade') === 'pro') {
           window.history.replaceState({}, '', '/app.html');
@@ -8590,6 +8597,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           membrosUids: firebase.firestore.FieldValue.arrayUnion(uid)
         });
 
+        logTeamActivity(teamDoc.id, { tipo: "membro_entrou" });
+
         closeTeamModal("join");
         showToast(`Entraste na equipa "${teamData.nome}"!`);
       } catch (e) {
@@ -8710,32 +8719,37 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     }
 
     function copyTeamCodeOnly() {
-      const code = document.getElementById("invite-code-display").textContent;
-      navigator.clipboard.writeText(code).then(() => showToast("Código copiado!"));
+      const code = document.getElementById("invite-code-display").textContent.trim();
+      const link = `https://kairoelite.app/?join=${encodeURIComponent(code)}`;
+      navigator.clipboard.writeText(link).then(() => showToast("Link de convite copiado!"));
     }
 
-    async function sendTeamInviteEmail() {
+    function shareTeamInvite() {
+      const code = document.getElementById("invite-code-display").textContent.trim();
+      const link = `https://kairoelite.app/?join=${encodeURIComponent(code)}`;
+      const teamName = appState.equipa?.nome || "Equipa Kairo";
+      const text = `Junta-te à minha equipa "${teamName}" no Kairo: ${link}`;
+      if (navigator.share) {
+        navigator.share({ title: `Convite para ${teamName}`, text, url: link });
+      } else {
+        navigator.clipboard.writeText(text).then(() => showToast("Texto de convite copiado!"));
+      }
+    }
+
+    function sendTeamInviteEmail() {
       const toEmail  = document.getElementById("invite-email-input").value.trim();
       const teamCode = document.getElementById("invite-code-display").textContent.trim();
       const teamName = appState.equipa?.nome || "Equipa";
       const fromName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Alguém";
+      const link = `https://kairoelite.app/?join=${encodeURIComponent(teamCode)}`;
 
       if (!toEmail || !toEmail.includes("@")) { showToast("Insere um email válido."); return; }
 
-      const btn = document.getElementById("btn-send-invite");
-      btn.disabled = true; btn.textContent = "A enviar...";
-
-      try {
-        const sendInvite = firebase.functions().httpsCallable("sendTeamInvite");
-        await sendInvite({ toEmail, teamCode, teamName, fromName });
-        showToast(`Convite enviado para ${toEmail}!`);
-        closeTeamInviteModal();
-      } catch (err) {
-        console.error(err);
-        showToast("Erro ao enviar o convite. Tenta novamente.");
-      } finally {
-        btn.disabled = false; btn.textContent = "Enviar Convite ✉️";
-      }
+      const subject = encodeURIComponent(`Convite para a equipa "${teamName}" no Kairo`);
+      const body = encodeURIComponent(`Olá!\n\n${fromName} convidou-te para a equipa "${teamName}" no Kairo.\n\nJunta-te aqui: ${link}\n\nCódigo: ${teamCode}`);
+      window.open(`mailto:${toEmail}?subject=${subject}&body=${body}`, "_blank");
+      showToast("Email aberto no teu cliente. Envia para concluir!");
+      closeTeamInviteModal();
     }
     // ============================================================
     // END MODO EQUIPA
@@ -8915,13 +8929,17 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         <label style="font-size:0.78rem;color:#666;margin-bottom:6px;display:block;">Email do convidado</label>
         <input type="email" id="invite-email-input" class="team-input" placeholder="email@exemplo.com" style="width:100%;box-sizing:border-box;" />
       </div>
-      <div style="display:flex;gap:10px;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button onclick="sendTeamInviteEmail()" id="btn-send-invite"
-          style="flex:1;background:linear-gradient(135deg,#7c5cff,#4ea8ff);border:none;color:#fff;padding:11px;border-radius:10px;font-size:0.88rem;font-weight:700;cursor:pointer;">
-          Enviar Convite ✉️
+          style="flex:1;min-width:120px;background:linear-gradient(135deg,#7c5cff,#4ea8ff);border:none;color:#fff;padding:11px;border-radius:10px;font-size:0.88rem;font-weight:700;cursor:pointer;">
+          Abrir Email ✉️
         </button>
-        <button onclick="copyTeamCodeOnly()" style="background:#111128;border:1px solid #1e1e3a;color:#9b85ff;padding:11px 16px;border-radius:10px;font-size:0.82rem;font-weight:600;cursor:pointer;">
-          Copiar código
+        <button onclick="shareTeamInvite()"
+          style="flex:1;min-width:120px;background:linear-gradient(135deg,#31d0aa,#4ea8ff);border:none;color:#fff;padding:11px;border-radius:10px;font-size:0.88rem;font-weight:700;cursor:pointer;">
+          Partilhar Link 🔗
+        </button>
+        <button onclick="copyTeamCodeOnly()" style="background:#111128;border:1px solid #1e1e3a;color:#9b85ff;padding:11px 16px;border-radius:10px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;">
+          Copiar Link
         </button>
       </div>
     </div>
