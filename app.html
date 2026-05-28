@@ -8222,6 +8222,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
             </div>
           </div>
           ${d.contexto ? `<div class="dec-card-ctx">${d.contexto}</div>` : ""}
+          ${renderAnaliseDecisao(d)}
           ${resultBar}
         </div>`;
       }
@@ -8282,14 +8283,15 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     function openDecisaoModal(id) {
       const d = id ? (appState.decisoes||[]).find(x=>x.id===id) : null;
       document.getElementById("dec-modal-title").textContent = d ? "Editar Decisão" : "Nova Decisão";
-      document.getElementById("dec-input-decisao").value    = d?.decisao    || "";
-      document.getElementById("dec-input-contexto").value   = d?.contexto   || "";
-      document.getElementById("dec-input-categoria").value  = d?.categoria  || "estrategia";
-      document.getElementById("dec-input-confianca").value  = d?.confianca  || 3;
-      document.getElementById("dec-conf-val").textContent   = (d?.confianca || 3) + "/5";
-      document.getElementById("dec-input-prazo").value      = d?.prazoRevisao ? d.prazoRevisao.slice(0,10) : "";
+      document.getElementById("dec-input-decisao").value    = d?.decisao       || "";
+      document.getElementById("dec-input-contexto").value     = d?.contexto      || "";
+      document.getElementById("dec-input-alternativas").value = d?.alternativas || "";
+      document.getElementById("dec-input-categoria").value  = d?.categoria    || "estrategia";
+      document.getElementById("dec-input-confianca").value  = d?.confianca     || 3;
+      document.getElementById("dec-conf-val").textContent   = (d?.confianca   || 3) + "/5";
+      document.getElementById("dec-input-prazo").value      = d?.prazoRevisao  ? d.prazoRevisao.slice(0,10) : "";
       document.getElementById("dec-modal-id").value         = id || "";
-      document.getElementById("dec-modal").style.display    = "flex";
+      document.getElementById("dec-modal").style.display     = "flex";
     }
 
     function closeDecisaoModal() {
@@ -8300,13 +8302,14 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const uid  = firebase.auth().currentUser?.uid; if (!uid) return;
       const id   = document.getElementById("dec-modal-id").value;
       const data = {
-        decisao:      document.getElementById("dec-input-decisao").value.trim(),
-        contexto:     document.getElementById("dec-input-contexto").value.trim(),
-        categoria:    document.getElementById("dec-input-categoria").value,
-        confianca:    parseInt(document.getElementById("dec-input-confianca").value),
-        prazoRevisao: document.getElementById("dec-input-prazo").value || null,
-        data:         id ? undefined : new Date().toISOString(),
-        updatedAt:    new Date().toISOString(),
+        decisao:       document.getElementById("dec-input-decisao").value.trim(),
+        contexto:      document.getElementById("dec-input-contexto").value.trim(),
+        alternativas:  document.getElementById("dec-input-alternativas").value.trim(),
+        categoria:     document.getElementById("dec-input-categoria").value,
+        confianca:     parseInt(document.getElementById("dec-input-confianca").value),
+        prazoRevisao:  document.getElementById("dec-input-prazo").value || null,
+        data:          id ? undefined : new Date().toISOString(),
+        updatedAt:     new Date().toISOString(),
       };
       if (!data.decisao) return alert("Escreve a decisão.");
       const ref = db.collection("users").doc(uid).collection("decisoes");
@@ -8350,6 +8353,58 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!confirm("Apagar decisão?")) return;
       const uid = firebase.auth().currentUser?.uid; if (!uid) return;
       await db.collection("users").doc(uid).collection("decisoes").doc(id).delete();
+    }
+
+    /* ---- Análise de Decisão baseada em regras ---- */
+    function analisarDecisaoRegras(alternativasText, contexto) {
+      const text = ((alternativasText || "") + " " + (contexto || "")).toLowerCase();
+      const positivos = ["melhor","excelente","otimo","ideal","perfeito","recomendo","vantagem","beneficio","ganho","lucro","rapido","barato","eficiente","seguro","profit","roi","crescimento","expansao","sucesso","ganhar","aumentar","mais barato","mais rapido","mais seguro","menor risco","melhor qualidade","save","profit","revenue","growth"];
+      const negativos = ["pior","mau","ruim","perda","prejuizo","caro","lento","complicado","risco","incerto","duvidoso","perigoso","menos","inferior","risk","loss","perder","slower","expensive","worse","bad"];
+      const linhas = (alternativasText || "").split("\n").filter(l => l.trim());
+      if (linhas.length < 2) return null;
+      
+      let melhor = null, melhorScore = -Infinity;
+      const resultados = linhas.map((linha, idx) => {
+        const t = linha.toLowerCase();
+        let score = 0;
+        positivos.forEach(p => { if (t.includes(p)) score += 2; });
+        negativos.forEach(n => { if (t.includes(n)) score -= 2; });
+        if (/\d+/.test(t)) score += 1;
+        score += linhas.length - idx * 0.5;
+        if (score > melhorScore) { melhorScore = score; melhor = linha; }
+        return { texto: linha, score: Math.max(0, score) };
+      });
+      
+      return {
+        melhor: melhor,
+        melhorScore: melhorScore,
+        total: resultados.length,
+        resultados: resultados,
+        explicacao: melhor ? `A opção com melhor score (${melhorScore.toFixed(1)}) tem mais indicações positivas.` : "Não foi possível analisar."
+      };
+    }
+
+    function renderAnaliseDecisao(d) {
+      const analise = analisarDecisaoRegras(d.alternativas, d.contexto);
+      if (!analise) return "";
+      const maxScore = Math.max(...analise.resultados.map(r => r.score));
+      return `
+        <div style="margin-top:12px;padding:12px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(124,92,255,0.05),rgba(0,194,255,0.03));border:1px solid rgba(124,92,255,0.12);">
+          <div style="font-size:0.78rem;font-weight:600;color:#9b85ff;margin-bottom:6px;">⚡ Sugestão Kairo</div>
+          <p style="font-size:0.82rem;color:#c0c0d8;margin:0 0 4px;"><strong>A melhor opção:</strong> ${escapeHtml(analise.melhor)}</p>
+          <p style="font-size:0.72rem;color:#888;margin:0">${analise.explicacao}</p>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-top:8px;">
+            ${analise.resultados.map(r => `
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden;">
+                  <div style="width:${maxScore > 0 ? (r.score/maxScore*100) : 0}%;height:100%;background:${r.texto === analise.melhor ? 'linear-gradient(90deg,#7c5cff,#4ea8ff)':'rgba(255,255,255,0.1)'};border-radius:3px;transition:width .3s ease;"></div>
+                </div>
+                <span style="font-size:0.65rem;color:#777;white-space:nowrap;">${r.score.toFixed(1)}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
     }
 
     function startDecisaoListener(uid) {
@@ -9143,6 +9198,13 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         <textarea id="dec-input-contexto" rows="3"
           style="width:100%;box-sizing:border-box;background:#111128;border:1px solid #1e1e3a;border-radius:10px;color:#e0e0f0;padding:10px 12px;font-size:0.85rem;resize:vertical;"
           placeholder="Porquê tomei esta decisão, que alternativas considerei..."></textarea>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.78rem;color:#666;margin-bottom:6px;display:block;">Alternativas / Opções (uma por linha)</label>
+        <textarea id="dec-input-alternativas" rows="3"
+          style="width:100%;box-sizing:border-box;background:#111128;border:1px solid #1e1e3a;border-radius:10px;color:#e0e0f0;padding:10px 12px;font-size:0.85rem;resize:vertical;"
+          placeholder="A. Opção X (vantagens/desvantagens)&#10;B. Opção Y (vantagens/desvantagens)&#10;C. Opção Z (vantagens/desvantagens)"></textarea>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
