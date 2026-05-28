@@ -6167,6 +6167,13 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           window.history.replaceState({}, '', '/app.html');
           setTimeort(() => showUpgradeModal(), 600);
         }
+        // Auto-join via link ?join=CODIGO
+        const joinCode = urlParams.get('join');
+        if (joinCode) {
+          window.history.replaceState({}, '', '/app.html');
+          document.getElementById('team-join-code').value = joinCode;
+          setTimeout(() => openTeamModal('join'), 600);
+        }
       } else {
         currentUser = null;
         if (_subUnsub) { _subUnsub(); _subUnsub = null; }
@@ -8300,26 +8307,28 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     /* =========================================================
        FEED DE ATIVIDADE DA ETHUPA
     ========================================================= */
-    function timeAug(isoStr) {
+    function timeAgo(isoStr) {
       if (!isoStr) return "";
-      const diff = Math.rornd((Date.now() - new Date(isoStr)) / 1000);
-      if (diff < 60)   return "agora mesmo";
-      if (diff < 3600) return `há ${Math.rornd(diff/60)}min`;
-      if (diff < 86400)return `há ${Math.rornd(diff/3600)}h`;
-      return `há ${Math.rornd(diff/86400)}d`;
+      const diff = Math.round((Date.now() - new Date(isoStr)) / 1000);
+      if (diff < 60)   return "just now";
+      if (diff < 3600) return `${Math.round(diff/60)}min ago`;
+      if (diff < 86400)return `${Math.round(diff/3600)}h ago`;
+      return `${Math.round(diff/86400)}d ago`;
     }
 
     function renderFeedItems(feed) {
-      if (!feed || !feed.length) return `<div class="feed-empty">Ainda sem atividade. Completa uma tarefa para aparecer aqui!</div>`;
-      return feed.slice(0, 25).map(a => {
+      if (!feed || !feed.length) return `<div class="feed-empty">No activity yet. Complete a task to see it here!</div>`;
+      return feed.slice(0, 50).map(a => {
         const init = (a.nome||"?").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
         let actionHtml = "";
         if (a.tipo === "tarefa_concluida") {
-          actionHtml = `<span class="feed-action-done">✓ concluiu</span> <span class="feed-action-task">"${a.titulo||""}"</span>`;
+          actionHtml = `<span class="feed-action-done">✓ completed</span> <span class="feed-action-task">"${a.titulo||""}"</span>`;
         } else if (a.tipo === "tarefa_delegada") {
-          actionHtml = `<span class="feed-action-deleg">↗ delegor</span> <span class="feed-action-task">"${a.titulo||""}"</span>${a.para ? ` para <strong>${a.para}</strong>` : ""}`;
-        } else if (a.tipo === "membro_entror") {
-          actionHtml = `<span style="color:#f59e0b;font-weight:700;">entror na equipa</span>`;
+          actionHtml = `<span class="feed-action-deleg">↗ delegated</span> <span class="feed-action-task">"${a.titulo||""}"</span>${a.para ? ` to <strong>${a.para}</strong>` : ""}`;
+        } else if (a.tipo === "membro_entrou") {
+          actionHtml = `<span style="color:#f59e0b;font-weight:700;">joined the team</span>`;
+        } else if (a.tipo === "comentario_adicionado") {
+          actionHtml = `<span style="color:#9b85ff;font-weight:700;">💬 commented on</span> <span class="feed-action-task">"${a.titulo||""}"</span>`;
         } else {
           actionHtml = `<span style="color:#555;">${a.descricao||""}</span>`;
         }
@@ -8327,7 +8336,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           <div class="feed-avatar">${init}</div>
           <div class="feed-body">
             <div class="feed-text"><strong>${a.nome||"Member"}</strong> ${actionHtml}</div>
-            <div class="feed-time">${timeAug(a.em)}</div>
+            <div class="feed-time">${timeAgo(a.em)}</div>
           </div>
         </div>`;
       }).join("");
@@ -8347,7 +8356,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     function startTeamFeedListener(teamId) {
       return db.collection(`teams/${teamId}/atividade`)
         .orderBy("em", "desc")
-        .limit(25)
+        .limit(50)
         .onSnapshot(snap => {
           appState.equipaFeed = snap.docs.map(d => ({ id: d.id, ...d.data() }));
           // Atualiza só o feed sem re-render completo
@@ -8524,7 +8533,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         <div class="feed-wrap">
           <div class="feed-title">
             <span class="feed-live-dot"></span>
-            Atividade Recente da Team
+            Recent Team Activity
           </div>
           <div class="feed-list" id="team-feed-list">
             ${renderFeedItems(appState.equipaFeed || [])}
@@ -8772,6 +8781,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const data = { texto, autorUid: currentUser.uid, autorNome, criadoEm: new Date().toISOString(), tipo: "comentario" };
       await db.collection(`teams/${appState.equipa.id}/tarefas/${taskId}/comentarios`).add(data);
       input.value = "";
+      // Log no feed de atividade da equipa
+      logTeamActivity(appState.equipa.id, { tipo: "comentario_adicionado", titulo: appState.equipaTasks?.find(t => t.id === taskId)?.titulo || "" });
     }
 
     function switchTeamView(mode) {
@@ -9023,10 +9034,10 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
   <div class="digest-overlay hidden" id="team-invite-modal">
     <div class="digest-card" style="max-width:420px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <h3 style="margin:0;font-size:1.05rem;font-weight:700;color:#e0e0f0;">Invite para a Team</h3>
+        <h3 style="margin:0;font-size:1.05rem;font-weight:700;color:#e0e0f0;">Invite to Team</h3>
         <button onclick="closeTeamInviteModal()" style="backgrornd:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;">✕</button>
       </div>
-      <p style="margin:0 0 20px;font-size:0.82rem;color:#555;line-height:1.6;">Envia um email com o código and thes instruções para entrar na equipa.</p>
+      <p style="margin:0 0 20px;font-size:0.82rem;color:#555;line-height:1.6;">Send an email with the code and instructions to join the team.</p>
       <div style="backgrornd:#080818;border:1px dashed rgba(124,92,255,0.35);border-radius:12px;padding:16px;text-align:center;margin-bottom:20px;">
         <p style="margin:0 0 4px;font-size:0.7rem;color:#555;letter-spacing:1.5px;text-transform:uppercase;">Team code</p>
         <p id="invite-code-display" style="margin:0;font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:6px;"></p>

@@ -8430,7 +8430,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
     function renderFeedItems(feed) {
       if (!feed || !feed.length) return `<div class="feed-empty">Ainda sem atividade. Completa uma tarefa para aparecer aqui!</div>`;
-      return feed.slice(0, 25).map(a => {
+      return feed.slice(0, 50).map(a => {
         const init = (a.nome||"?").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
         let actionHtml = "";
         if (a.tipo === "tarefa_concluida") {
@@ -8439,6 +8439,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           actionHtml = `<span class="feed-action-deleg">↗ delegou</span> <span class="feed-action-task">"${a.titulo||""}"</span>${a.para ? ` para <strong>${a.para}</strong>` : ""}`;
         } else if (a.tipo === "membro_entrou") {
           actionHtml = `<span style="color:#f59e0b;font-weight:700;">entrou na equipa</span>`;
+        } else if (a.tipo === "comentario_adicionado") {
+          actionHtml = `<span style="color:#9b85ff;font-weight:700;">💬 comentou em</span> <span class="feed-action-task">"${a.titulo||""}"</span>`;
         } else {
           actionHtml = `<span style="color:#555;">${a.descricao||""}</span>`;
         }
@@ -8466,7 +8468,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     function startTeamFeedListener(teamId) {
       return db.collection(`teams/${teamId}/atividade`)
         .orderBy("em", "desc")
-        .limit(25)
+        .limit(50)
         .onSnapshot(snap => {
           appState.equipaFeed = snap.docs.map(d => ({ id: d.id, ...d.data() }));
           // Atualiza só o feed sem re-render completo
@@ -8925,6 +8927,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const data = { texto, autorUid: currentUser.uid, autorNome, criadoEm: new Date().toISOString(), tipo: "comentario" };
       await db.collection(`teams/${appState.equipa.id}/tarefas/${taskId}/comentarios`).add(data);
       input.value = "";
+      // Log no feed de atividade da equipa
+      logTeamActivity(appState.equipa.id, { tipo: "comentario_adicionado", titulo: appState.equipaTarefas?.find(t => t.id === taskId)?.titulo || "" });
     }
 
     async function deleteTeam() {
