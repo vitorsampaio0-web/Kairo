@@ -3653,6 +3653,8 @@
 
     const appState = {
       currentView: "dashboard",
+      teamViewMode: "lista",
+      teamFilterTab: "todas",
       notas: [],
       notaSelecionada: null,
       notasSearch: "",
@@ -8421,6 +8423,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     function renderTeam(filterTab) {
       const el = document.getElementById("equipa-view");
       if (!el) return;
+      appState.teamFilterTab = filterTab || appState.teamFilterTab || "todas";
       const equipa = appState.equipa;
 
       if (!equipa) {
@@ -8564,14 +8567,22 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           ${membros.length > 0 ? accRows : `<p style="color:#444;font-size:0.8rem;">Ainda sem membros.</p>`}
         </div>
 
+        <!-- Tabs Lista / Kanban -->
+        <div class="team-view-tabs" style="margin-bottom:16px;">
+          <button class="team-view-tab ${appState.teamViewMode !== 'kanban' ? 'active' : ''}" onclick="switchTeamView('lista')">📋 Lista</button>
+          <button class="team-view-tab ${appState.teamViewMode === 'kanban' ? 'active' : ''}" onclick="switchTeamView('kanban')">📊 Kanban</button>
+        </div>
+
         <!-- Filtros -->
         <div class="team-filter-tabs">${tabsHtml}</div>
 
         <!-- Lista tarefas -->
+        ${appState.teamViewMode !== 'kanban' ? `
         <div class="team-tasks-header">
           <h3>Tarefas (${tarefasFiltradas.length}${tarefasFiltradas.length!==tarefas.length?" filtradas":""})</h3>
         </div>
         ${taskItems || `<p style="color:#555;font-size:0.85rem;padding:20px 0;">Nenhuma tarefa neste filtro.</p>`}
+        ` : renderTeamKanban(tarefasFiltradas)}
 
         <!-- Feed de Atividade -->
         <div class="feed-wrap">
@@ -8730,14 +8741,11 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     async function toggleTeamTask(taskId) {
       const task = appState.equipaTarefas.find(t => t.id === taskId);
       if (!task || !appState.equipa) return;
-      const newStatus = task.status === "concluida" ? "pendente" : "concluida";
+      const cycle = { pendente: "andamento", andamento: "concluida", concluida: "pendente" };
+      const newStatus = cycle[task.status] || "pendente";
       await db.doc(`teams/${appState.equipa.id}/tarefas/${taskId}`).update({ status: newStatus });
-      // Registar no feed só ao concluir (não ao re-abrir)
       if (newStatus === "concluida") {
-        logTeamActivity(appState.equipa.id, {
-          tipo:   "tarefa_concluida",
-          titulo: task.titulo || "",
-        });
+        logTeamActivity(appState.equipa.id, { tipo: "tarefa_concluida", titulo: task.titulo || "" });
       }
     }
 
@@ -8745,6 +8753,47 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!appState.equipa) return;
       if (!confirm("Apagar esta tarefa?")) return;
       await db.doc(`teams/${appState.equipa.id}/tarefas/${taskId}`).delete();
+    }
+
+    function switchTeamView(mode) {
+      appState.teamViewMode = mode;
+      renderTeam(appState.teamFilterTab || "todas");
+    }
+
+    function renderTeamKanban(tarefas) {
+      const colunas = [
+        { key: "pendente", label: "A Fazer", color: "#f59e0b" },
+        { key: "andamento", label: "Em Andamento", color: "#4ea8ff" },
+        { key: "concluida", label: "Concluído", color: "#31d0aa" }
+      ];
+      const membros = appState.equipa?.membros || [];
+      return `
+        <div class="kanban-board">
+          ${colunas.map(col => {
+            const colTasks = tarefas.filter(t => t.status === col.key);
+            return `
+            <div class="kanban-col">
+              <div class="kanban-col-header">
+                <span>${col.label}</span>
+                <span class="kanban-col-count">${colTasks.length}</span>
+              </div>
+              ${colTasks.map(t => {
+                const assignee = membros.find(m => m.uid === t.atribuidoA);
+                return `
+                <div class="kanban-card" onclick="openTeamTaskDetail('${t.id}')">
+                  <p class="kanban-card-title">${t.titulo}</p>
+                  <div class="kanban-card-meta">
+                    ${assignee ? `<div class="kanban-card-avatar" title="${assignee.nome}">${(assignee.nome||"?").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()}</div>` : "<div class='kanban-card-avatar' style='background:#333;' title='Sem atribuição'>?</div>"}
+                    ${t.prazo ? `<span>⏰ ${new Date(t.prazo).toLocaleDateString("pt-PT",{day:"numeric",month:"short"})}</span>` : ""}
+                  </div>
+                </div>
+                `;
+              }).join("") || `<p style="color:#444;font-size:0.72rem;text-align:center;padding:20px 0;">Sem tarefas</p>`}
+            </div>
+            `;
+          }).join("")}
+        </div>
+      `;
     }
 
     async function leaveTeam() {

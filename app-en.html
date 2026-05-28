@@ -1435,6 +1435,17 @@
     .team-task-date { font-size:0.7rem; color:#555; }
     .team-leave-btn { backgrornd:none; border:1px solid rgba(248,113,113,0.2); color:#f87171; border-radius:8px; padding:6px 12px; font-size:0.75rem; cursor:pointer; }
 
+    /* ---- Comentários + Kanban ---- */
+    .team-task-comment-btn { backgrornd:none; border:none; color:#7c5cff; cursor:pointer; font-size:0.72rem; padding:4px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; }
+    .comment-avatar { width:30px; height:30px; border-radius:50%; backgrornd:linear-gradient(135deg,#4ea8ff,#7c5cff); }
+    .kanban-board { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:16px; }
+    .kanban-col { backgrornd:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.04); border-radius:14px; padding:12px; min-height:200px; }
+    .kanban-col-header { font-size:0.78rem; font-weight:600; color:#888; margin-bottom:10px; }
+    .kanban-card { backgrornd:#11111a; border:1px solid #1e1e3a; border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; }
+    .kanban-card-title { font-size:0.82rem; font-weight:600; color:#e0e0f0; }
+    .team-view-tabs { display:flex; gap:8px; margin-bottom:12px; }
+    .team-view-tab.active { backgrornd:rgba(124,92,255,0.12); border-color:rgba(124,92,255,0.25); color:#9b85ff; }
+
     /* ---- Accorntability / Delegação ---- */
     .acc-panel { backgrornd:#0d0d1f; border:1px solid #1e1e3a; border-radius:14px; padding:16px 18px; margin-bottom:20px; }
     .acc-panel-title { font-size:0.72rem; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
@@ -3000,6 +3011,25 @@
       <button class="team-save-btn" onclick="saveTeamTask()">Delegar Task</button>
     </div>
   </div>
+  <!-- Task Details (Team with comments) -->
+  <div class="team-modal-overlay hidden" id="team-task-detail-modal">
+    <div class="task-detail-card">
+      <div class="task-detail-header">
+        <h3 class="task-detail-title" id="team-task-detail-title">Task Details</h3>
+        <button onclick="closeTeamTaskDetail()" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <div class="task-detail-meta" id="team-task-detail-meta"></div>
+      <div id="team-task-detail-nota" style="font-size:0.85rem;color:#888;background:rgba(255,255,255,0.02);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);"></div>
+      <div style="border-top:1px solid #1e1e3a;padding-top:12px;">
+        <div style="font-size:0.78rem;font-weight:600;color:#777;margin-bottom:8px;">💬 Comentários</div>
+        <div class="comment-list" id="team-task-comments-list"><div style="color:#555;font-size:0.78rem;">Ainda sem comentários.</div></div>
+        <div class="comment-input-wrap">
+          <textarea id="team-task-comment-input" class="comment-input" placeholder="Escreve um comentário..." rows="2"></textarea>
+          <button class="comment-send-btn" onclick="sendTeamTaskComment()">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="digest-overlay hidden" id="referral-modal">
     <div class="digest-card" style="max-width:440px;">
       <button class="digest-close" onclick="closeReferralModal()"><i data-lucide="x"></i></button>
@@ -3491,6 +3521,8 @@
 
     const appState = {
       currentView: "dashboard",
+      teamViewMode: "lista",
+      teamFilterTab: "todas",
       notas: [],
       notaSelecionada: null,
       notasSearch: "",
@@ -8272,6 +8304,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     function renderTeam(filterTab) {
       const el = document.getElementById("equipa-view");
       if (!el) return;
+      appState.teamFilterTab = filterTab || appState.teamFilterTab || "todas";
       const equipa = appState.equipa;
 
       if (!equipa) {
@@ -8385,6 +8418,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
               ${t.nota ? `<p class="team-task-nota">"${t.nota}"</p>` : ""}
             </div>
             <div style="display:flex;gap:6px;">
+              <button class="team-task-comment-btn" onclick="openTeamTaskDetail('${t.id}')">
+                <i data-lucide="message-circle" style="width:12px;height:12px;"></i> Comment
+              </button>
               <button class="meta-action-btn" onclick="openEditTeamTask('${t.id}')"><i data-lucide="pencil" style="width:12px;height:12px;"></i></button>
               <button class="meta-action-btn" onclick="deleteTeamTask('${t.id}')" style="color:#f87171;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
             </div>
@@ -8412,14 +8448,22 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           ${membros.length > 0 ? accRows : `<p style="color:#444;font-size:0.8rem;">Ainda sem membros.</p>`}
         </div>
 
+        <!-- Tabs Lista / Kanban -->
+        <div class="team-view-tabs" style="margin-bottom:16px;">
+          <button class="team-view-tab ${appState.teamViewMode !== 'kanban' ? 'active' : ''}" onclick="switchTeamView('lista')">📋 Lista</button>
+          <button class="team-view-tab ${appState.teamViewMode === 'kanban' ? 'active' : ''}" onclick="switchTeamView('kanban')">📊 Kanban</button>
+        </div>
+
         <!-- Filtros -->
         <div class="team-filter-tabs">${tabsHtml}</div>
 
         <!-- Lista tasks -->
+        ${appState.teamViewMode !== 'kanban' ? `
         <div class="team-tasks-header">
           <h3>Tasks (${tasksFiltradas.length}${tasksFiltradas.length!==tasks.length?" filtradas":""})</h3>
         </div>
         ${taskItems || `<p style="color:#555;font-size:0.85rem;padding:20px 0;">Nenhuma tarefa neste filtro.</p>`}
+        ` : renderTeamKanban(tasksFiltradas, membros)}
 
         <!-- Feed de Atividade -->
         <div class="feed-wrap">
@@ -8578,14 +8622,11 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     async function toggleTeamTask(taskId) {
       const task = appState.equipaTasks.find(t => t.id === taskId);
       if (!task || !appState.equipa) return;
-      const newStatus = task.status === "concluida" ? "pendente" : "concluida";
+      const cycle = { pendente: "andamento", andamento: "concluida", concluida: "pendente" };
+      const newStatus = cycle[task.status] || "pendente";
       await db.doc(`teams/${appState.equipa.id}/tasks/${taskId}`).update({ status: newStatus });
-      // Register no feed só ao concluir (não ao re-abrir)
       if (newStatus === "concluida") {
-        logTeamActivity(appState.equipa.id, {
-          tipo:   "tarefa_concluida",
-          titulo: task.titulo || "",
-        });
+        logTeamActivity(appState.equipa.id, { tipo: "tarefa_concluida", titulo: task.titulo || "" });
       }
     }
 
@@ -8612,6 +8653,110 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!confirm("Apagar a equipa para todos os membros?")) return;
       await db.doc(`teams/${appState.equipa.id}`).delete();
       showToast("Team apagada.");
+    }
+
+    /* ---- Comentários em tarefas de equipa ---- */
+    let _taskDetailUnsub = null;
+    let _taskDetailId = null;
+
+    function closeTeamTaskDetail() {
+      document.getElementById("team-task-detail-modal").classList.add("hidden");
+      if (_taskDetailUnsub) { _taskDetailUnsub(); _taskDetailUnsub = null; }
+      _taskDetailId = null;
+    }
+
+    function openTeamTaskDetail(taskId) {
+      if (!appState.equipa) return;
+      _taskDetailId = taskId;
+      const task = appState.equipaTarefas.find(t => t.id === taskId);
+      if (!task) return;
+      document.getElementById("team-task-detail-title").textContent = task.titulo || "Detalhes";
+      const assignee = (appState.equipa.membros || []).find(m => m.uid === task.atribuidoA);
+      const delegator = (appState.equipa.membros || []).find(m => m.uid === task.delegadoPor);
+      const statusLabel = { pendente: "To Do", andamento: "In Progress", concluida: "Done" }[task.status] || task.status;
+      document.getElementById("team-task-detail-meta").innerHTML = `
+        <span>👤 ${assignee?.nome || "Unassigned"}</span>
+        <span>📅 ${task.prazo ? new Date(task.prazo).toLocaleDateString("en-US", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"}) : "No deadline"}</span>
+        <span>🚩 ${statusLabel}</span>
+        ${delegator ? `<span>↗ Delegated by ${delegator.nome}</span>` : ""}
+      `;
+      document.getElementById("team-task-detail-nota").textContent = task.nota || "";
+      document.getElementById("team-task-detail-nota").style.display = task.nota ? "block" : "none";
+      document.getElementById("team-task-detail-modal").classList.remove("hidden");
+      listenToTeamTaskComments(taskId);
+    }
+
+    function listenToTeamTaskComments(taskId) {
+      if (!appState.equipa || !taskId) return;
+      if (_taskDetailUnsub) { _taskDetailUnsub(); }
+      const listEl = document.getElementById("team-task-comments-list");
+      _taskDetailUnsub = db.collection(`teams/${appState.equipa.id}/tarefas/${taskId}/comentarios`)
+        .orderBy("criadoEm", "asc")
+        .onSnapshot(snap => {
+          const docs = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+          if (!docs.length) { listEl.innerHTML = '<div style="color:#555;font-size:0.78rem;">No comments yet.</div>'; return; }
+          listEl.innerHTML = docs.map(c => `
+            <div class="comment-item">
+              <div class="comment-avatar">${(c.autorNome || "?").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()}</div>
+              <div class="comment-body">
+                <div><span class="comment-author">${escapeHtml(c.autorNome)}</span><span class="comment-time">${formatDateHora(c.criadoEm)}</span></div>
+                <div class="comment-text">${escapeHtml(c.texto)}</div>
+              </div>
+            </div>
+          `).join("");
+          listEl.scrollTop = listEl.scrollHeight;
+        });
+    }
+
+    async function sendTeamTaskComment() {
+      const input = document.getElementById("team-task-comment-input");
+      const texto = input.value.trim();
+      if (!texto || !appState.equipa || !_taskDetailId) return;
+      const taskId = _taskDetailId;
+      const autorNome = currentUser?.displayName || currentUser?.email?.split("@")[0] || "User";
+      const data = { texto, autorUid: currentUser.uid, autorNome, criadoEm: new Date().toISOString(), tipo: "comentario" };
+      await db.collection(`teams/${appState.equipa.id}/tarefas/${taskId}/comentarios`).add(data);
+      input.value = "";
+    }
+
+    function switchTeamView(mode) {
+      appState.teamViewMode = mode;
+      renderTeam(appState.teamFilterTab || "todas");
+    }
+
+    function renderTeamKanban(tarefas, membros) {
+      const colunas = [
+        { key: "pendente", label: "To Do", color: "#f59e0b" },
+        { key: "andamento", label: "In Progress", color: "#4ea8ff" },
+        { key: "concluida", label: "Done", color: "#31d0aa" }
+      ];
+      return `
+        <div class="kanban-board">
+          ${colunas.map(col => {
+            const colTasks = tarefas.filter(t => t.status === col.key);
+            return `
+            <div class="kanban-col">
+              <div class="kanban-col-header">
+                <span>${col.label}</span>
+                <span class="kanban-col-count">${colTasks.length}</span>
+              </div>
+              ${colTasks.map(t => {
+                const assignee = membros.find(m => m.uid === t.atribuidoA);
+                return `
+                <div class="kanban-card" onclick="openTeamTaskDetail('${t.id}')">
+                  <p class="kanban-card-title">${t.titulo}</p>
+                  <div class="kanban-card-meta">
+                    ${assignee ? `<div class="kanban-card-avatar" title="${assignee.nome}">${(assignee.nome||"?").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()}</div>` : "<div class='kanban-card-avatar' style='backgrornd:#333;' title='Unassigned'>?</div>"}
+                    ${t.prazo ? `<span>⏰ ${new Date(t.prazo).toLocaleDateString("en-US",{day:"numeric",month:"short"})}</span>` : ""}
+                  </div>
+                </div>
+                `;
+              }).join("") || `<p style="color:#444;font-size:0.72rem;text-align:center;padding:20px 0;">Sem tasks</p>`}
+            </div>
+            `;
+          }).join("")}
+        </div>
+      `;
     }
 
     function copyTeamCode(code) {
