@@ -1435,6 +1435,46 @@
     .team-task-date { font-size:0.7rem; color:#555; }
     .team-leave-btn { background:none; border:1px solid rgba(248,113,113,0.2); color:#f87171; border-radius:8px; padding:6px 12px; font-size:0.75rem; cursor:pointer; }
 
+    /* ---- Comentários em tarefas de equipa ---- */
+    .team-task-comment-btn { background:none; border:none; color:#7c5cff; cursor:pointer; font-size:0.72rem; padding:4px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; }
+    .team-task-comment-btn:hover { background:rgba(124,92,255,0.08); }
+
+    .task-detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:3100; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .task-detail-card { background:#12122a; border:1px solid #1e1e3a; border-radius:20px; padding:28px; width:min(560px,96vw); max-height:82vh; overflow-y:auto; display:flex; flex-direction:column; gap:16px; }
+    .task-detail-header { display:flex; justify-content:space-between; align-items:flex-start; }
+    .task-detail-title { font-size:1.1rem; font-weight:700; color:#e0e0f0; margin:0; line-height:1.35; }
+    .task-detail-meta { display:flex; flex-wrap:wrap; gap:8px; align-items:center; color:#888; font-size:0.78rem; }
+
+    .comment-list { display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+    .comment-item { display:flex; gap:10px; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); }
+    .comment-avatar { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#4ea8ff,#7c5cff); display:flex; align-items:center; justify-content:center; font-size:0.68rem; font-weight:700; color:#fff; flex-shrink:0; }
+    .comment-body { flex:1; }
+    .comment-author { font-weight:600; font-size:0.78rem; color:#e0e0f0; }
+    .comment-time { font-size:0.65rem; color:#555; margin-left:6px; }
+    .comment-text { font-size:0.82rem; color:#b0b0d0; margin-top:2px; line-height:1.35; }
+
+    .comment-input-wrap { display:flex; gap:8px; align-items:flex-end; margin-top:8px; }
+    .comment-input { flex:1; background:#0a0a14; border:1px solid #1e1e3a; border-radius:10px; padding:10px 14px; color:#e0e0f0; font-size:0.85rem; outline:none; resize:none; min-height:40px; max-height:120px; font-family:inherit; }
+    .comment-input:focus { border-color:#7c5cff; }
+    .comment-send-btn { background:linear-gradient(135deg,#7c5cff,#4ea8ff); border:none; color:#fff; padding:10px 16px; border-radius:10px; font-size:0.82rem; font-weight:700; cursor:pointer; flex-shrink:0; }
+
+    /* ---- Kanban Equipa ---- */
+    .kanban-board { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:16px; }
+    .kanban-col { background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.04); border-radius:14px; padding:12px; min-height:200px; }
+    .kanban-col-header { font-size:0.78rem; font-weight:600; color:#888; margin-bottom:10px; padding:0 4px; display:flex; justify-content:space-between; align-items:center; }
+    .kanban-col-count { font-size:0.65rem; color:#555; background:rgba(255,255,255,0.04); padding:2px 8px; border-radius:6px; }
+    .kanban-card { background:#11111a; border:1px solid #1e1e3a; border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:transform .1s ease,border-color .15s ease; }
+    .kanban-card:hover { border-color:rgba(124,92,255,0.25); transform:translateY(-1px); }
+    .kanban-card-title { font-size:0.82rem; font-weight:600; color:#e0e0f0; margin:0 0 6px; line-height:1.3; }
+    .kanban-card-meta { display:flex; flex-wrap:wrap; gap:6px; font-size:0.68rem; color:#666; align-items:center; }
+    .kanban-card-avatar { width:20px; height:20px; border-radius:50%; background:linear-gradient(135deg,#4ea8ff,#7c5cff); display:flex; align-items:center; justify-content:center; font-size:0.56rem; font-weight:700; color:#fff; }
+
+    .team-view-tabs { display:flex; gap:8px; margin-bottom:12px; }
+    .team-view-tab { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); color:#888; padding:6px 14px; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all .15s ease; }
+    .team-view-tab.active { background:rgba(124,92,255,0.12); border-color:rgba(124,92,255,0.25); color:#9b85ff; }
+
+    @media (max-width: 640px) { .kanban-board { grid-template-columns:1fr; } }
+
     /* ---- Accountability / Delegação ---- */
     .acc-panel { background:#0d0d1f; border:1px solid #1e1e3a; border-radius:14px; padding:16px 18px; margin-bottom:20px; }
     .acc-panel-title { font-size:0.72rem; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
@@ -3101,6 +3141,27 @@
       <button class="team-save-btn" onclick="saveTeamTask()">Delegar Tarefa</button>
     </div>
   </div>
+
+  <!-- Detalhes da Tarefa de Equipa (com comentários) -->
+  <div class="team-modal-overlay hidden" id="team-task-detail-modal">
+    <div class="task-detail-card">
+      <div class="task-detail-header">
+        <h3 class="task-detail-title" id="team-task-detail-title">Detalhes da Tarefa</h3>
+        <button onclick="closeTeamTaskDetail()" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <div class="task-detail-meta" id="team-task-detail-meta"></div>
+      <div id="team-task-detail-nota" style="font-size:0.85rem;color:#888;background:rgba(255,255,255,0.02);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);"></div>
+      <div style="border-top:1px solid #1e1e3a;padding-top:12px;">
+        <div style="font-size:0.78rem;font-weight:600;color:#777;margin-bottom:8px;">💬 Comentários</div>
+        <div class="comment-list" id="team-task-comments-list"><div style="color:#555;font-size:0.78rem;">Ainda sem comentários.</div></div>
+        <div class="comment-input-wrap">
+          <textarea id="team-task-comment-input" class="comment-input" placeholder="Escreve um comentário..." rows="2"></textarea>
+          <button class="comment-send-btn" onclick="sendTeamTaskComment()">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="digest-overlay hidden" id="referral-modal">
     <div class="digest-card" style="max-width:440px;">
       <button class="digest-close" onclick="closeReferralModal()"><i data-lucide="x"></i></button>
@@ -8473,6 +8534,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
               ${t.nota ? `<p class="team-task-nota">"${t.nota}"</p>` : ""}
             </div>
             <div style="display:flex;gap:6px;">
+              <button class="team-task-comment-btn" onclick="openTeamTaskDetail('${t.id}')">
+                <i data-lucide="message-circle" style="width:12px;height:12px;"></i> Comentar
+              </button>
               <button class="meta-action-btn" onclick="openEditTeamTask('${t.id}')"><i data-lucide="pencil" style="width:12px;height:12px;"></i></button>
               <button class="meta-action-btn" onclick="deleteTeamTask('${t.id}')" style="color:#f87171;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
             </div>
@@ -8693,6 +8757,70 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         membrosUids: firebase.firestore.FieldValue.arrayRemove(uid)
       });
       showToast("Saíste da equipa.");
+    }
+
+    /* ---- Comentários em tarefas de equipa ---- */
+    let _taskDetailUnsub = null;
+    let _taskDetailId = null;
+
+    function closeTeamTaskDetail() {
+      document.getElementById("team-task-detail-modal").classList.add("hidden");
+      if (_taskDetailUnsub) { _taskDetailUnsub(); _taskDetailUnsub = null; }
+      _taskDetailId = null;
+    }
+
+    function openTeamTaskDetail(taskId) {
+      if (!appState.equipa) return;
+      _taskDetailId = taskId;
+      const task = appState.equipaTarefas.find(t => t.id === taskId);
+      if (!task) return;
+      document.getElementById("team-task-detail-title").textContent = task.titulo || "Detalhes";
+      const assignee = (appState.equipa.membros || []).find(m => m.uid === task.atribuidoA);
+      const delegator = (appState.equipa.membros || []).find(m => m.uid === task.delegadoPor);
+      const statusLabel = { pendente: "A fazer", andamento: "Em andamento", concluida: "Concluída" }[task.status] || task.status;
+      document.getElementById("team-task-detail-meta").innerHTML = `
+        <span>👤 ${assignee?.nome || "Sem atribuição"}</span>
+        <span>📅 ${task.prazo ? new Date(task.prazo).toLocaleDateString("pt-PT", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"}) : "Sem prazo"}</span>
+        <span>🚩 ${statusLabel}</span>
+        ${delegator ? `<span>↗ Delegado por ${delegator.nome}</span>` : ""}
+      `;
+      document.getElementById("team-task-detail-nota").textContent = task.nota || "";
+      document.getElementById("team-task-detail-nota").style.display = task.nota ? "block" : "none";
+      document.getElementById("team-task-detail-modal").classList.remove("hidden");
+      listenToTeamTaskComments(taskId);
+    }
+
+    function listenToTeamTaskComments(taskId) {
+      if (!appState.equipa || !taskId) return;
+      if (_taskDetailUnsub) { _taskDetailUnsub(); }
+      const listEl = document.getElementById("team-task-comments-list");
+      _taskDetailUnsub = db.collection(`teams/${appState.equipa.id}/tarefas/${taskId}/comentarios`)
+        .orderBy("criadoEm", "asc")
+        .onSnapshot(snap => {
+          const docs = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+          if (!docs.length) { listEl.innerHTML = '<div style="color:#555;font-size:0.78rem;">Ainda sem comentários.</div>'; return; }
+          listEl.innerHTML = docs.map(c => `
+            <div class="comment-item">
+              <div class="comment-avatar">${(c.autorNome || "?").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()}</div>
+              <div class="comment-body">
+                <div><span class="comment-author">${escapeHtml(c.autorNome)}</span><span class="comment-time">${formatDateHora(c.criadoEm)}</span></div>
+                <div class="comment-text">${escapeHtml(c.texto)}</div>
+              </div>
+            </div>
+          `).join("");
+          listEl.scrollTop = listEl.scrollHeight;
+        });
+    }
+
+    async function sendTeamTaskComment() {
+      const input = document.getElementById("team-task-comment-input");
+      const texto = input.value.trim();
+      if (!texto || !appState.equipa || !_taskDetailId) return;
+      const taskId = _taskDetailId;
+      const autorNome = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Utilizador";
+      const data = { texto, autorUid: currentUser.uid, autorNome, criadoEm: new Date().toISOString(), tipo: "comentario" };
+      await db.collection(`teams/${appState.equipa.id}/tarefas/${taskId}/comentarios`).add(data);
+      input.value = "";
     }
 
     async function deleteTeam() {
