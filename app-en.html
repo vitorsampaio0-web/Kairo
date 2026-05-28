@@ -8531,9 +8531,12 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
         <!-- Feed de Atividade -->
         <div class="feed-wrap">
-          <div class="feed-title">
-            <span class="feed-live-dot"></span>
-            Recent Team Activity
+          <div class="feed-title" style="justify-content:space-between;">
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span class="feed-live-dot"></span>
+              Recent Team Activity
+            </span>
+            ${isAdmin ? `<button onclick="clearTeamFeed()" style="background:none;border:none;color:#666;font-size:0.65rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.06em;">Clear</button>` : ""}
           </div>
           <div class="feed-list" id="team-feed-list">
             ${renderFeedItems(appState.equipaFeed || [])}
@@ -8710,6 +8713,16 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         membrosUids: firebase.firestore.FieldValue.arrayRemove(uid)
       });
       showToast("Saíste da equipa.");
+    }
+
+    async function clearTeamFeed() {
+      if (!appState.equipa) return;
+      if (!confirm("Clear all activity history for this team?")) return;
+      const snap = await db.collection(`teams/${appState.equipa.id}/atividade`).get();
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      showToast("Team activity cleared.");
     }
 
     async function deleteTeam() {

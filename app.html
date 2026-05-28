@@ -8643,9 +8643,12 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
         <!-- Feed de Atividade -->
         <div class="feed-wrap">
-          <div class="feed-title">
-            <span class="feed-live-dot"></span>
-            Atividade Recente da Equipa
+          <div class="feed-title" style="justify-content:space-between;">
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span class="feed-live-dot"></span>
+              Atividade Recente da Equipa
+            </span>
+            ${isAdmin ? `<button onclick="clearTeamFeed()" style="background:none;border:none;color:#666;font-size:0.65rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.06em;">Limpar</button>` : ""}
           </div>
           <div class="feed-list" id="team-feed-list">
             ${renderFeedItems(appState.equipaFeed || [])}
@@ -8929,6 +8932,16 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       input.value = "";
       // Log no feed de atividade da equipa
       logTeamActivity(appState.equipa.id, { tipo: "comentario_adicionado", titulo: appState.equipaTarefas?.find(t => t.id === taskId)?.titulo || "" });
+    }
+
+    async function clearTeamFeed() {
+      if (!appState.equipa) return;
+      if (!confirm("Apagar todo o histórico de atividade desta equipa?")) return;
+      const snap = await db.collection(`teams/${appState.equipa.id}/atividade`).get();
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      showToast("Atividade da equipa limpa.");
     }
 
     async function deleteTeam() {
