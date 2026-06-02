@@ -4992,37 +4992,6 @@
             </div>
           </div>
 
-          ${(() => {
-            const h = getWeeklyHighlights();
-            return `
-            <div class="weekly-highlights">
-              <div class="weekly-highlights-header">
-                <span class="weekly-highlights-title"><i data-lucide="trophy" style="width:16px;height:16px;color:var(--gold);"></i> Weekly Highlights</span>
-                <button class="weekly-highlights-share" id="share-highlights-btn">
-                  <i data-lucide="share-2" style="width:13px;height:13px;"></i> Share
-                </button>
-              </div>
-              <div class="weekly-highlights-grid">
-                <div class="weekly-highlight-item">
-                  <div class="weekly-highlight-value">${h.completed}</div>
-                  <div class="weekly-highlight-label">Tasks done</div>
-                </div>
-                <div class="weekly-highlight-item">
-                  <div class="weekly-highlight-value">${h.rate}%</div>
-                  <div class="weekly-highlight-label">Success rate</div>
-                </div>
-                <div class="weekly-highlight-item">
-                  <div class="weekly-highlight-value">${h.bestStreak}</div>
-                  <div class="weekly-highlight-label">Best streak</div>
-                </div>
-                <div class="weekly-highlight-item">
-                  <div class="weekly-highlight-value">${h.habitsActive}</div>
-                  <div class="weekly-highlight-label">Active habits</div>
-                </div>
-              </div>
-            </div>`;
-          })()}
-
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <label style="font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.02em;">Date início</label>
