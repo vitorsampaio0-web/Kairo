@@ -8229,6 +8229,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
             <div class="dec-actions">
               ${!revisada ? `<button class="dec-btn dec-btn-review" onclick="openRevisaoModal('${d.id}')">Revisar</button>` : `<span style="font-size:0.7rem;color:#10b981;font-weight:700;">✓ Revista</span>`}
               <button class="dec-btn dec-btn-edit" onclick="openDecisaoModal('${d.id}')">✏️</button>
+              <button class="dec-btn" onclick="deleteDecisao('${d.id}')" title="Apagar decisão" style="background:#111128;border:1px solid #1e1e3a;color:#f87171;font-size:0.8rem;">🗑️</button>
             </div>
           </div>
           ${d.contexto ? `<div class="dec-card-ctx">${d.contexto}</div>` : ""}
