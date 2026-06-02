@@ -4228,7 +4228,29 @@
 
     function getWeeklyHabitAverage() {
       if (!appState.habitos.length) return 0;
-      const total = appState.habitos.reduce((acc, habit) => acc + habit.progresso, 0);
+      const hoje = new Date();
+      const diaSemana = hoje.getDay();
+      const offset = diaSemana === 0 ? -6 : 1 - diaSemana;
+      const segunda = new Date(hoje);
+      segunda.setDate(hoje.getDate() + offset);
+      const hojeStr = hoje.toISOString().split('T')[0];
+      const semanaStr = segunda.toISOString().split('T')[0];
+
+      const total = appState.habitos.reduce((acc, habit) => {
+        const historico = habit.historico || {};
+        let diasFeitos = 0;
+        let diasContados = 0;
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(segunda);
+          d.setDate(segunda.getDate() + i);
+          const dStr = d.toISOString().split('T')[0];
+          if (dStr > hojeStr) break;
+          diasContados++;
+          if (historico[dStr]) diasFeitos++;
+        }
+        const progressoReal = diasContados > 0 ? Math.round((diasFeitos / diasContados) * 100) : 0;
+        return acc + progressoReal;
+      }, 0);
       return Math.round(total / appState.habitos.length);
     }
 
@@ -4908,7 +4930,26 @@
             </div>
 
             <div class="list-stack">
-              ${appState.habitos.map(habit => `
+              ${appState.habitos.map(habit => {
+                const historico = habit.historico || {};
+                const hoje = new Date();
+                const diaSemana = hoje.getDay();
+                const offset = diaSemana === 0 ? -6 : 1 - diaSemana;
+                const segunda = new Date(hoje);
+                segunda.setDate(hoje.getDate() + offset);
+                const hojeStr = hoje.toISOString().split('T')[0];
+                let diasFeitos = 0;
+                let diasContados = 0;
+                for (let i = 0; i < 7; i++) {
+                  const d = new Date(segunda);
+                  d.setDate(segunda.getDate() + i);
+                  const dStr = d.toISOString().split('T')[0];
+                  if (dStr > hojeStr) break;
+                  diasContados++;
+                  if (historico[dStr]) diasFeitos++;
+                }
+                const progressoReal = diasContados > 0 ? Math.round((diasFeitos / diasContados) * 100) : 0;
+                return `
                 <div class="habit-card ${habit.concluidoHoje ? "done" : ""}">
                   <div class="habit-top">
                     <div>
@@ -4929,14 +4970,14 @@
                   </div>
                   ${renderHabitWeekGrid(habit)}
                   <div class="progress-bar">
-                    <div class="progress-fill" style="width:${habit.progresso}%"></div>
+                    <div class="progress-fill" style="width:${progressoReal}%"></div>
                   </div>
                   <div class="habit-meta">
-                    <span class="badge">${habit.progresso}% na semana</span>
+                    <span class="badge">${progressoReal}% esta semana (${diasFeitos}/${diasContados} dias)</span>
                     <span class="badge ${habit.concluidoHoje ? "status-concluida" : "status-pendente"}">${habit.concluidoHoje ? "Concluído hoje" : "Pendente hoje"}</span>
                   </div>
-                </div>
-              `).join("")}
+                </div>`;
+              }).join("")}
               ${!appState.habitos.length ? `<div class="empty-state">Nenhum hábito criado ainda. Adiciona o primeiro acima.</div>` : ""}
             </div>
           </div>
