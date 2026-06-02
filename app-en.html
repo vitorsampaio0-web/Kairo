@@ -8285,7 +8285,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       return `${Math.round(diff/86400)}d ago`;
     }
 
-    function renderFeedItems(feed) {
+    function renderFeedItems(feed, isAdmin) {
       if (!feed || !feed.length) return `<div class="feed-empty">No activity yet. Complete a task to see it here!</div>`;
       return feed.slice(0, 50).map(a => {
         const init = (a.nome||"?").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
@@ -8331,7 +8331,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           appState.equipaFeed = snap.docs.map(d => ({ id: d.id, ...d.data() }));
           // Atualiza só o feed sem re-render completo
           const el = document.getElementById("team-feed-list");
-          if (el) el.innerHTML = renderFeedItems(appState.equipaFeed);
+          if (el) el.innerHTML = renderFeedItems(appState.equipaFeed, true);
         }, err => console.error("[Feed] listener:", err));
     }
 
@@ -8509,7 +8509,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
             ${isAdmin ? `<button onclick="clearTeamFeed()" style="background:none;border:none;color:#666;font-size:0.65rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.06em;">Clear</button>` : ""}
           </div>
           <div class="feed-list" id="team-feed-list">
-            ${renderFeedItems(appState.equipaFeed || [])}
+            ${renderFeedItems(appState.equipaFeed || [], isAdmin)}
           </div>
         </div>`;
 
@@ -8691,7 +8691,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       await db.collection(`teams/${appState.equipa.id}/atividade`).doc(id).delete();
       appState.equipaFeed = (appState.equipaFeed || []).filter(a => a.id !== id);
       const el = document.getElementById("team-feed-list");
-      if (el) el.innerHTML = renderFeedItems(appState.equipaFeed);
+      if (el) el.innerHTML = renderFeedItems(appState.equipaFeed, true);
       showToast("Activity deleted.");
     }
 
@@ -8704,7 +8704,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       await batch.commit();
       appState.equipaFeed = [];
       const el = document.getElementById("team-feed-list");
-      if (el) el.innerHTML = renderFeedItems([]);
+      if (el) el.innerHTML = renderFeedItems([], true);
       showToast("Team activity cleared.");
     }
 
