@@ -8301,12 +8301,13 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         } else {
           actionHtml = `<span style="color:#555;">${a.descricao||""}</span>`;
         }
-        return `<div class="feed-item">
+        return `<div class="feed-item" data-feed-id="${a.id}">
           <div class="feed-avatar">${init}</div>
-          <div class="feed-body">
+          <div class="feed-body" style="flex:1;min-width:0;">
             <div class="feed-text"><strong>${a.nome||"Member"}</strong> ${actionHtml}</div>
             <div class="feed-time">${timeAgo(a.em)}</div>
           </div>
+          ${isAdmin ? `<button onclick="deleteFeedItem('${a.id}')" title="Delete activity" style="background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:0 4px;line-height:1;opacity:0;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">&times;</button>` : ""}
         </div>`;
       }).join("");
     }
@@ -8684,6 +8685,16 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       showToast("Saíste da equipa.");
     }
 
+    async function deleteFeedItem(id) {
+      if (!appState.equipa || !id) return;
+      if (!confirm("Delete this activity?")) return;
+      await db.collection(`teams/${appState.equipa.id}/atividade`).doc(id).delete();
+      appState.equipaFeed = (appState.equipaFeed || []).filter(a => a.id !== id);
+      const el = document.getElementById("team-feed-list");
+      if (el) el.innerHTML = renderFeedItems(appState.equipaFeed);
+      showToast("Activity deleted.");
+    }
+
     async function clearTeamFeed() {
       if (!appState.equipa) return;
       if (!confirm("Clear all activity history for this team?")) return;
@@ -8691,6 +8702,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const batch = db.batch();
       snap.docs.forEach(d => batch.delete(d.ref));
       await batch.commit();
+      appState.equipaFeed = [];
+      const el = document.getElementById("team-feed-list");
+      if (el) el.innerHTML = renderFeedItems([]);
       showToast("Team activity cleared.");
     }
 
