@@ -3266,7 +3266,7 @@
           <button type="button" class="meta-dur-btn" data-dur="90" onclick="selectDur(this)">90 dias</button>
           <button type="button" class="meta-dur-btn" data-dur="0" onclick="selectDur(this)">Personalizado</button>
         </div>
-        <input id="meta-prazo-custom" class="meta-input" type="date" style="display:none;margin-top:8px;">
+        <input id="meta-prazo-custom" class="meta-input" type="date" style="display:none;margin-top:8px;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
       </div>
       <div class="meta-field">
         <label>Cor</label>
@@ -3414,7 +3414,7 @@
       </div>
       <div class="modal-field">
         <label>Lembrete (hora)</label>
-        <input id="edit-habit-reminder" class="task-input" type="time" />
+        <input id="edit-habit-reminder" class="task-input" type="time" style="cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
       </div>
       <div class="modal-actions">
         <button class="secondary-btn" onclick="closeEditHabitModal()">Cancelar</button>
@@ -3524,11 +3524,11 @@
       <div class="modal-row">
         <div class="modal-field">
           <label>Data</label>
-          <input id="edit-task-date" class="task-input" type="date" />
+          <input id="edit-task-date" class="task-input" type="date" style="cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
         </div>
         <div class="modal-field">
           <label>Hora</label>
-          <input id="edit-task-time" class="task-input" type="time" />
+          <input id="edit-task-time" class="task-input" type="time" style="cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
         </div>
       </div>
       <div class="modal-field">
@@ -4804,8 +4804,8 @@
               <option value="Saúde">Saúde</option>
               <option value="Desporto">Desporto</option>
             </select>
-            <input id="quick-task-date" class="task-input" type="date" />
-            <input id="quick-task-time" class="task-input" type="time" />
+            <input id="quick-task-date" class="task-input" type="date" style="cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
+            <input id="quick-task-time" class="task-input" type="time" style="cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
             <select id="quick-task-repeat" class="task-select" onchange="toggleDayPicker('quick')">
               <option value="nenhuma">Sem repetição</option>
               <option value="diaria">Repete diariamente</option>
@@ -5135,11 +5135,11 @@
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <label style="font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.02em;">Data início</label>
-              <input type="date" class="task-input" id="hist-date-inicio" value="${dateInicio}" style="max-width:165px;" />
+              <input type="date" class="task-input" id="hist-date-inicio" value="${dateInicio}" style="max-width:165px;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
             </div>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <label style="font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.02em;">Data fim</label>
-              <input type="date" class="task-input" id="hist-date-fim" value="${dateFim}" style="max-width:165px;" />
+              <input type="date" class="task-input" id="hist-date-fim" value="${dateFim}" style="max-width:165px;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
             </div>
             ${(dateInicio || dateFim) ? `<button class="ghost-btn" id="hist-clear-dates" style="padding:10px 14px;align-self:flex-end;" title="Limpar datas"><i data-lucide="x-circle"></i></button>` : ""}
           </div>
@@ -9266,7 +9266,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         <div>
           <label style="font-size:0.78rem;color:#666;margin-bottom:6px;display:block;">Prazo de Revisão</label>
           <input type="date" id="dec-input-prazo"
-            style="width:100%;box-sizing:border-box;background:#111128;border:1px solid #1e1e3a;border-radius:10px;color:#e0e0f0;padding:9px 12px;font-size:0.85rem;" />
+            style="width:100%;box-sizing:border-box;background:#111128;border:1px solid #1e1e3a;border-radius:10px;color:#e0e0f0;padding:9px 12px;font-size:0.85rem;cursor:pointer;"
+            onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
         </div>
       </div>
 
