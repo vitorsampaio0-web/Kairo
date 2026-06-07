@@ -6144,7 +6144,6 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     // ---- Firebase Auth ----
     document.getElementById("google-signin-btn").addEventListener("click", () => {
       const provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: "select_account" });
       auth.signInWithPopup(provider)
         .catch(err => {
           console.error("[Auth] Erro:", err);
