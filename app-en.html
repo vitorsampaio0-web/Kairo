@@ -2867,7 +2867,8 @@
             <button onclick="window.open('kairo-brochure.html','_blank')"><i data-lucide="book-open"></i> Guide</button>
             <button onclick="openNotifModal()"><i data-lucide="bell"></i> Notifications</button>
             <button onclick="openReferralModal()"><i data-lucide="gift"></i> Invite Friends</button>
-            <button onclick="firebase.auth().signOct()"><i data-lucide="log-ort"></i> Sign Oct</button>
+            <button onclick="openDeleteAccountModal()" style="color:#ff6b8a;"><i data-lucide="trash-2"></i> Delete Account</button>
+            <button onclick="firebase.auth().signOut()"><i data-lucide="log-out"></i> Sign Out</button>
           </div>
 
           <button id="topbar-upgrade-btn" class="topbar-upgrade-btn" onclick="showUpgradeModal()" style="display:none;">⚡ Pro</button>
@@ -8269,6 +8270,51 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       }
     }
 
+    /* ---- Delete Account ---- */
+    function openDeleteAccountModal() {
+      document.getElementById("delete-account-modal").classList.remove("hidden");
+      document.getElementById("delete-confirm-input").value = "";
+      document.getElementById("delete-confirm-input").focus();
+    }
+    function closeDeleteAccountModal() {
+      document.getElementById("delete-account-modal").classList.add("hidden");
+      document.getElementById("delete-confirm-input").value = "";
+    }
+    async function confirmDeleteAccount() {
+      const input = document.getElementById("delete-confirm-input").value.trim();
+      if (input !== "DELETE") {
+        showToast("Type DELETE to confirm.");
+        return;
+      }
+      const user = firebase.auth().currentUser;
+      if (!user) { showToast("You need to sign in."); return; }
+
+      try {
+        showToast("Deleting data...");
+        const uid = user.uid;
+        const batch = db.batch();
+
+        const cols = ["tarefas", "habitos", "eventos", "metas", "decisoes", "notas", "attachments", "usage"];
+        for (const col of cols) {
+          const snap = await db.collection(`users/${uid}/${col}`).get();
+          snap.docs.forEach(doc => batch.delete(doc.ref));
+        }
+
+        batch.delete(db.doc(`users/${uid}`));
+        await batch.commit();
+
+        await user.delete();
+
+        showToast("Account deleted successfully.");
+        setTimeout(() => {
+          window.location.href = "./index.html";
+        }, 1500);
+      } catch (e) {
+        console.error("[DeleteAccount]", e);
+        showToast("Error deleting account. Please try again.");
+      }
+    }
+
     async function saveRevisao() {
       const uid = firebase.auth().currentUser?.uid; if (!uid) return;
       const id  = document.getElementById("rev-modal-id").value;
@@ -9299,6 +9345,28 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
         <span style="font-size:.75rem;color:#666;">Sent anonymously with user ID</span>
         <button class="primary-btn" onclick="sendFeedback()" style="padding:8px 18px;font-size:.85rem;">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Account Modal -->
+  <div id="delete-account-modal" class="feedback-modal hidden" onclick="if(event.target===this)closeDeleteAccountModal()">
+    <div class="feedback-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="margin:0;font-size:1rem;font-weight:700;color:#ff6b8a;">Delete Account</h3>
+        <button onclick="closeDeleteAccountModal()" style="background:none;border:none;color:#666;font-size:1.3rem;cursor:pointer;line-height:1;">×</button>
+      </div>
+      <p style="color:#b0bed9;font-size:.85rem;margin-bottom:14px;">This action is irreversible. All your data will be permanently deleted:</p>
+      <ul style="color:#b0bed9;font-size:.82rem;margin:0 0 16px 18px;">
+        <li>Profile, tasks, habits, goals, decisions, notes</li>
+        <li>Events, attachments, activity history</li>
+        <li>Subscription and team data</li>
+      </ul>
+      <p style="color:#95a5bf;font-size:.8rem;margin-bottom:12px;">To confirm, type <strong>DELETE</strong> below:</p>
+      <input id="delete-confirm-input" type="text" class="feedback-textarea" style="min-height:44px;margin-bottom:14px;" placeholder="DELETE" />
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="ghost-btn" onclick="closeDeleteAccountModal()" style="padding:8px 16px;font-size:.85rem;">Cancel</button>
+        <button class="primary-btn" onclick="confirmDeleteAccount()" style="padding:8px 18px;font-size:.85rem;background:linear-gradient(135deg,#ff6b8a,#e11d48);">Delete Account</button>
       </div>
     </div>
   </div>
