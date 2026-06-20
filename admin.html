@@ -844,6 +844,30 @@
         </button>
       </div>
 
+      <!-- Gerir Admins -->
+      <div class="panel">
+        <div class="panel-title">
+          <i data-lucide="shield"></i>
+          Gerir Administradores
+        </div>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:12px;">
+          Introduz o email do utilizador para tornar/remover admin instantaneamente.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input type="email" id="admin-email-input" placeholder="email@exemplo.com"
+            style="flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;font-size:0.85rem;" />
+          <button class="primary-btn" onclick="promoteAdminByEmail()" style="white-space:nowrap;">
+            <i data-lucide="shield-check" style="width:15px;height:15px;vertical-align:middle;margin-right:6px;"></i>
+            Tornar Admin
+          </button>
+          <button class="ghost-btn" onclick="demoteAdminByEmail()" style="white-space:nowrap;border-color:#ef4444;color:#ef4444;">
+            <i data-lucide="shield-off" style="width:15px;height:15px;vertical-align:middle;margin-right:6px;"></i>
+            Remover Admin
+          </button>
+        </div>
+        <div id="admin-action-result" style="margin-top:12px;font-size:0.82rem;"></div>
+      </div>
+
       <!-- Create Voucher -->
       <div class="panel">
         <div class="panel-title">
@@ -1123,6 +1147,58 @@
         showToast('Erro: ' + (err.message || 'Operação falhou.'), 'error');
         btn.disabled = false;
         btn.textContent = originalText;
+      }
+    }
+
+    // ─── Promover/Demover admin por email ───
+    async function promoteAdminByEmail() {
+      const email = document.getElementById('admin-email-input').value.trim().toLowerCase();
+      const resultEl = document.getElementById('admin-action-result');
+      if (!email) { resultEl.innerHTML = '<span style="color:#ef4444;">Introduz um email.</span>'; return; }
+      
+      try {
+        // Procurar utilizador pelo email na lista carregada
+        const user = allUsers.find(u => (u.email || '').toLowerCase() === email);
+        if (!user) {
+          resultEl.innerHTML = '<span style="color:#ef4444;">Utilizador não encontrado. Verifica o email ou recarrega a página.</span>';
+          return;
+        }
+        if (adminUids.has(user.uid)) {
+          resultEl.innerHTML = '<span style="color:#f59e0b;">Este utilizador já é administrador.</span>';
+          return;
+        }
+        await callAdminFn('adminSetAdmin', { uid: user.uid });
+        adminUids.add(user.uid);
+        renderUsers();
+        resultEl.innerHTML = '<span style="color:#31d0aa;">✓ ' + email + ' promovido a administrador.</span>';
+        showToast('Utilizador promovido a administrador.', 'success');
+      } catch (err) {
+        resultEl.innerHTML = '<span style="color:#ef4444;">Erro: ' + (err.message || 'Operação falhou') + '</span>';
+      }
+    }
+
+    async function demoteAdminByEmail() {
+      const email = document.getElementById('admin-email-input').value.trim().toLowerCase();
+      const resultEl = document.getElementById('admin-action-result');
+      if (!email) { resultEl.innerHTML = '<span style="color:#ef4444;">Introduz um email.</span>'; return; }
+      
+      try {
+        const user = allUsers.find(u => (u.email || '').toLowerCase() === email);
+        if (!user) {
+          resultEl.innerHTML = '<span style="color:#ef4444;">Utilizador não encontrado. Verifica o email ou recarrega a página.</span>';
+          return;
+        }
+        if (!adminUids.has(user.uid)) {
+          resultEl.innerHTML = '<span style="color:#f59e0b;">Este utilizador não é administrador.</span>';
+          return;
+        }
+        await callAdminFn('adminRemoveAdmin', { uid: user.uid });
+        adminUids.delete(user.uid);
+        renderUsers();
+        resultEl.innerHTML = '<span style="color:#31d0aa;">✓ ' + email + ' removido de administrador.</span>';
+        showToast('Privilégios de administrador removidos.', 'success');
+      } catch (err) {
+        resultEl.innerHTML = '<span style="color:#ef4444;">Erro: ' + (err.message || 'Operação falhou') + '</span>';
       }
     }
 
