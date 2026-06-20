@@ -3362,7 +3362,7 @@
       <div class="modal-field">
         <label>Client (optional)</label>
         <input id="edit-task-client" class="task-input" type="text" placeholder="Client name" list="client-list" />
-        <datalist id="client-list"></datalist>
+        <datalist id="client-list">${getUniqueClients().map(c => `<option value="${c}">${c}</option>`).join('')}</datalist>
       </div>
       <div class="modal-row">
         <div class="modal-field">
@@ -4693,7 +4693,7 @@
               </button>
             </div>
             <input id="quick-task-client" class="task-input" type="text" placeholder="Client (optional)" list="quick-client-list" />
-            <datalist id="quick-client-list"></datalist>
+            <datalist id="quick-client-list">${getUniqueClients().map(c => `<option value="${c}">${c}</option>`).join('')}</datalist>
             <select id="quick-task-priority" class="task-select">
               <option value="media">Priority média</option>
               <option value="alta">High prioridade</option>
