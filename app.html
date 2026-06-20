@@ -15,6 +15,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="./onboarding.css" />
+  <script src="./onboarding.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -6268,6 +6270,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         // Gravar score diário (se necessário) para histórico
         try { await saveDailyScoreSeNecessario(); } catch(e) { console.error("[DailyScore]", e); }
         showApp(user);
+        // Onboarding para novos utilizadores
+        if (window._triggerOnboarding) window._triggerOnboarding(user.uid);
         // Iniciar lembretes de hábitos (in-app)
         iniciarLembretesHabitos();
         // Carregar subscription (onSnapshot em tempo real)
@@ -9338,6 +9342,25 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           style="background:#111128;border:1px solid #1e1e3a;color:#666;padding:12px 20px;border-radius:10px;font-size:0.9rem;cursor:pointer;">
           Cancelar
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Overlay -->
+  <div id="onboarding-overlay" class="onboarding-overlay">
+    <div id="onboarding-card" class="onboarding-card">
+      <button class="onboarding-skip" onclick="finishOnboarding()">Saltar</button>
+      <div class="onboarding-icon"><i data-lucide="layout-dashboard"></i></div>
+      <h3 class="onboarding-step-title">Dashboard</h3>
+      <p class="onboarding-step-text">O teu centro de comando. Ves tarefas do dia, habitos e metricas de produtividade num relance.</p>
+      <div class="onboarding-actions">
+        <div class="onboarding-dots">
+          <span class="onboarding-dot active"></span>
+          <span class="onboarding-dot"></span>
+          <span class="onboarding-dot"></span>
+        </div>
+        <button class="onboarding-btn secondary" id="onboarding-prev" onclick="prevOnboardingStep()" style="display:none;">Anterior</button>
+        <button class="onboarding-btn primary" id="onboarding-next" onclick="nextOnboardingStep()">Seguinte</button>
       </div>
     </div>
   </div>
