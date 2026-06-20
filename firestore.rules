@@ -93,6 +93,14 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Feedback: qualquer utilizador autenticado pode enviar; só admins podem ler
+    match /feedback/{doc} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      allow update, delete: if false;
+    }
+
     // Config global (feature flags) — qualquer utilizador pode LER, só admins escrevem
     match /config/{doc} {
       allow read: if request.auth != null;

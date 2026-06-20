@@ -8350,6 +8350,38 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       document.getElementById("rev-modal").style.display = "none";
     }
 
+    /* ---- Feedback ---- */
+    function openFeedbackModal() {
+      document.getElementById("feedback-modal").classList.remove("hidden");
+      document.getElementById("feedback-text").focus();
+    }
+    function closeFeedbackModal() {
+      document.getElementById("feedback-modal").classList.add("hidden");
+      document.getElementById("feedback-text").value = "";
+    }
+    async function sendFeedback() {
+      const uid = firebase.auth().currentUser?.uid;
+      if (!uid) { showToast("Precisas de iniciar sessão."); return; }
+      const tipo = document.getElementById("feedback-type").value;
+      const texto = document.getElementById("feedback-text").value.trim();
+      if (!texto) { showToast("Escreve uma mensagem."); return; }
+      try {
+        await db.collection("feedback").add({
+          uid,
+          tipo,
+          texto,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        closeFeedbackModal();
+        showToast("Obrigado pelo feedback!");
+      } catch (e) {
+        console.error("[Feedback]", e);
+        showToast("Erro ao enviar. Tenta novamente.");
+      }
+    }
+
     async function saveRevisao() {
       const uid = firebase.auth().currentUser?.uid; if (!uid) return;
       const id  = document.getElementById("rev-modal-id").value;
@@ -9361,6 +9393,31 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         </div>
         <button class="onboarding-btn secondary" id="onboarding-prev" onclick="prevOnboardingStep()" style="display:none;">Anterior</button>
         <button class="onboarding-btn primary" id="onboarding-next" onclick="nextOnboardingStep()">Seguinte</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Button -->
+  <button id="feedback-btn" class="feedback-btn" onclick="openFeedbackModal()" title="Reportar problema ou sugerir melhoria">
+    <i data-lucide="message-square"></i>
+  </button>
+
+  <!-- Feedback Modal -->
+  <div id="feedback-modal" class="feedback-modal hidden" onclick="if(event.target===this)closeFeedbackModal()">
+    <div class="feedback-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="margin:0;font-size:1rem;font-weight:700;color:#e0e0f0;">Reportar Problema / Sugestão</h3>
+        <button onclick="closeFeedbackModal()" style="background:none;border:none;color:#666;font-size:1.3rem;cursor:pointer;line-height:1;">×</button>
+      </div>
+      <select id="feedback-type" class="feedback-select">
+        <option value="bug">🐛 Bug / Erro</option>
+        <option value="suggestion">💡 Sugestão</option>
+        <option value="other">📝 Outro</option>
+      </select>
+      <textarea id="feedback-text" class="feedback-textarea" rows="5" placeholder="Descreve o problema ou a tua sugestão..."></textarea>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+        <span style="font-size:.75rem;color:#666;">Enviado anonimamente com ID de utilizador</span>
+        <button class="primary-btn" onclick="sendFeedback()" style="padding:8px 18px;font-size:.85rem;">Enviar</button>
       </div>
     </div>
   </div>
