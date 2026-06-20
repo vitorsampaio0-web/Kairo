@@ -18,6 +18,16 @@
   <link rel="stylesheet" href="./onboarding.css" />
   <script src="./onboarding.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -3704,6 +3714,10 @@
       document.getElementById("login-screen").classList.add("hidden");
       document.querySelector(".app-shell").style.display = "";
       renderAll();
+      // GA4: user login
+      if (typeof gtag === 'function') {
+        gtag('event', 'login', { method: user.providerData?.[0]?.providerId || 'email' });
+      }
     }
 
     function updateSidebarUser(user) {
@@ -6282,9 +6296,11 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         if (urlParams.get('checkout') === 'success') {
           showToast('Subscrição Pro ativada! Bem-vindo ao Kairo Pro.');
           window.history.replaceState({}, '', '/app.html');
+          if (typeof gtag === 'function') gtag('event', 'purchase', { currency: 'EUR', value: 1 });
         } else if (urlParams.get('checkout') === 'cancelled') {
           showToast('Pagamento cancelado. Podes tentar novamente quando quiseres.');
           window.history.replaceState({}, '', '/app.html');
+          if (typeof gtag === 'function') gtag('event', 'cancel_checkout');
         }
         // Auto-join via link ?join=CODIGO
         const joinCode = urlParams.get('join');
