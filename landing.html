@@ -1343,6 +1343,80 @@
     gtag('js', new Date());
     gtag('config', 'G-7QYXPE2G2J');
   </script>
+
+  <!-- Meta Pixel (Facebook/Instagram) — Substituir META_PIXEL_ID pelo teu ID -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', 'META_PIXEL_ID');
+  fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+         src="https://www.facebook.com/tr?id=META_PIXEL_ID&ev=PageView&noscript=1"/>
+  </noscript>
+
+  <!-- GA4 + Google Ads (única carga do gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7QYXPE2G2J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-7QYXPE2G2J');
+    gtag('config', 'AW-XXXXXXXXXX');
+  </script>
+
+  <!-- Schema.org: Product + Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Kairo",
+    "applicationCategory": "BusinessApplication",
+    "description": "O centro de comando para líderes que executam. Produtividade de Elite com IA.",
+    "operatingSystem": "Web, iOS, Android",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "2000"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Kairo Elite",
+      "url": "https://kairoelite.app",
+      "logo": "https://kairoelite.app/logo-kairo.png"
+    }
+  }
+  </script>
+
+  <!-- Teste A/B: Variante B (headline + CTA cor) -->
+  <script>
+  (function() {
+    const variant = localStorage.getItem('kairo_ab_variant') || (Math.random() < 0.5 ? 'A' : 'B');
+    localStorage.setItem('kairo_ab_variant', variant);
+    window.__KAIRO_AB_VARIANT__ = variant;
+    gtag('event', 'ab_variant', { variant: variant });
+    if (variant === 'B') {
+      document.documentElement.classList.add('ab-variant-b');
+    }
+  })();
+  </script>
+  <style>
+    .ab-variant-b .hero-sub-headline { font-size: 2.6rem !important; }
+    .ab-variant-b .btn-primary { background: linear-gradient(135deg, #ff6b8a, #e11d48) !important; }
+    .ab-variant-b .hero-desc { max-width: 520px !important; }
+  </style>
 </head>
 <body>
 
@@ -2129,6 +2203,27 @@
       el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
       metricObserver.observe(el);
     });
+  </script>
+
+  <!-- Marketing: Tracking automático de cliques nos CTAs -->
+  <script>
+  (function() {
+    document.addEventListener('click', function(e) {
+      const a = e.target.closest('a[href="index.html"]');
+      if (!a) return;
+      const label = a.textContent.trim().substring(0, 40);
+      // GA4
+      if (typeof gtag !== 'undefined') gtag('event', 'cta_click', { label, page: 'landing' });
+      // Meta Pixel
+      if (typeof fbq !== 'undefined') fbq('trackCustom', 'CTAClick', { label, page: 'landing' });
+      // Google Ads Conversion (remarketing event)
+      if (typeof gtag !== 'undefined') gtag('event', 'conversion', {
+        send_to: 'AW-XXXXXXXXXX/REPLACE_LABEL',
+        value: 1.0,
+        currency: 'EUR'
+      });
+    });
+  })();
   </script>
 </body>
 </html>
