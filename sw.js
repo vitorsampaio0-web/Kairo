@@ -32,6 +32,18 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
+  // Nunca cachear scripts de analytics, tracking ou CDNs externas
+  const url = new URL(event.request.url);
+  if (
+    url.hostname.includes("googletagmanager.com") ||
+    url.hostname.includes("google-analytics.com") ||
+    url.hostname.includes("firebaseinstallations.googleapis.com") ||
+    url.hostname.includes("firebaseremoteconfig.googleapis.com")
+  ) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
