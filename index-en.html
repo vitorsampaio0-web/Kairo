@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kairo — Sign In</title>
+  <meta name="description" content="The command center for leaders who execute. Sign in to Kairo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #07070f;
+      --surface: #0d0d1f;
+      --surface-2: #111128;
+      --border: #1e1e3a;
+      --border-2: #2a2a5a;
+      --text: #e8eaf6;
+      --text-muted: #8b8fc4;
+      --text-dim: #5a5f9e;
+      --primary: #7c5cff;
+      --primary-glow: rgba(124,92,255,0.35);
+      --primary-hover: #9474ff;
+      --white: #ffffff;
+      --error: #ff6b8a;
+      --success: #10b981;
+      --radius: 14px;
+      --radius-lg: 20px;
+      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    html { font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      font-weight: 400;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    .bg-glow { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-glow::before {
+      content: ''; position: absolute; top: -20%; left: -10%; width: 60vw; height: 60vw;
+      background: radial-gradient(circle, rgba(124,92,255,0.10) 0%, transparent 60%);
+      animation: pulseGlow 8s ease-in-out infinite alternate;
+    }
+    .bg-glow::after {
+      content: ''; position: absolute; bottom: -20%; right: -10%; width: 50vw; height: 50vw;
+      background: radial-gradient(circle, rgba(78,168,255,0.07) 0%, transparent 60%);
+      animation: pulseGlow 10s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes pulseGlow {
+      0% { transform: scale(1) translate(0,0); opacity: 0.6; }
+      50% { transform: scale(1.1) translate(20px,-20px); opacity: 1; }
+      100% { transform: scale(1) translate(-10px,10px); opacity: 0.6; }
+    }
+    .login-wrap {
+      position: relative; z-index: 1; width: 100%; max-width: 420px;
+      background: rgba(13,13,31,0.75); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 42px 36px 36px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .brand { text-align: center; margin-bottom: 32px; }
+    .brand-logo {
+      width: 60px; height: 60px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--primary), #4ea8ff);
+      border-radius: 16px; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.5rem; color: #fff;
+      box-shadow: 0 8px 30px var(--primary-glow);
+    }
+    .brand h1 { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; color: var(--white); margin-bottom: 6px; }
+    .brand p { font-size: 0.82rem; color: var(--text-muted); font-weight: 400; line-height: 1.5; }
+    .lang-switch { text-align: center; margin-bottom: 28px; }
+    .lang-switch a {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--text-muted); text-decoration: none; font-size: 0.78rem; font-weight: 600;
+      border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px;
+      transition: var(--transition); background: var(--surface-2);
+    }
+    .lang-switch a:hover { border-color: var(--border-2); color: var(--white); }
+    .login-options { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
+    .btn {
+      position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 20px; border-radius: 12px; border: none;
+      font-family: inherit; font-size: 0.92rem; font-weight: 700; cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+      text-decoration: none; outline: none;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-google { background: var(--white); color: #1f2937; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    .btn-google:hover { background: #f8f9fb; box-shadow: 0 6px 24px rgba(0,0,0,0.2); transform: translateY(-1px); }
+    .btn-email { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .btn-email:hover { border-color: var(--border-2); background: #16163a; transform: translateY(-1px); }
+    .divider {
+      display: flex; align-items: center; gap: 14px;
+      color: var(--text-dim); font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 24px;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .email-form { display: none; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+    .email-form.active { display: flex; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label { font-size: 0.73rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .input-group input {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 13px 15px; color: var(--white); font-family: inherit; font-size: 0.9rem;
+      transition: border-color var(--transition), box-shadow var(--transition); outline: none;
+    }
+    .input-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,92,255,0.15); }
+    .input-group input::placeholder { color: var(--text-dim); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #6a4de8); color: var(--white);
+      box-shadow: 0 8px 28px rgba(124,92,255,0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-hover), #8562ff);
+      box-shadow: 0 10px 32px rgba(124,92,255,0.38); transform: translateY(-1px);
+    }
+    .helper-links { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 18px; }
+    .helper-links a { color: var(--text-dim); text-decoration: none; font-weight: 600; transition: color var(--transition); }
+    .helper-links a:hover { color: var(--primary); }
+    .error-msg {
+      display: none; align-items: center; gap: 8px;
+      background: rgba(255,107,138,0.08); border: 1px solid rgba(255,107,138,0.2);
+      border-radius: 10px; padding: 11px 14px; font-size: 0.82rem; color: var(--error); font-weight: 600; margin-bottom: 14px;
+    }
+    .error-msg.visible { display: flex; }
+    .spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.25); border-top-color: var(--white); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    .spinner.visible { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .terms { text-align: center; font-size: 0.7rem; color: var(--text-dim); line-height: 1.6; margin-top: 18px; }
+    .terms a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 2px; }
+    .terms a:hover { color: var(--primary); }
+    .login-footer {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);
+    }
+    .login-footer a { color: var(--text-dim); text-decoration: none; font-size: 0.72rem; font-weight: 600; transition: color var(--transition); }
+    .login-footer a:hover { color: var(--primary); }
+    @media (max-width: 480px) {
+      .login-wrap { padding: 30px 22px 26px; border-radius: var(--radius); }
+      .brand h1 { font-size: 1.25rem; }
+    }
+  </style>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7QYXPE2G2J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-7QYXPE2G2J', { page_title: 'Login Kairo EN' });
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <main class="login-wrap">
+    <div class="brand">
+      <div class="brand-logo">K</div>
+      <h1>Kairo</h1>
+      <p>The command center for leaders who execute.</p>
+    </div>
+
+    <div class="lang-switch">
+      <a href="index.html" aria-label="Mudar para Português">🇵🇹 Português</a>
+    </div>
+
+    <div class="login-options">
+      <button id="btnGoogle" class="btn btn-google" onclick="signInWithGoogle()" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        <span>Sign in with Google</span>
+      </button>
+
+      <button id="btnEmailToggle" class="btn btn-email" onclick="toggleEmailForm()" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <span>Sign in with Email</span>
+      </button>
+    </div>
+
+    <form id="emailForm" class="email-form" onsubmit="return signInWithEmail(event)">
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="name@company.com" autocomplete="email" required>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <div class="helper-links">
+        <a href="#" onclick="resetPassword();return false">Recover password</a>
+        <a href="#" onclick="toggleSignup();return false" id="toggleAuth">Create account</a>
+      </div>
+      <div id="errorMsg" class="error-msg">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="errorText">Authentication error</span>
+      </div>
+      <button id="btnSubmit" class="btn btn-primary" type="submit">
+        <span class="spinner" id="spinner"></span>
+        <span id="submitText">Sign in</span>
+      </button>
+    </form>
+
+    <p class="terms">By signing in, you agree to the <a href="terms.html" target="_blank">Terms</a> and <a href="privacy.html" target="_blank">Privacy</a>.</p>
+  </main>
+
+  <footer class="login-footer">
+    <a href="landing-en.html" target="_blank">Learn more</a>
+    <span style="color:var(--border-2)">|</span>
+    <a href="index.html" target="_blank">PT</a>
+    <span style="color:var(--border-2)">|</span>
+    <a href="guide.html" target="_blank">Guide</a>
+  </footer>
+
+  <script>
+    (function() {
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAjkpXMcKg7651b0DIRbeMk0QDmx7a5JGM',
+        authDomain: 'kairo-3a7e4.firebaseapp.com',
+        projectId: 'kairo-3a7e4',
+        storageBucket: 'kairo-3a7e4.firebasestorage.app',
+        messagingSenderId: '137726126366',
+        appId: '1:137726126366:web:dbbdbfa05e8e99465c07fe',
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const providers = { google: new firebase.auth.GoogleAuthProvider() };
+
+      window.signInWithGoogle = async () => { setLoading(true); try { await auth.signInWithPopup(providers.google); trackGA('login', { method: 'google' }); } catch (e) { showError('Error signing in with Google. Please try again.'); } finally { setLoading(false); } };
+      window.signInWithEmail = async (e) => { e.preventDefault(); const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value; const isSignup = document.getElementById('toggleAuth').dataset.mode === 'signup'; setLoading(true); try { if (isSignup) { await auth.createUserWithEmailAndPassword(email, password); trackGA('sign_up', { method: 'email' }); } else { await auth.signInWithEmailAndPassword(email, password); trackGA('login', { method: 'email' }); } } catch (e) { showError(mapAuthError(e.code) || e.message); } finally { setLoading(false); } };
+      window.resetPassword = async () => { const email = document.getElementById('email').value.trim(); if (!email) { showError('Enter your email first.'); return; } try { await auth.sendPasswordResetEmail(email); showError('Recovery link sent. Check your email.'); const el = document.getElementById('errorMsg'); el.style.color = 'var(--success)'; el.style.borderColor = 'rgba(16,185,129,0.25)'; el.style.background = 'rgba(16,185,129,0.06)'; } catch (e) { showError(mapAuthError(e.code) || e.message); } };
+      window.toggleEmailForm = () => { document.getElementById('emailForm').classList.toggle('active'); };
+      window.toggleSignup = () => { const toggler = document.getElementById('toggleAuth'); const label = document.getElementById('submitText'); const isSignup = toggler.dataset.mode === 'signup'; if (isSignup) { toggler.dataset.mode = 'login'; toggler.textContent = 'Create account'; label.textContent = 'Sign in'; } else { toggler.dataset.mode = 'signup'; toggler.textContent = 'I already have an account'; label.textContent = 'Create account'; } };
+
+      auth.onAuthStateChanged((user) => { if (user) window.location.href = './app-en.html'; });
+      function setLoading(on) { document.getElementById('spinner').classList.toggle('visible', on); ['btnGoogle','btnEmailToggle','btnSubmit'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = on; }); }
+      function showError(msg) { const el = document.getElementById('errorMsg'); document.getElementById('errorText').textContent = msg; el.classList.add('visible'); el.style.color = ''; el.style.borderColor = ''; el.style.background = ''; setTimeout(() => el.classList.remove('visible'), 6000); }
+      function trackGA(eventName, params) { if (typeof gtag !== 'undefined') gtag('event', eventName, params); }
+      function mapAuthError(code) { const msgs = { 'auth/invalid-email': 'Invalid email.', 'auth/user-disabled': 'Account disabled.', 'auth/user-not-found': 'User not found.', 'auth/wrong-password': 'Incorrect password.', 'auth/email-already-in-use': 'This email already has an account.', 'auth/weak-password': 'Weak password (min. 6 characters).', 'auth/invalid-credential': 'Invalid credentials.', 'auth/popup-closed-by-user': 'Login popup closed.' }; return msgs[code]; }
+      document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', (e) => { if (a.getAttribute('href') === '#') e.preventDefault(); }));
+    })();
+  </script>
+</body>
+</html>
