@@ -248,8 +248,8 @@
       const auth = firebase.auth();
       const providers = { google: new firebase.auth.GoogleAuthProvider() };
 
-      window.signInWithGoogle = async () => { setLoading(true); try { await auth.signInWithPopup(providers.google); trackGA('login', { method: 'google' }); } catch (e) { showError('Error signing in with Google. Please try again.'); } finally { setLoading(false); } };
-      window.signInWithEmail = async (e) => { e.preventDefault(); const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value; const isSignup = document.getElementById('toggleAuth').dataset.mode === 'signup'; setLoading(true); try { if (isSignup) { await auth.createUserWithEmailAndPassword(email, password); trackGA('sign_up', { method: 'email' }); } else { await auth.signInWithEmailAndPassword(email, password); trackGA('login', { method: 'email' }); } } catch (e) { showError(mapAuthError(e.code) || e.message); } finally { setLoading(false); } };
+      window.signInWithGoogle = async () => { setLoading(true); try { await auth.signInWithPopup(providers.google); trackConversion('google', false); } catch (e) { showError('Error signing in with Google. Please try again.'); } finally { setLoading(false); } };
+      window.signInWithEmail = async (e) => { e.preventDefault(); const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value; const isSignup = document.getElementById('toggleAuth').dataset.mode === 'signup'; setLoading(true); try { if (isSignup) { await auth.createUserWithEmailAndPassword(email, password); trackConversion('email', true); } else { await auth.signInWithEmailAndPassword(email, password); trackConversion('email', false); } } catch (e) { showError(mapAuthError(e.code) || e.message); } finally { setLoading(false); } };
       window.resetPassword = async () => { const email = document.getElementById('email').value.trim(); if (!email) { showError('Enter your email first.'); return; } try { await auth.sendPasswordResetEmail(email); showError('Recovery link sent. Check your email.'); const el = document.getElementById('errorMsg'); el.style.color = 'var(--success)'; el.style.borderColor = 'rgba(16,185,129,0.25)'; el.style.background = 'rgba(16,185,129,0.06)'; } catch (e) { showError(mapAuthError(e.code) || e.message); } };
       window.toggleEmailForm = () => { document.getElementById('emailForm').classList.toggle('active'); };
       window.toggleSignup = () => { const toggler = document.getElementById('toggleAuth'); const label = document.getElementById('submitText'); const isSignup = toggler.dataset.mode === 'signup'; if (isSignup) { toggler.dataset.mode = 'login'; toggler.textContent = 'Create account'; label.textContent = 'Sign in'; } else { toggler.dataset.mode = 'signup'; toggler.textContent = 'I already have an account'; label.textContent = 'Create account'; } };
@@ -258,6 +258,20 @@
       function setLoading(on) { document.getElementById('spinner').classList.toggle('visible', on); ['btnGoogle','btnEmailToggle','btnSubmit'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = on; }); }
       function showError(msg) { const el = document.getElementById('errorMsg'); document.getElementById('errorText').textContent = msg; el.classList.add('visible'); el.style.color = ''; el.style.borderColor = ''; el.style.background = ''; setTimeout(() => el.classList.remove('visible'), 6000); }
       function trackGA(eventName, params) { if (typeof gtag !== 'undefined') gtag('event', eventName, params); }
+      function trackConversion(method, isSignup) {
+        if (isSignup) { trackGA('sign_up', { method, location: 'login_page' }); }
+        else { trackGA('login', { method, location: 'login_page' }); }
+        if (typeof fbq !== 'undefined') {
+          fbq('track', isSignup ? 'CompleteRegistration' : 'Lead', { content_name: method, location: 'login' });
+        }
+        if (typeof gtag !== 'undefined') {
+          gtag('event', isSignup ? 'sign_up' : 'login', {
+            send_to: 'AW-XXXXXXXXXX/REPLACE_LABEL',
+            value: 1.0,
+            currency: 'EUR'
+          });
+        }
+      }
       function mapAuthError(code) { const msgs = { 'auth/invalid-email': 'Invalid email.', 'auth/user-disabled': 'Account disabled.', 'auth/user-not-found': 'User not found.', 'auth/wrong-password': 'Incorrect password.', 'auth/email-already-in-use': 'This email already has an account.', 'auth/weak-password': 'Weak password (min. 6 characters).', 'auth/invalid-credential': 'Invalid credentials.', 'auth/popup-closed-by-user': 'Login popup closed.' }; return msgs[code]; }
       document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', (e) => { if (a.getAttribute('href') === '#') e.preventDefault(); }));
     })();
