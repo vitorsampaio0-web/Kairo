@@ -178,6 +178,56 @@
       border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,92,255,0.15);
     }
     .input-group input::placeholder { color: var(--text-dim); }
+    .input-group input.invalid { border-color: var(--error); }
+    .input-group input.valid   { border-color: var(--success); }
+
+    .input-wrap { position: relative; }
+    .input-wrap .input-icon {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      width: 18px; height: 18px; pointer-events: none; opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .input-wrap input.invalid ~ .input-icon { opacity: 1; color: var(--error); }
+    .input-wrap input.valid ~ .input-icon   { opacity: 1; color: var(--success); }
+
+    .pw-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-dim);
+      cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: var(--white); }
+
+    .pw-strength {
+      height: 3px; border-radius: 2px; background: var(--border);
+      overflow: hidden; margin-top: 6px; transition: background 0.3s;
+    }
+    .pw-strength .pw-bar {
+      height: 100%; width: 0%; border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+    }
+    .pw-strength.weak   .pw-bar { width: 33%;  background: var(--error); }
+    .pw-strength.medium .pw-bar { width: 66%;  background: #f59e0b; }
+    .pw-strength.strong .pw-bar { width: 100%; background: var(--success); }
+
+    .pw-reqs {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      font-size: 0.65rem; color: var(--text-dim); margin-top: 6px;
+    }
+    .pw-reqs .pw-req {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 3px 7px; transition: 0.25s;
+    }
+    .pw-reqs .pw-req.ok { color: var(--success); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.06); }
+
+    .login-blocked {
+      display: none; text-align: center; background: rgba(255,107,138,0.08);
+      border: 1px solid rgba(255,107,138,0.2); border-radius: 10px;
+      padding: 12px 14px; font-size: 0.82rem; color: var(--error); font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .login-blocked.visible { display: block; }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--primary), #6a4de8);
@@ -300,13 +350,32 @@
     </div>
 
     <form id="emailForm" class="email-form" onsubmit="return signInWithEmail(event)">
+      <div id="loginBlocked" class="login-blocked">
+        Demasiadas tentativas. Tenta novamente dentro de <span id="blockTimer">60</span>s.
+      </div>
       <div class="input-group">
         <label for="email">Email</label>
-        <input id="email" type="email" placeholder="nome@empresa.com" autocomplete="email" required>
+        <div class="input-wrap">
+          <input id="email" type="email" placeholder="nome@empresa.com" autocomplete="email" required oninput="validateEmail()">
+          <svg class="input-icon" id="emailIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <small id="emailFeedback" style="font-size:0.72rem;color:var(--text-dim);display:none;margin-top:4px;">Email inválido</small>
       </div>
       <div class="input-group">
         <label for="password">Password</label>
-        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+        <div class="input-wrap">
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required oninput="checkPasswordStrength()">
+          <button type="button" class="pw-toggle" onclick="togglePassword()" aria-label="Mostrar password">
+            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="pw-strength" id="pwStrength"><div class="pw-bar"></div></div>
+        <div class="pw-reqs" id="pwReqs">
+          <span class="pw-req" data-req="len">8+ caracteres</span>
+          <span class="pw-req" data-req="num">1 número</span>
+          <span class="pw-req" data-req="uc">1 maiúscula</span>
+          <span class="pw-req" data-req="sc">1 especial (!@#$%)</span>
+        </div>
       </div>
       <div class="helper-links">
         <a href="#" onclick="resetPassword();return false">Recuperar password</a>
@@ -367,10 +436,17 @@
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const isSignup = document.getElementById('toggleAuth').dataset.mode === 'signup';
+        // Rate limiting check
+        const blocked = isRateLimited();
+        if (blocked > 0) { startBlockTimer(blocked); return; }
+        // Client-side validation
+        if (!EMAIL_RE.test(email)) { showError('Introduz um email válido.'); return; }
+        if (password.length < 6) { showError('A password deve ter pelo menos 6 caracteres.'); return; }
         setLoading(true);
         try {
           let result;
           if (isSignup) {
+            if (password.length < 8) { showError('Password fraca (min. 8 caracteres no registo).'); return; }
             result = await auth.createUserWithEmailAndPassword(email, password);
             trackConversion('email', true);
           } else {
@@ -378,6 +454,7 @@
             trackConversion('email', false);
           }
         } catch (e) {
+          recordAttempt();
           showError(mapAuthError(e.code) || e.message);
         } finally {
           setLoading(false);
@@ -476,6 +553,82 @@
             currency: 'EUR'
           });
         }
+      }
+
+      // ---- Validacao e Seguranca ----
+      const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      window.validateEmail = function() {
+        const el = document.getElementById('email');
+        const fb = document.getElementById('emailFeedback');
+        const icon = document.getElementById('emailIcon');
+        if (!el.value) { el.classList.remove('invalid','valid'); fb.style.display='none'; icon.style.opacity='0'; return; }
+        const ok = EMAIL_RE.test(el.value.trim());
+        el.classList.toggle('invalid', !ok);
+        el.classList.toggle('valid', ok);
+        fb.style.display = ok ? 'none' : 'block';
+        fb.textContent = ok ? '' : 'Email inválido';
+        icon.style.opacity = '1';
+        icon.querySelector('circle').setAttribute('stroke', ok ? 'var(--success)' : 'var(--error)');
+        icon.querySelectorAll('line').forEach(l => l.setAttribute('stroke', ok ? 'var(--success)' : 'var(--error)'));
+      };
+
+      window.togglePassword = function() {
+        const el = document.getElementById('password');
+        const icon = document.getElementById('eyeIcon');
+        const isPw = el.type === 'password';
+        el.type = isPw ? 'text' : 'password';
+        icon.innerHTML = isPw
+          ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+          : '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+      };
+
+      window.checkPasswordStrength = function() {
+        const val = document.getElementById('password').value;
+        const bar = document.getElementById('pwStrength');
+        const reqs = { len: val.length >= 8, num: /\d/.test(val), uc: /[A-Z]/.test(val), sc: /[!@#$%^&*(),.?":{}|<>]/.test(val) };
+        document.querySelectorAll('.pw-req').forEach(r => {
+          const k = r.dataset.req;
+          r.classList.toggle('ok', reqs[k]);
+          r.style.textDecoration = reqs[k] ? 'line-through' : 'none';
+          r.style.opacity = reqs[k] ? '0.5' : '1';
+        });
+        const score = Object.values(reqs).filter(Boolean).length;
+        bar.className = 'pw-strength' + (score <= 1 ? ' weak' : score <= 2 ? ' medium' : ' strong');
+      };
+
+      // ---- Rate Limiting (anti-brute-force) ----
+      const RL_KEY = 'kairo_login_attempts';
+      const RL_MAX = 5;
+      const RL_WINDOW_MS = 5 * 60 * 1000;   // 5 min
+      const RL_BLOCK_MS  = 60 * 1000;       // 1 min block
+      function getAttempts() {
+        try { return JSON.parse(localStorage.getItem(RL_KEY)) || []; } catch { return []; }
+      }
+      function saveAttempts(a) { localStorage.setItem(RL_KEY, JSON.stringify(a)); }
+      function isRateLimited() {
+        const now = Date.now();
+        let attempts = getAttempts().filter(t => now - t < RL_WINDOW_MS);
+        saveAttempts(attempts);
+        if (attempts.length >= RL_MAX) {
+          const last = attempts[attempts.length - 1];
+          return now - last < RL_BLOCK_MS ? Math.ceil((RL_BLOCK_MS - (now - last)) / 1000) : 0;
+        }
+        return 0;
+      }
+      function recordAttempt() {
+        const a = getAttempts(); a.push(Date.now()); saveAttempts(a);
+      }
+      function startBlockTimer(secs) {
+        const el = document.getElementById('loginBlocked');
+        const timer = document.getElementById('blockTimer');
+        el.classList.add('visible');
+        let remaining = secs;
+        timer.textContent = remaining;
+        const iv = setInterval(() => {
+          remaining--;
+          timer.textContent = remaining;
+          if (remaining <= 0) { clearInterval(iv); el.classList.remove('visible'); }
+        }, 1000);
       }
 
       // Smooth scroll prevention for anchors

@@ -145,6 +145,51 @@
       .login-wrap { padding: 30px 22px 26px; border-radius: var(--radius); }
       .brand h1 { font-size: 1.25rem; }
     }
+    .input-group input.invalid { border-color: var(--error); }
+    .input-group input.valid   { border-color: var(--success); }
+    .input-wrap { position: relative; }
+    .input-wrap .input-icon {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      width: 18px; height: 18px; pointer-events: none; opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .input-wrap input.invalid ~ .input-icon { opacity: 1; color: var(--error); }
+    .input-wrap input.valid ~ .input-icon   { opacity: 1; color: var(--success); }
+    .pw-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-dim);
+      cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: var(--white); }
+    .pw-strength {
+      height: 3px; border-radius: 2px; background: var(--border);
+      overflow: hidden; margin-top: 6px; transition: background 0.3s;
+    }
+    .pw-strength .pw-bar {
+      height: 100%; width: 0%; border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+    }
+    .pw-strength.weak   .pw-bar { width: 33%;  background: var(--error); }
+    .pw-strength.medium .pw-bar { width: 66%;  background: #f59e0b; }
+    .pw-strength.strong .pw-bar { width: 100%; background: var(--success); }
+    .pw-reqs {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      font-size: 0.65rem; color: var(--text-dim); margin-top: 6px;
+    }
+    .pw-reqs .pw-req {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 3px 7px; transition: 0.25s;
+    }
+    .pw-reqs .pw-req.ok { color: var(--success); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.06); }
+    .login-blocked {
+      display: none; text-align: center; background: rgba(255,107,138,0.08);
+      border: 1px solid rgba(255,107,138,0.2); border-radius: 10px;
+      padding: 12px 14px; font-size: 0.82rem; color: var(--error); font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .login-blocked.visible { display: block; }
   </style>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-7QYXPE2G2J"></script>
@@ -201,13 +246,32 @@
     </div>
 
     <form id="emailForm" class="email-form" onsubmit="return signInWithEmail(event)">
+      <div id="loginBlocked" class="login-blocked">
+        Too many attempts. Try again in <span id="blockTimer">60</span>s.
+      </div>
       <div class="input-group">
         <label for="email">Email</label>
-        <input id="email" type="email" placeholder="name@company.com" autocomplete="email" required>
+        <div class="input-wrap">
+          <input id="email" type="email" placeholder="name@company.com" autocomplete="email" required oninput="validateEmail()">
+          <svg class="input-icon" id="emailIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <small id="emailFeedback" style="font-size:0.72rem;color:var(--text-dim);display:none;margin-top:4px;">Invalid email</small>
       </div>
       <div class="input-group">
         <label for="password">Password</label>
-        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+        <div class="input-wrap">
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required oninput="checkPasswordStrength()">
+          <button type="button" class="pw-toggle" onclick="togglePassword()" aria-label="Show password">
+            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="pw-strength" id="pwStrength"><div class="pw-bar"></div></div>
+        <div class="pw-reqs" id="pwReqs">
+          <span class="pw-req" data-req="len">8+ chars</span>
+          <span class="pw-req" data-req="num">1 number</span>
+          <span class="pw-req" data-req="uc">1 uppercase</span>
+          <span class="pw-req" data-req="sc">1 special (!@#$%)</span>
+        </div>
       </div>
       <div class="helper-links">
         <a href="#" onclick="resetPassword();return false">Recover password</a>
@@ -254,6 +318,78 @@
       window.toggleEmailForm = () => { document.getElementById('emailForm').classList.toggle('active'); };
       window.toggleSignup = () => { const toggler = document.getElementById('toggleAuth'); const label = document.getElementById('submitText'); const isSignup = toggler.dataset.mode === 'signup'; if (isSignup) { toggler.dataset.mode = 'login'; toggler.textContent = 'Create account'; label.textContent = 'Sign in'; } else { toggler.dataset.mode = 'signup'; toggler.textContent = 'I already have an account'; label.textContent = 'Create account'; } };
 
+      window.signInWithEmail = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const isSignup = document.getElementById('toggleAuth').dataset.mode === 'signup';
+        const blocked = isRateLimited();
+        if (blocked > 0) { startBlockTimer(blocked); return; }
+        if (!EMAIL_RE.test(email)) { showError('Enter a valid email.'); return; }
+        if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+        setLoading(true);
+        try {
+          if (isSignup) {
+            if (password.length < 8) { showError('Weak password (min. 8 chars for sign-up).'); return; }
+            await auth.createUserWithEmailAndPassword(email, password);
+            trackConversion('email', true);
+          } else {
+            await auth.signInWithEmailAndPassword(email, password);
+            trackConversion('email', false);
+          }
+        } catch (e) {
+          recordAttempt();
+          showError(mapAuthError(e.code) || e.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      // ---- Validation & Security ----
+      const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      window.validateEmail = function() {
+        const el = document.getElementById('email');
+        const fb = document.getElementById('emailFeedback');
+        const icon = document.getElementById('emailIcon');
+        if (!el.value) { el.classList.remove('invalid','valid'); fb.style.display='none'; icon.style.opacity='0'; return; }
+        const ok = EMAIL_RE.test(el.value.trim());
+        el.classList.toggle('invalid', !ok); el.classList.toggle('valid', ok);
+        fb.style.display = ok ? 'none' : 'block'; fb.textContent = ok ? '' : 'Invalid email';
+        icon.style.opacity = '1';
+        icon.querySelector('circle').setAttribute('stroke', ok ? 'var(--success)' : 'var(--error)');
+        icon.querySelectorAll('line').forEach(l => l.setAttribute('stroke', ok ? 'var(--success)' : 'var(--error)'));
+      };
+      window.togglePassword = function() {
+        const el = document.getElementById('password');
+        const icon = document.getElementById('eyeIcon');
+        const isPw = el.type === 'password';
+        el.type = isPw ? 'text' : 'password';
+        icon.innerHTML = isPw
+          ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+          : '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+      };
+      window.checkPasswordStrength = function() {
+        const val = document.getElementById('password').value;
+        const bar = document.getElementById('pwStrength');
+        const reqs = { len: val.length >= 8, num: /\d/.test(val), uc: /[A-Z]/.test(val), sc: /[!@#$%^&*(),.?":{}|<>]/.test(val) };
+        document.querySelectorAll('.pw-req').forEach(r => {
+          const k = r.dataset.req; r.classList.toggle('ok', reqs[k]); r.style.textDecoration = reqs[k] ? 'line-through' : 'none'; r.style.opacity = reqs[k] ? '0.5' : '1';
+        });
+        const score = Object.values(reqs).filter(Boolean).length;
+        bar.className = 'pw-strength' + (score <= 1 ? ' weak' : score <= 2 ? ' medium' : ' strong');
+      };
+
+      // ---- Rate Limiting ----
+      const RL_KEY = 'kairo_login_attempts';
+      const RL_MAX = 5;
+      const RL_WINDOW_MS = 5 * 60 * 1000;
+      const RL_BLOCK_MS  = 60 * 1000;
+      function getAttempts() { try { return JSON.parse(localStorage.getItem(RL_KEY)) || []; } catch { return []; } }
+      function saveAttempts(a) { localStorage.setItem(RL_KEY, JSON.stringify(a)); }
+      function isRateLimited() { const now = Date.now(); let attempts = getAttempts().filter(t => now - t < RL_WINDOW_MS); saveAttempts(attempts); if (attempts.length >= RL_MAX) { const last = attempts[attempts.length - 1]; return now - last < RL_BLOCK_MS ? Math.ceil((RL_BLOCK_MS - (now - last)) / 1000) : 0; } return 0; }
+      function recordAttempt() { const a = getAttempts(); a.push(Date.now()); saveAttempts(a); }
+      function startBlockTimer(secs) { const el = document.getElementById('loginBlocked'); const timer = document.getElementById('blockTimer'); el.classList.add('visible'); let remaining = secs; timer.textContent = remaining; const iv = setInterval(() => { remaining--; timer.textContent = remaining; if (remaining <= 0) { clearInterval(iv); el.classList.remove('visible'); } }, 1000); }
+
       auth.onAuthStateChanged((user) => { if (user) window.location.href = './app-en.html'; });
       function setLoading(on) { document.getElementById('spinner').classList.toggle('visible', on); ['btnGoogle','btnEmailToggle','btnSubmit'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = on; }); }
       function showError(msg) { const el = document.getElementById('errorMsg'); document.getElementById('errorText').textContent = msg; el.classList.add('visible'); el.style.color = ''; el.style.borderColor = ''; el.style.background = ''; setTimeout(() => el.classList.remove('visible'), 6000); }
@@ -261,16 +397,8 @@
       function trackConversion(method, isSignup) {
         if (isSignup) { trackGA('sign_up', { method, location: 'login_page' }); }
         else { trackGA('login', { method, location: 'login_page' }); }
-        if (typeof fbq !== 'undefined') {
-          fbq('track', isSignup ? 'CompleteRegistration' : 'Lead', { content_name: method, location: 'login' });
-        }
-        if (typeof gtag !== 'undefined') {
-          gtag('event', isSignup ? 'sign_up' : 'login', {
-            send_to: 'AW-XXXXXXXXXX/REPLACE_LABEL',
-            value: 1.0,
-            currency: 'EUR'
-          });
-        }
+        if (typeof fbq !== 'undefined') { fbq('track', isSignup ? 'CompleteRegistration' : 'Lead', { content_name: method, location: 'login' }); }
+        if (typeof gtag !== 'undefined') { gtag('event', isSignup ? 'sign_up' : 'login', { send_to: 'AW-XXXXXXXXXX/REPLACE_LABEL', value: 1.0, currency: 'EUR' }); }
       }
       function mapAuthError(code) { const msgs = { 'auth/invalid-email': 'Invalid email.', 'auth/user-disabled': 'Account disabled.', 'auth/user-not-found': 'User not found.', 'auth/wrong-password': 'Incorrect password.', 'auth/email-already-in-use': 'This email already has an account.', 'auth/weak-password': 'Weak password (min. 6 characters).', 'auth/invalid-credential': 'Invalid credentials.', 'auth/popup-closed-by-user': 'Login popup closed.' }; return msgs[code]; }
       document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', (e) => { if (a.getAttribute('href') === '#') e.preventDefault(); }));
