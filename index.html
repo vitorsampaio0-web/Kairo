@@ -201,15 +201,14 @@
     .nav-logo img {
       height: 52px;
       width: auto;
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+    @keyframes logoPulse {
+      0%, 100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
+      50% { filter: brightness(1.15) drop-shadow(0 0 12px rgba(124,92,255,0.35)); }
     }
 
-    .nav-logo-text {
-      font-family: var(--font-display);
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--white);
-      letter-spacing: 0.05em;
-    }
+    .nav-logo-text { display: none; }
 
     .nav-links {
       display: flex;
@@ -305,13 +304,7 @@
 
     .hero-eyebrow { margin-bottom: 32px; }
 
-    .hero-logo-large {
-      display: block;
-      height: 180px;
-      width: auto;
-      margin-bottom: 24px;
-      filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.5));
-    }
+    .hero-logo-large { display: none; }
 
     .hero-headline {
       font-size: clamp(3.5rem, 6vw, 6.5rem);
@@ -1425,7 +1418,6 @@
     <div class="nav-inner">
       <a href="#" class="nav-logo">
         <img src="./logo-kairo.png" alt="Kairo" onerror="this.style.display='none'" />
-        <span class="nav-logo-text">Kairo</span>
       </a>
       <ul class="nav-links">
         <li><a href="#features">Funcionalidades</a></li>
@@ -1461,7 +1453,6 @@
     <div class="container">
       <div class="hero-grid">
         <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
-          <img src="./logo-kairo.png" alt="Kairo" class="hero-logo-large" onerror="this.style.display='none'" />
           <div class="hero-eyebrow">
             <span class="eyebrow"><span class="eyebrow-dot"></span>Usado por mais de 2.000 líderes em todo o mundo</span>
           </div>
