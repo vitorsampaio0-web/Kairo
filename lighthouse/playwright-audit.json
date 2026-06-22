@@ -1,0 +1,27 @@
+{
+  "metrics": {
+    "domContentLoaded": 3668.2999999523163,
+    "loadComplete": 4796.5,
+    "fcp": 748,
+    "lcp": null,
+    "resourceCount": 12,
+    "transferSize": 84768,
+    "encodedBodySize": 84468
+  },
+  "checks": {
+    "renderBlockingScripts": 6,
+    "totalScripts": 13,
+    "totalStylesheets": 2,
+    "imgsWithoutDimensions": 0,
+    "imgsWithoutLazy": 0,
+    "imgsWithSrcset": 2,
+    "totalImgs": 3,
+    "hasPreconnect": true,
+    "hasDnsPrefetch": true,
+    "hasFontPreload": false,
+    "hasAosPrint": true
+  },
+  "score": 90,
+  "loadTime": 5735,
+  "timestamp": "2026-06-22T16:09:41.963Z"
+}

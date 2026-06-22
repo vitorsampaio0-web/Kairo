@@ -2143,16 +2143,19 @@
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
   <script>
-    // Init AOS
-    AOS.init({
-      once: true,
-      duration: 700,
-      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-      offset: 60
-    });
-
-    // Init Lucide icons
-    lucide.createIcons();
+    function initLibs() {
+      if (typeof AOS === 'undefined' || typeof lucide === 'undefined') {
+        setTimeout(initLibs, 50);
+        return;
+      }
+      AOS.init({ once: true, duration: 700, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', offset: 60 });
+      lucide.createIcons();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLibs);
+    } else {
+      initLibs();
+    }
 
     // Navbar scroll effect
     const navbar = document.getElementById('navbar');
