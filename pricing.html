@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preços — Kairo | Produtividade de um CEO</title>
+  <meta name="description" content="Planos Kairo: Grátis, Pro e Enterprise. Começa grátis. Subscreve por 9,99€/mês e desbloqueia IA, sincronização e analíticas avançadas." />
+  <link rel="canonical" href="https://kairoelite.app/pricing.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:      #0d1117;
+      --surface:    #161b22;
+      --surface-2:  #1c2128;
+      --surface-3:  #1A1A1A;
+      --border:     #2d333b;
+      --border-2:   #2A2A2A;
+      --gold:       #2d7ff9;
+      --gold-light: #60a5fa;
+      --gold-dim:   #1d6ce0;
+      --white:      #F4F2ED;
+      --off-white:  #C8C5BC;
+      --muted:      #6A6A6A;
+      --muted-2:    #444444;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'DM Sans', system-ui, sans-serif;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 32px;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.022;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+    ::selection { background: var(--gold); color: var(--black); }
+
+    h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; }
+    p { color: var(--off-white); }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      padding: 6px 14px;
+      border-radius: 100px;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 120px 0; }
+    .section-sm { padding: 80px 0; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--black);
+    }
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--off-white);
+      border: 1px solid var(--border-2);
+    }
+    .btn-ghost:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      transform: translateY(-2px);
+    }
+    .btn-lg {
+      padding: 18px 40px;
+      font-size: 0.94rem;
+      border-radius: var(--radius-lg);
+    }
+    .btn-pricing {
+      width: 100%;
+      justify-content: center;
+      padding: 14px;
+      font-size: 0.88rem;
+    }
+    .btn-pricing-outline {
+      background: transparent;
+      color: var(--off-white);
+      border: 1px solid var(--border-2);
+    }
+    .btn-pricing-outline:hover { border-color: var(--gold-dim); color: var(--gold); transform: none; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 24px;
+      transition: var(--transition);
+    }
+    nav.scrolled {
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .nav-logo {
+      display: none !important;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-language-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--muted);
+      cursor: pointer;
+      position: relative;
+    }
+    .nav-language-selector a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    .nav-language-selector a:hover,
+    .nav-language-selector a.active {
+      color: var(--gold);
+      background: rgba(59, 130, 246, 0.08);
+    }
+    .nav-cta { display: flex; align-items: center; gap: 12px; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--off-white); transition: var(--transition); }
+
+    /* PRICING HERO */
+    .pricing-hero {
+      min-height: 50vh;
+      display: flex;
+      align-items: center;
+      padding-top: 120px;
+      padding-bottom: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(59,130,246,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .pricing-hero h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      max-width: 800px;
+      margin: 0 auto 16px;
+      color: var(--white);
+    }
+    .pricing-hero p {
+      font-size: 1.1rem;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    /* PRICING CARDS */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .pricing-card {
+      background: var(--black);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .pricing-card.featured {
+      border-color: var(--gold);
+      background: linear-gradient(180deg, rgba(59,130,246,0.04) 0%, var(--black) 100%);
+      box-shadow: 0 0 0 1px rgba(59,130,246,0.1), 0 20px 60px rgba(59,130,246,0.08);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--gold);
+      padding: 4px 16px;
+      border-radius: 100px;
+    }
+    .pricing-tier {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .pricing-price {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+    .pricing-currency {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--off-white);
+      margin-top: 8px;
+    }
+    .pricing-amount {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1;
+    }
+    .pricing-amount.custom {
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      height: 56px;
+    }
+    .pricing-period { font-size: 0.78rem; color: var(--muted); align-self: flex-end; padding-bottom: 6px; }
+    .pricing-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+    .pricing-features { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .pricing-feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.84rem;
+      color: var(--off-white);
+    }
+    .pricing-feature-icon { color: var(--gold); flex-shrink: 0; }
+    .pricing-feature-icon.muted { color: var(--muted-2); }
+    .pricing-cta { margin-top: auto; }
+
+    /* COMPARISON TABLE */
+    .comparison-section { padding: 80px 0; }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 40px;
+      font-size: 0.88rem;
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 16px 24px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .comparison-table th {
+      font-family: var(--font-display);
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      color: var(--white);
+      font-size: 1.1rem;
+      position: sticky;
+      top: 72px;
+      background: var(--black);
+      z-index: 10;
+    }
+    .comparison-table td { color: var(--off-white); }
+    .comparison-table .feature-name { font-weight: 500; color: var(--white); }
+    .comparison-table .check { color: var(--gold); text-align: center; }
+    .comparison-table .cross { color: var(--muted-2); text-align: center; }
+    .comparison-table .highlight-row { background: rgba(59,130,246,0.03); }
+
+    /* FAQ */
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 24px 0;
+    }
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--white);
+    }
+    .faq-question i { transition: var(--transition); }
+    .faq-question.active i { transform: rotate(180deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .faq-answer.open {
+      max-height: 500px;
+      padding-top: 16px;
+    }
+    .faq-answer p { font-size: 0.88rem; line-height: 1.7; color: var(--muted); }
+
+    /* TRUST */
+    .trust-section { text-align: center; padding: 80px 0; }
+    .trust-section p { color: var(--muted); font-size: 0.84rem; margin-bottom: 32px; }
+    .trust-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+    .trust-badge {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-2);
+      border: 1px solid var(--border-2);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 60px 0 36px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 56px;
+    }
+    .footer-brand { display: flex; flex-direction: column; gap: 16px; }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .footer-logo img { height: 28px; width: auto; }
+    .footer-logo-text {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+    .footer-tagline { font-size: 0.84rem; color: var(--muted); max-width: 240px; line-height: 1.6; }
+    .footer-socials { display: flex; gap: 12px; margin-top: 4px; }
+    .footer-social {
+      width: 34px; height: 34px; border-radius: var(--radius-sm);
+      background: var(--surface-3); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); text-decoration: none; transition: var(--transition);
+    }
+    .footer-social:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .footer-col h5 {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      margin-bottom: 20px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      transition: var(--transition);
+    }
+    .footer-links a:hover { color: var(--white); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-copy { font-size: 0.78rem; color: var(--muted-2); }
+    .footer-legal { display: flex; gap: 24px; }
+    .footer-legal a { color: var(--muted); text-decoration: none; font-size: 0.78rem; transition: var(--transition); }
+    .footer-legal a:hover { color: var(--white); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .nav-language-selector { display: none; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+      .comparison-table { font-size: 0.78rem; }
+      .comparison-table th, .comparison-table td { padding: 12px 8px; }
+      .container { padding: 0 16px; }
+      .section { padding: 80px 0; }
+      .footer-top { grid-template-columns: 1fr; gap: 40px; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Kairo",
+    "description": "App de produtividade com IA para líderes e CEOs.",
+    "brand": { "@type": "Brand", "name": "Kairo" },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Grátis",
+        "price": "0",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock",
+        "description": "Gestão de tarefas, hábitos e dashboard — grátis para sempre."
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro",
+        "price": "9.99",
+        "priceCurrency": "EUR",
+        "priceValidUntil": "2026-12-31",
+        "availability": "https://schema.org/InStock",
+        "url": "https://kairoelite.app/login.html",
+        "description": "Kairo AI completo, sincronização, analíticas avançadas e suporte prioritário."
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="var(--gold)" stroke-width="1.5"/><circle cx="16" cy="16" r="4" fill="var(--gold)"/></svg>
+        <span style="font-family:var(--font-display);font-size:1.1rem;font-weight:600;color:var(--white);letter-spacing:0.05em;">Kairo</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="index.html#features">Funcionalidades</a></li>
+        <li><a href="pricing.html">Preços</a></li>
+      </ul>
+      <div class="nav-cta">
+        <div class="nav-language-selector">
+          <a href="pricing.html" class="active">PT</a>
+          <span style="color:var(--border-2);">|</span>
+          <a href="pricing-en.html">EN</a>
+        </div>
+        <a href="login.html" class="btn btn-ghost" style="padding:10px 20px;font-size:0.82rem;">Entrar</a>
+        <a href="login.html" class="btn btn-primary" style="padding:10px 20px;font-size:0.82rem;">Começar Grátis</a>
+      </div>
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div id="mobileMenu" style="display:none;position:fixed;inset:0;background:var(--black);z-index:200;flex-direction:column;padding:80px 24px 24px;gap:32px;overflow-y:auto;">
+    <button id="mobileClose" style="position:absolute;top:20px;right:24px;background:none;border:none;color:var(--white);font-size:1.5rem;cursor:pointer;">&times;</button>
+    <a href="index.html" onclick="closeMobileMenu()" style="font-family:var(--font-display);font-size:1.6rem;color:var(--white);text-decoration:none;">Início</a>
+    <a href="index.html#features" onclick="closeMobileMenu()" style="font-family:var(--font-display);font-size:1.6rem;color:var(--white);text-decoration:none;">Funcionalidades</a>
+    <a href="pricing.html" onclick="closeMobileMenu()" style="font-family:var(--font-display);font-size:1.6rem;color:var(--gold);text-decoration:none;">Preços</a>
+    <div style="display:flex;gap:16px;margin-top:24px;">
+      <a href="login.html" class="btn btn-primary btn-lg" style="flex:1;justify-content:center;">Começar Grátis</a>
+    </div>
+  </div>
+
+  <!-- PRICING HERO -->
+  <section class="pricing-hero">
+    <div class="container" style="position:relative;z-index:1;">
+      <span class="eyebrow" data-aos="fade-up">Preços</span>
+      <h1 data-aos="fade-up" data-aos-delay="100">Investe na tua clareza.</h1>
+      <p data-aos="fade-up" data-aos-delay="200" style="color:var(--muted);">Uma subscrição. Acesso total. Menos que o teu café da manhã, a compor diariamente.</p>
+    </div>
+  </section>
+
+  <!-- PRICING CARDS -->
+  <section class="section-sm" style="padding-top:0;">
+    <div class="container">
+      <div class="pricing-grid" data-aos="fade-up" data-aos-delay="100">
+
+        <!-- Free -->
+        <div class="pricing-card" itemscope itemtype="https://schema.org/Offer">
+          <meta itemprop="priceCurrency" content="EUR" />
+          <meta itemprop="price" content="0" />
+          <div>
+            <div class="pricing-tier">Grátis</div>
+            <div class="pricing-price">
+              <span class="pricing-currency">€</span>
+              <span class="pricing-amount" itemprop="price">0</span>
+              <span class="pricing-period">/mês</span>
+            </div>
+            <p class="pricing-desc">Começa a criar melhores hábitos. Grátis para sempre, sem cartão necessário.</p>
+          </div>
+          <div class="pricing-features">
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Gestão de tarefas e clientes</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Seguimento básico de hábitos</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Dashboard diário</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Login com Google</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Agenda integrada</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Notas e decisões</div>
+            <div class="pricing-feature" style="opacity:0.35;"><i data-lucide="x" class="pricing-feature-icon muted" style="width:15px;height:15px;"></i>Kairo AI</div>
+            <div class="pricing-feature" style="opacity:0.35;"><i data-lucide="x" class="pricing-feature-icon muted" style="width:15px;height:15px;"></i>Sincronização entre dispositivos</div>
+          </div>
+          <div class="pricing-cta">
+            <a href="login.html" class="btn btn-pricing btn-pricing-outline">Começar grátis</a>
+          </div>
+        </div>
+
+        <!-- Pro -->
+        <div class="pricing-card featured" itemscope itemtype="https://schema.org/Offer">
+          <meta itemprop="priceCurrency" content="EUR" />
+          <meta itemprop="price" content="9.99" />
+          <div class="pricing-badge">Mais Popular</div>
+          <div>
+            <div class="pricing-tier" style="color:var(--gold);">Pro</div>
+            <div class="pricing-price">
+              <span class="pricing-currency">€</span>
+              <span class="pricing-amount" itemprop="price">9</span>
+              <span class="pricing-currency" style="margin-top:14px;">.99</span>
+              <span class="pricing-period">/mês</span>
+            </div>
+            <p class="pricing-desc">Todo o poder do Kairo. Para líderes que não cedem.</p>
+          </div>
+          <div class="pricing-features">
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Tudo do Grátis</div>
+            <div class="pricing-feature"><i data-lucide="sparkles" class="pricing-feature-icon" style="width:15px;height:15px;"></i><strong>Kairo AI — acesso total</strong></div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Sincronização entre dispositivos</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Histórico completo e analíticas</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Modo offline</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Equipa e workspaces</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Anexos (até 500 MB/mês)</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Suporte prioritário</div>
+          </div>
+          <div class="pricing-cta">
+            <a href="login.html" class="btn btn-primary btn-pricing">Começar Pro →</a>
+          </div>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="pricing-card" itemscope itemtype="https://schema.org/Offer">
+          <div>
+            <div class="pricing-tier">Enterprise</div>
+            <div class="pricing-price">
+              <span class="pricing-amount custom">Custom</span>
+            </div>
+            <p class="pricing-desc">Para organizações que funcionam com excelência. Adaptado à tua equipa.</p>
+          </div>
+          <div class="pricing-features">
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Tudo do Pro</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Dashboards de equipa ilimitados</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>SSO e controlos de administrador</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Onboarding dedicado</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>SLA e conformidade</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Integrações personalizadas</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Anexos ilimitados</div>
+            <div class="pricing-feature"><i data-lucide="check" class="pricing-feature-icon" style="width:15px;height:15px;"></i>Suporte dedicado 24/7</div>
+          </div>
+          <div class="pricing-cta">
+            <a href="mailto:hello@kairoelite.app" class="btn btn-pricing btn-pricing-outline">Contactar vendas →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section class="comparison-section" style="background:var(--surface);">
+    <div class="container">
+      <div class="section-header centered" style="text-align:center;" data-aos="fade-up">
+        <span class="eyebrow">Comparativo</span>
+        <h2 style="font-size:clamp(1.8rem,4vw,3.2rem);margin-top:16px;">Tudo o que precisas para decidir.</h2>
+      </div>
+      <div style="overflow-x:auto;" data-aos="fade-up" data-aos-delay="100">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th style="width:40%;">Funcionalidade</th>
+              <th style="width:20%;text-align:center;">Grátis</th>
+              <th style="width:20%;text-align:center;color:var(--gold);">Pro</th>
+              <th style="width:20%;text-align:center;">Enterprise</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="feature-name">Tarefas ilimitadas</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr class="highlight-row"><td class="feature-name">Gestão de clientes</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr><td class="feature-name">Hábitos e streaks</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr class="highlight-row"><td class="feature-name">Dashboard e agendas</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr><td class="feature-name">Notas e decisões</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr class="highlight-row"><td class="feature-name">Login com Google</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr><td class="feature-name">Kairo AI (insights)</td><td class="cross">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr class="highlight-row"><td class="feature-name">Sincronização cross-device</td><td class="cross">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr><td class="feature-name">Analíticas avançadas</td><td class="cross">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr class="highlight-row"><td class="feature-name">Modo offline</td><td class="cross">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr><td class="feature-name">Equipa e workspaces</td><td class="cross">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr class="highlight-row"><td class="feature-name">Anexos de ficheiros</td><td class="cross">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr><td class="feature-name">Suporte prioritário</td><td class="cross">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+            <tr class="highlight-row"><td class="feature-name">SSO e controlo admin</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
+            <tr><td class="feature-name">SLA e conformidade</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
+            <tr class="highlight-row"><td class="feature-name">API e integrações</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section-sm">
+    <div class="container" style="max-width:720px;">
+      <div style="text-align:center;margin-bottom:48px;" data-aos="fade-up">
+        <span class="eyebrow">Dúvidas</span>
+        <h2 style="font-size:clamp(1.8rem,4vw,3.2rem);margin-top:16px;">Perguntas frequentes.</h2>
+      </div>
+      <div data-aos="fade-up" data-aos-delay="100">
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Posso começar grátis e passar para Pro depois?
+            <i data-lucide="chevron-down" style="width:20px;height:20px;color:var(--muted);"></i>
+          </div>
+          <div class="faq-answer">
+            <p>Sim. Começas no plano Grátis sem cartão. Sempre que quiseres, podes subscrever o Pro diretamente na app. A mudança é instantânea.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            O que acontece se cancelar o Pro?
+            <i data-lucide="chevron-down" style="width:20px;height:20px;color:var(--muted);"></i>
+          </div>
+          <div class="faq-answer">
+            <p>Se cancelares, mantens todo o acesso até ao fim do período pago. Depois, a conta volta ao plano Grátis e os dados ficam guardados. Recuperas tudo se subscreveres de novo.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Há desconto para subscrição anual?
+            <i data-lucide="chevron-down" style="width:20px;height:20px;color:var(--muted);"></i>
+          </div>
+          <div class="faq-answer">
+            <p>Sim. O plano Pro anual tem 17% de desconto — €99/ano em vez de €119,88. Entra em contacto connosco para ativar a subscrição anual.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            O plano Enterprise inclui onboarding da equipa?
+            <i data-lucide="chevron-down" style="width:20px;height:20px;color:var(--muted);"></i>
+          </div>
+          <div class="faq-answer">
+            <p>Sim. O Enterprise inclui sessão de onboarding dedicada para a tua equipa, documentação interna e treino aos administradores.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Os meus dados estão seguros?
+            <i data-lucide="chevron-down" style="width:20px;height:20px;color:var(--muted);"></i>
+          </div>
+          <div class="faq-answer">
+            <p>Todos os dados são encriptados em trânsito (TLS 1.3) e em repouso no Firebase. O Kairo não vende dados a terceiros e está em conformidade com o RGPD.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="trust-section" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="container">
+      <p data-aos="fade-up">Sem compromissos. Cancela quando quiseres.</p>
+      <div class="trust-badges" data-aos="fade-up" data-aos-delay="100">
+        <span class="trust-badge">Encriptação TLS 1.3</span>
+        <span class="trust-badge">Conforme RGPD</span>
+        <span class="trust-badge">SSL Verificado</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="section-sm" style="text-align:center;position:relative;overflow:hidden;">
+    <div class="container" style="position:relative;z-index:1;">
+      <h2 class="cta-headline" style="font-size:clamp(2rem,5vw,3.5rem);max-width:700px;margin:0 auto 24px;">Pronto para levar a tua produtividade ao próximo nível?</h2>
+      <p style="color:var(--muted);margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto;">Junta-te a milhares de líderes que já organizam o seu dia com o Kairo.</p>
+      <div class="cta-actions" style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+        <a href="login.html" class="btn btn-primary btn-lg">
+          Começar Grátis
+          <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </a>
+        <a href="mailto:hello@kairoelite.app" class="btn btn-ghost btn-lg">Falar com vendas</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <img src="./logo-kairo.png" alt="Kairo" onerror="this.style.display='none'" />
+            <span class="footer-logo-text">Kairo</span>
+          </a>
+          <p class="footer-tagline">O centro de comando para líderes que executam. Construído para a clareza, projetado para a execução.</p>
+          <div class="footer-socials">
+            <a href="#" class="footer-social" aria-label="X / Twitter">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25z"/></svg>
+            </a>
+            <a href="#" class="footer-social" aria-label="LinkedIn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="#" class="footer-social" aria-label="GitHub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h5>Produto</h5>
+          <ul class="footer-links">
+            <li><a href="index.html#features">Funcionalidades</a></li>
+            <li><a href="pricing.html">Preços</a></li>
+            <li><a href="login.html">Abrir App</a></li>
+            <li><a href="#">Novidades</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Empresa</h5>
+          <ul class="footer-links">
+            <li><a href="#">Sobre</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Carreiras</a></li>
+            <li><a href="mailto:hello@kairoelite.app">Contacto</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <ul class="footer-links">
+            <li><a href="./privacidade.html">Política de Privacidade</a></li>
+            <li><a href="./termos.html">Termos de Serviço</a></li>
+            <li><a href="./privacidade.html#cookies">Política de Cookies</a></li>
+            <li><a href="./privacidade.html">Segurança</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 Kairo. Todos os direitos reservados.</p>
+        <div class="footer-legal">
+          <a href="./privacidade.html">Privacidade</a>
+          <a href="./termos.html">Termos</a>
+          <a href="mailto:hello@kairoelite.app">Contacto</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    AOS.init({ once: true, duration: 700, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', offset: 60 });
+    lucide.createIcons();
+
+    // Navbar scroll
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 24);
+    }, { passive: true });
+
+    // Mobile menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileClose = document.getElementById('mobileClose');
+    hamburger.addEventListener('click', () => { mobileMenu.style.display = 'flex'; document.body.style.overflow = 'hidden'; });
+    mobileClose.addEventListener('click', closeMobileMenu);
+    function closeMobileMenu() { mobileMenu.style.display = 'none'; document.body.style.overflow = ''; }
+
+    // FAQ toggle
+    function toggleFaq(el) {
+      const answer = el.nextElementSibling;
+      el.classList.toggle('active');
+      answer.classList.toggle('open');
+    }
+
+    // Marketing tracking
+    (function() {
+      document.addEventListener('click', function(e) {
+        const a = e.target.closest('a[href="login.html"]');
+        if (!a) return;
+        const label = a.textContent.trim().substring(0, 40);
+        if (typeof gtag !== 'undefined') gtag('event', 'cta_click', { label, page: 'pricing' });
+        if (typeof fbq !== 'undefined') fbq('trackCustom', 'CTAClick', { label, page: 'pricing' });
+        if (typeof gtag !== 'undefined') gtag('event', 'conversion', { send_to: 'AW-XXXXXXXXXX/REPLACE_LABEL', value: 1.0, currency: 'EUR' });
+      });
+    })();
+  </script>
+</body>
+</html>
