@@ -19,12 +19,60 @@
       "firestore.indexes.json",
       "functions/**",
       "node_modules/**",
-      ".git/**"
+      ".git/**",
+      "e2e/**",
+      "playwright.config.js",
+      "package.json"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(html|htm)",
+        "headers": [
+          { "key": "Cache-Control", "value": "max-age=0, no-cache, no-store, must-revalidate" }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css|json|xml|svg|txt)",
+        "headers": [
+          { "key": "Cache-Control", "value": "max-age=31536000, immutable" },
+          { "key": "Vary", "value": "Accept-Encoding" }
+        ]
+      },
+      {
+        "source": "**/*.@(png|jpg|jpeg|gif|webp|ico|woff|woff2|ttf|otf|eot)",
+        "headers": [
+          { "key": "Cache-Control", "value": "max-age=31536000, immutable" },
+          { "key": "Vary", "value": "Accept-Encoding" }
+        ]
+      },
+      {
+        "source": "/sw.js",
+        "headers": [
+          { "key": "Cache-Control", "value": "max-age=0, no-cache, no-store, must-revalidate" },
+          { "key": "Service-Worker-Allowed", "value": "/" }
+        ]
+      },
+      {
+        "source": "/manifest.json",
+        "headers": [
+          { "key": "Cache-Control", "value": "max-age=0, no-cache, no-store, must-revalidate" }
+        ]
+      }
     ],
     "rewrites": [
+      { "source": "/", "destination": "/index.html" },
+      { "source": "/en", "destination": "/index-en.html" }
+    ],
+    "redirects": [
       {
-        "source": "/",
-        "destination": "/landing.html"
+        "source": "/landing.html",
+        "destination": "/index.html",
+        "type": 301
+      },
+      {
+        "source": "/landing-en.html",
+        "destination": "/index-en.html",
+        "type": 301
       }
     ]
   }
