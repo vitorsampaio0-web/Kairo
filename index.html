@@ -198,17 +198,7 @@
       text-decoration: none;
     }
 
-    .nav-logo img {
-      height: 52px;
-      width: auto;
-      animation: logoPulse 3s ease-in-out infinite;
-    }
-    @keyframes logoPulse {
-      0%, 100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
-      50% { filter: brightness(1.15) drop-shadow(0 0 12px rgba(124,92,255,0.35)); }
-    }
-
-    .nav-logo-text { display: none; }
+    .nav-logo { display: none !important; }
 
     .nav-links {
       display: flex;
@@ -304,7 +294,18 @@
 
     .hero-eyebrow { margin-bottom: 32px; }
 
-    .hero-logo-large { display: none; }
+    .hero-logo-large {
+      display: block;
+      height: 180px;
+      width: auto;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.5));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
 
     .hero-headline {
       font-size: clamp(3.5rem, 6vw, 6.5rem);
@@ -1416,7 +1417,7 @@
   <!-- NAV -->
   <nav id="navbar">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">
+      <a href="#" class="nav-logo" style="display:none;">
         <img src="./logo-kairo.png" alt="Kairo" onerror="this.style.display='none'" />
       </a>
       <ul class="nav-links">
@@ -1453,6 +1454,7 @@
     <div class="container">
       <div class="hero-grid">
         <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
+          <img src="./logo-kairo.png" alt="Kairo" class="hero-logo-large" onerror="this.style.display='none'" />
           <div class="hero-eyebrow">
             <span class="eyebrow"><span class="eyebrow-dot"></span>Usado por mais de 2.000 líderes em todo o mundo</span>
           </div>
