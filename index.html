@@ -2070,6 +2070,15 @@
             </div>
           </a>
         </div>
+
+        <!-- NEWSLETTER -->
+        <div id="newsletter" style="margin-top:48px;max-width:480px;margin-left:auto;margin-right:auto;" data-aos="fade-up" data-aos-delay="200">
+          <form id="newsletterForm" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;" onsubmit="handleNewsletter(event)">
+            <input type="email" id="newsletterEmail" placeholder="O teu email para novidades" required style="flex:1;min-width:240px;padding:12px 16px;border-radius:var(--radius-md);border:1px solid var(--border-2);background:var(--surface-2);color:var(--white);font-family:var(--font-body);font-size:0.88rem;outline:none;transition:var(--transition);" onfocus="this.style.borderColor='var(--gold-dim)'" onblur="this.style.borderColor='var(--border-2)'">
+            <button type="submit" id="newsletterBtn" class="btn btn-primary" style="padding:12px 20px;font-size:0.82rem;white-space:nowrap;">Subscrever</button>
+          </form>
+          <p id="newsletterMsg" style="margin-top:8px;font-size:0.78rem;color:var(--muted);min-height:20px;text-align:center;"></p>
+        </div>
       </div>
     </div>
   </section>
@@ -2208,6 +2217,49 @@
 
   <!-- Marketing: Tracking automático de cliques nos CTAs -->
   <script>
+  // Newsletter subscription handler
+  async function handleNewsletter(e) {
+    e.preventDefault();
+    const input = document.getElementById('newsletterEmail');
+    const btn   = document.getElementById('newsletterBtn');
+    const msg   = document.getElementById('newsletterMsg');
+    const email = input.value.trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      msg.textContent = 'Email inválido.';
+      msg.style.color = '#ff6b6b';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'A subscrever...';
+    msg.textContent = '';
+
+    try {
+      const resp = await fetch('https://us-central1-kairoelite-a35a2.cloudfunctions.net/subscribeNewsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'landing', idioma: 'pt' }),
+      });
+      const data = await resp.json();
+      if (data.result?.success) {
+        msg.textContent = 'Subscrito! Verifica a tua caixa de entrada.';
+        msg.style.color = '#4ade80';
+        input.value = '';
+        if (typeof gtag !== 'undefined') gtag('event', 'newsletter_subscribe', { email_domain: email.split('@')[1] });
+      } else {
+        msg.textContent = data.error?.message || 'Erro. Tenta novamente.';
+        msg.style.color = '#ff6b6b';
+      }
+    } catch (err) {
+      msg.textContent = 'Erro de ligação. Tenta mais tarde.';
+      msg.style.color = '#ff6b6b';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Subscrever';
+    }
+  }
+
   (function() {
     document.addEventListener('click', function(e) {
       const a = e.target.closest('a[href="login.html"]');

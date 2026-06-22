@@ -108,6 +108,13 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
+    // Newsletter subscribers: qualquer um pode subscrever; só admins podem ler
+    match /newsletter_subscribers/{email} {
+      allow create: if request.resource.data.email == email;
+      allow read: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      allow update: if request.auth != null && request.auth.token.email == email;
+    }
+
     // Admins: cada admin pode ler o seu proprio registo (para verificacao UI)
     match /admins/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;

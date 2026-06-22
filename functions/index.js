@@ -11,6 +11,300 @@ const db = admin.firestore();
 // Helpers
 // ---------------------------------------------------------------------------
 
+const { Resend } = require("resend");
+const cors = require("cors")({ origin: true });
+
+admin.initializeApp();
+const db = admin.firestore();
+
+/* ═══════════════════════════════════════════
+   RESEND HELPERS — Email Marketing Automático
+   ═══════════════════════════════════════════ */
+
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("RESEND_API_KEY não configurada.");
+  return new Resend(apiKey);
+}
+
+// -- Templates HTML reutilizáveis --
+
+function baseEmailHtml({ title, preheader, bodyHtml, footerCtaUrl, footerCtaLabel, unsubscribeUrl }) {
+  return `<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title>
+<style>@media(max-width:600px){.container{width:100%!important;padding:20px 16px!important;}}</style>
+</head>
+<body style="margin:0;padding:0;background:#0a0a14;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a14;padding:40px 16px;">
+<tr><td align="center">
+<table class="container" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+  <tr>
+    <td style="background:linear-gradient(135deg,#0d0d1f,#1a0533);border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;border-bottom:3px solid #7c5cff;">
+      <div style="font-size:36px;margin-bottom:8px;">◈</div>
+      <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;letter-spacing:-0.5px;">Kairo</h1>
+      <p style="margin:6px 0 0;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;">CEO-Level Productivity</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#111122;padding:36px 40px;">${bodyHtml}</td>
+  </tr>
+  <tr>
+    <td style="background:#0d0d1f;border-radius:0 0 16px 16px;padding:20px 40px;text-align:center;border-top:1px solid #1e1e3a;">
+      <p style="margin:0 0 12px;font-size:11px;color:#444;line-height:1.7;">
+        ${preheader}<br>
+        © ${new Date().getFullYear()} Kairo — <a href="https://kairoelite.app" style="color:#555;text-decoration:none;">kairoelite.app</a>
+      </p>
+      ${footerCtaUrl ? `<a href="${footerCtaUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c5cff,#4ea8ff);color:#fff;padding:10px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px;">${footerCtaLabel}</a>` : ""}
+      ${unsubscribeUrl ? `<p style="margin:12px 0 0;font-size:11px;color:#333;"><a href="${unsubscribeUrl}" style="color:#333;text-decoration:underline;">Cancelar subscrição</a></p>` : ""}
+    </td>
+  </tr>
+</table>
+</td></tr></table></body></html>`;
+}
+
+// ══════════════════════════════════════════════════════
+// 1. HELPER: Subscrever à newsletter
+// ══════════════════════════════════════════════════════
+exports.subscribeNewsletter = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const input = req.body.data || req.body || {};
+      const email = (input.email || "").trim().toLowerCase();
+      const source = input.source || "landing";
+      const idioma = input.idioma || "pt";
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: { message: "Email inválido." } });
+      }
+
+      await db.collection("newsletter_subscribers").doc(email).set({
+        email,
+        source,
+        idioma,
+        subscritoEm: admin.firestore.FieldValue.serverTimestamp(),
+        ativo: true,
+        enviados: {},
+      }, { merge: true });
+
+      // Envio imediato de email de boas-vindas (onboarding #0)
+      try {
+        const resend = getResend();
+        const html = baseEmailHtml({
+          title: "Bem-vindo ao Kairo",
+          preheader: "O teu primeiro passo para produtividade de elite.",
+          bodyHtml: `
+            <p style="margin:0 0 6px;font-size:17px;color:#d0d0e8;">Olá, 👋</p>
+            <p style="margin:0 0 20px;font-size:14px;color:#888;line-height:1.7;">Obrigado por te juntares à comunidade Kairo. Ao longo dos próximos dias vou guiar-te a aproveitar ao máximo a app.</p>
+            <div style="background:#0d0d2a;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:20px;">
+              <p style="margin:0 0 8px;font-size:13px;color:#7c5cff;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Próximo passo</p>
+              <p style="margin:0;font-size:14px;color:#c9c9e0;">Cria a tua conta gratuita e adiciona a primeira tarefa do dia.</p>
+            </div>
+          `,
+          footerCtaUrl: "https://kairoelite.app/login.html",
+          footerCtaLabel: "Criar conta gratuita →",
+          unsubscribeUrl: `https://kairoelite.app/unsubscribe.html?email=${encodeURIComponent(email)}`,
+        });
+        await resend.emails.send({
+          from: "Kairo <noreply@kairoelite.app>",
+          to: email,
+          subject: "🚀 Bem-vindo ao Kairo — O teu centro de comando",
+          html,
+        });
+      } catch (err) {
+        console.warn("[subscribeNewsletter] Email de boas-vindas falhou:", err.message);
+      }
+
+      res.json({ result: { success: true } });
+    } catch (err) {
+      console.error("[subscribeNewsletter]", err);
+      res.status(500).json({ error: { message: err.message } });
+    }
+  });
+});
+
+// ══════════════════════════════════════════════════════
+// 2. HELPER: Enviar newsletter manual (admin)
+// ══════════════════════════════════════════════════════
+exports.sendNewsletter = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const uid = await verifyRequest(req);
+      await requireAdmin(uid);
+
+      const input = req.body.data || req.body || {};
+      const { assunto, corpoHtml, filtroIdioma } = input;
+      if (!assunto || !corpoHtml) {
+        return res.status(400).json({ error: { message: "Assunto e corpo são obrigatórios." } });
+      }
+
+      const resend = getResend();
+      let query = db.collection("newsletter_subscribers").where("ativo", "==", true);
+      if (filtroIdioma) query = query.where("idioma", "==", filtroIdioma);
+
+      const snap = await query.get();
+      let enviados = 0;
+      let falhados = 0;
+
+      await Promise.all(snap.docs.map(async (doc) => {
+        const { email, idioma } = doc.data();
+        const h = baseEmailHtml({
+          title: assunto,
+          preheader: "Kairo Newsletter",
+          bodyHtml: corpoHtml,
+          footerCtaUrl: "https://kairoelite.app/login.html",
+          footerCtaLabel: idioma === "en" ? "Open Kairo →" : "Abrir Kairo →",
+          unsubscribeUrl: `https://kairoelite.app/unsubscribe.html?email=${encodeURIComponent(email)}`,
+        });
+        try {
+          await resend.emails.send({ from: "Kairo <noreply@kairoelite.app>", to: email, subject: assunto, html: h });
+          await doc.ref.update({ "enviados.newsletter": admin.firestore.FieldValue.serverTimestamp() });
+          enviados++;
+        } catch (e) {
+          console.warn(`[sendNewsletter] Falha para ${email}:`, e.message);
+          falhados++;
+        }
+      }));
+
+      res.json({ result: { enviados, falhados, total: snap.size } });
+    } catch (err) {
+      console.error("[sendNewsletter]", err);
+      res.status(401).json({ error: { message: err.message } });
+    }
+  });
+});
+
+// ══════════════════════════════════════════════════════
+// 3. CRON: Onboarding — envia emails D1, D3, D7
+// ══════════════════════════════════════════════════════
+exports.onboardingSequence = functions.pubsub
+  .schedule("0 */6 * * *")
+  .timeZone("Europe/Lisbon")
+  .onRun(async () => {
+    const resend = getResend();
+    const now = new Date();
+
+    const sequences = [
+      {
+        dia: 1,
+        enviadoKey: "onboardingD1",
+        assuntoPT: "Dia 1 — A tua primeira tarefa no Kairo",
+        assuntoEN: "Day 1 — Your first task in Kairo",
+        corpoPT: `<p style="margin:0 0 20px;font-size:14px;color:#888;line-height:1.7;">O segredo dos CEOs mais produtivos não é trabalhar mais horas. É trabalhar com <strong style="color:#fff;">foco absoluto</strong>.</p><div style="background:#0d0d2a;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:20px;"><p style="margin:0;font-size:14px;color:#c9c9e0;"><strong style="color:#7c5cff;">Desafio do Dia 1:</strong><br>Adiciona 3 tarefas no Kairo e marca a mais importante como prioridade alta.</p></div>`,
+        corpoEN: `<p style="margin:0 0 20px;font-size:14px;color:#888;line-height:1.7;">The secret of the most productive CEOs is not working more hours. It's working with <strong style="color:#fff;">absolute focus</strong>.</p><div style="background:#0d0d2a;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:20px;"><p style="margin:0;font-size:14px;color:#c9c9e0;"><strong style="color:#7c5cff;">Day 1 Challenge:</strong><br>Add 3 tasks to Kairo and mark the most important as high priority.</p></div>`,
+      },
+      {
+        dia: 3,
+        enviadoKey: "onboardingD3",
+        assuntoPT: "Dia 3 — O poder dos hábitos diários",
+        assuntoEN: "Day 3 — The power of daily habits",
+        corpoPT: `<p style="margin:0 0 20px;font-size:14px;color:#888;line-height:1.7;">Grandes objetivos são alcançados com <strong style="color:#fff;">pequenas repetições</strong>. No Kairo podes criar hábitos, track streaks e ver a tua evolução.</p><div style="background:#0d0d2a;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:20px;"><p style="margin:0;font-size:14px;color:#c9c9e0;"><strong style="color:#7c5cff;">Desafio do Dia 3:</strong><br>Cria 1 hábito e completa-o hoje. O resto vem por inércia.</p></div>`,
+        corpoEN: `<p style="margin:0 0 20px;font-size:14px;color:#888;line-height:1.7;">Big goals are achieved with <strong style="color:#fff;">small repetitions</strong>. In Kairo you can create habits, track streaks and see your progress.</p><div style="background:#0d0d2a;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:20px;"><p style="margin:0;font-size:14px;color:#c9c9e0;"><strong style="color:#7c5cff;">Day 3 Challenge:</strong><br>Create 1 habit and complete it today. The rest follows by momentum.</p></div>`,
+      },
+      {
+        dia: 7,
+        enviadoKey: "onboardingD7",
+        assuntoPT: "Dia 7 — O teu resumo da primeira semana",
+        assuntoEN: "Day 7 — Your first week summary",
+        corpoPT: `<p style="margin:0 0 20px;font-size:14px;color:#888;line-height:1.7;">Passou uma semana desde que começaste. O dashboard do Kairo já está a dar-te insights reais sobre a tua produtividade.</p><div style="background:#0d0d2a;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:20px;"><p style="margin:0;font-size:14px;color:#c9c9e0;"><strong style="color:#7c5cff;">Descobre o Pro:</strong><br>Kairo AI, sincronização cross-device, relatórios avançados e modo offline.</p></div>`,
+        corpoEN: `<p style="margin:0 0 20px;font-size:14px;color:#888;line-height:1.7;">A week has passed since you started. Kairo's dashboard is already giving you real insights into your productivity.</p><div style="background:#0d0d2a;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:20px;"><p style="margin:0;font-size:14px;color:#c9c9e0;"><strong style="color:#7c5cff;">Discover Pro:</strong><br>Kairo AI, cross-device sync, advanced reports and offline mode.</p></div>`,
+      },
+    ];
+
+    const snap = await db.collection("newsletter_subscribers").where("ativo", "==", true).get();
+
+    for (const seq of sequences) {
+      for (const doc of snap.docs) {
+        const { email, idioma, subscritoEm, enviados = {} } = doc.data();
+        if (enviados[seq.enviadoKey]) continue; // já enviado
+
+        const subTime = subscritoEm.toDate ? subscritoEm.toDate() : new Date(subscritoEm);
+        const diffDays = Math.floor((now - subTime) / (1000 * 60 * 60 * 24));
+        if (diffDays < seq.dia) continue;
+
+        const isEN = idioma === "en";
+        const html = baseEmailHtml({
+          title: isEN ? seq.assuntoEN : seq.assuntoPT,
+          preheader: "Kairo Onboarding",
+          bodyHtml: isEN ? seq.corpoEN : seq.corpoPT,
+          footerCtaUrl: "https://kairoelite.app/login.html",
+          footerCtaLabel: isEN ? "Open Kairo →" : "Abrir Kairo →",
+          unsubscribeUrl: `https://kairoelite.app/unsubscribe.html?email=${encodeURIComponent(email)}`,
+        });
+
+        try {
+          await resend.emails.send({
+            from: "Kairo <noreply@kairoelite.app>",
+            to: email,
+            subject: isEN ? seq.assuntoEN : seq.assuntoPT,
+            html,
+          });
+          await doc.ref.update({ [`enviados.${seq.enviadoKey}`]: admin.firestore.FieldValue.serverTimestamp() });
+          console.log(`[onboardingSequence] ${seq.enviadoKey} enviado para ${email}`);
+        } catch (err) {
+          console.warn(`[onboardingSequence] Falha para ${email}:`, err.message);
+        }
+      }
+    }
+    return null;
+  });
+
+// ══════════════════════════════════════════════════════
+// 4. CRON: Re-engagement — após 14 dias sem login
+// ══════════════════════════════════════════════════════
+exports.reEngagement = functions.pubsub
+  .schedule("0 10 * * *")
+  .timeZone("Europe/Lisbon")
+  .onRun(async () => {
+    const resend = getResend();
+    const now = new Date();
+    const cutOff = admin.firestore.Timestamp.fromDate(new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000));
+
+    // Encontrar utilizadores com último login há +14 dias e ainda não receberam re-engagement
+    // Nota: isto usa auth metadata, mas como não temos acesso a auth metadata diretamente no cron,
+    // usamos fallback: procurar na coleção users por lastLoginAt
+    const snap = await db.collection("users")
+      .where("lastLoginAt", "<=", cutOff)
+      .where("notificacoes.email", "==", true)
+      .limit(100)
+      .get();
+
+    await Promise.all(snap.docs.map(async (doc) => {
+      const data = doc.data();
+      if (data.engagementEmailSent) return;
+      const email = data.email;
+      if (!email) return;
+
+      const html = baseEmailHtml({
+        title: "Sentimos a tua falta no Kairo",
+        preheader: "Dá uma nova cara à tua produtividade.",
+        bodyHtml: `<p style="margin:0 0 20px;font-size:14px;color:#888;line-height:1.7;">Faz 14 dias desde a tua última visita. Os teus objetivos estão a espera.</p><div style="background:#0d0d2a;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:20px;"><p style="margin:0;font-size:14px;color:#c9c9e0;">Na última semana adicionámos novas funcionalidades: <strong style="color:#fff;">anexos em tarefas</strong>, <strong style="color:#fff;">equipa com workspaces</strong> e <strong style="color:#fff;">templates de metas</strong>.</p></div>`,
+        footerCtaUrl: "https://kairoelite.app/login.html",
+        footerCtaLabel: "Voltar ao Kairo →",
+        unsubscribeUrl: `https://kairoelite.app/unsubscribe.html?email=${encodeURIComponent(email)}`,
+      });
+
+      try {
+        await resend.emails.send({
+          from: "Kairo <noreply@kairoelite.app>", to: email,
+          subject: "Sentimos a tua falta — Há novidades no Kairo",
+          html,
+        });
+        await doc.ref.update({ engagementEmailSent: admin.firestore.FieldValue.serverTimestamp() });
+      } catch (err) {
+        console.warn(`[reEngagement] Falha para ${email}:`, err.message);
+      }
+    }));
+
+    return null;
+  });
+
+/* ═══════════════════════════════════════════
+   EXISTING HELPERS
+   ═══════════════════════════════════════════ */
+
 function getStripe() {
   const secret = process.env.STRIPE_SECRET;
   return new Stripe(secret, { apiVersion: "2023-10-16" });

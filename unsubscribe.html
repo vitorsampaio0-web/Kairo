@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cancelar Subscrição — Kairo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --black:#0d1117; --surface:#161b22; --gold:#2d7ff9; --gold-light:#60a5fa; --white:#F4F2ED; --off-white:#C8C5BC; --muted:#6A6A6A; --font-body:'DM Sans',system-ui,sans-serif; --font-display:'Cormorant Garamond',Georgia,serif; --radius-md:12px; }
+    html { font-size: 16px; }
+    body { background: var(--black); color: var(--white); font-family: var(--font-body); font-weight: 300; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .card { background: var(--surface); border: 1px solid #2d333b; border-radius: var(--radius-md); padding: 48px; max-width: 420px; width: 100%; text-align: center; }
+    h1 { font-family: var(--font-display); font-size: 2rem; font-weight: 300; margin-bottom: 8px; }
+    p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 28px; }
+    button { background: var(--gold); color: var(--black); border: none; padding: 14px 32px; border-radius: var(--radius-md); font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: 0.3s; }
+    button:hover { background: var(--gold-light); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    #msg { margin-top: 16px; font-size: 0.85rem; min-height: 20px; }
+    .success { color: #4ade80; }
+    .error { color: #ff6b6b; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Cancelar subscrição</h1>
+    <p id="desc">A carregar...</p>
+    <button id="btn" disabled>Cancelar subscrição</button>
+    <p id="msg"></p>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = { apiKey: "AIzaSyD7jnNSZV_C0jU7aibhA1f3_BgMuc9KpwY", authDomain: "kairoelite-a35a2.firebaseapp.com", projectId: "kairoelite-a35a2", storageBucket: "kairoelite-a35a2.appspot.com", messagingSenderId: "1013624006007", appId: "1:1013624006007:web:9a031dbffe9c8ef95e76aa", measurementId: "G-E30MM1F4BM" };
+    firebase.initializeApp(firebaseConfig);
+
+    const params = new URLSearchParams(location.search);
+    const email  = (params.get('email') || '').trim().toLowerCase();
+    const desc   = document.getElementById('desc');
+    const btn    = document.getElementById('btn');
+    const msg    = document.getElementById('msg');
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      desc.textContent = 'Email inválido ou em falta no link.';
+      msg.textContent = '';
+    } else {
+      desc.textContent = `Cancelar subscrição do email: ${email}`;
+      btn.disabled = false;
+    }
+
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      btn.textContent = 'A processar...';
+      try {
+        await firebase.firestore().doc(`newsletter_subscribers/${email}`).update({ ativo: false });
+        msg.textContent = 'Subscrição cancelada com sucesso.';
+        msg.className = 'success';
+        btn.style.display = 'none';
+        desc.textContent = 'Sempre que quiseres, podes voltar a subscrever na landing page.';
+      } catch (err) {
+        msg.textContent = 'Erro ao cancelar. Tenta mais tarde.';
+        msg.className = 'error';
+        btn.disabled = false;
+        btn.textContent = 'Cancelar subscrição';
+      }
+    });
+  </script>
+</body>
+</html>
