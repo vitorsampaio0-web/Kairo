@@ -296,11 +296,19 @@
 
     .hero-logo-large {
       display: block;
-      height: 180px;
-      width: auto;
-      margin-bottom: 24px;
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      margin: 0 auto 32px;
       filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.5));
       animation: logoFloat 4s ease-in-out infinite;
+    }
+    @media (max-width: 480px) {
+      .hero-logo-large {
+        max-width: 100%;
+        width: 90vw;
+        margin-bottom: 24px;
+      }
     }
     @keyframes logoFloat {
       0%, 100% { transform: translateY(0); }
