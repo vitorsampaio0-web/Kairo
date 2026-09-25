@@ -2244,7 +2244,7 @@
     msg.textContent = '';
 
     try {
-      const resp = await fetch('https://us-central1-kairoelite-a35a2.cloudfunctions.net/subscribeNewsletter', {
+      const resp = await fetch('https://us-central1-kairo-3a7e4.cloudfunctions.net/subscribeNewsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, source: 'landing', idioma: 'pt' }),

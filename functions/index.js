@@ -7,16 +7,6 @@ const cors = require("cors")({ origin: true });
 admin.initializeApp();
 const db = admin.firestore();
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-const { Resend } = require("resend");
-const cors = require("cors")({ origin: true });
-
-admin.initializeApp();
-const db = admin.firestore();
-
 /* ═══════════════════════════════════════════
    RESEND HELPERS — Email Marketing Automático
    ═══════════════════════════════════════════ */
