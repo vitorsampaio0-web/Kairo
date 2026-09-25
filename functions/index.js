@@ -116,6 +116,37 @@ exports.subscribeNewsletter = functions.https.onRequest((req, res) => {
 });
 
 // ══════════════════════════════════════════════════════
+// 2b. HELPER: Cancelar subscrição da newsletter (sem login)
+// ══════════════════════════════════════════════════════
+exports.unsubscribeNewsletter = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const input = req.body.data || req.body || {};
+      const email = (input.email || "").trim().toLowerCase();
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: { message: "Email inválido." } });
+      }
+
+      const ref = db.collection("newsletter_subscribers").doc(email);
+      const snap = await ref.get();
+      if (snap.exists) {
+        await ref.update({
+          ativo: false,
+          canceladoEm: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+
+      // Responder sucesso mesmo se não existir (não revela se o email está na lista)
+      res.json({ result: { success: true } });
+    } catch (err) {
+      console.error("[unsubscribeNewsletter]", err);
+      res.status(500).json({ error: { message: err.message } });
+    }
+  });
+});
+
+// ══════════════════════════════════════════════════════
 // 2. HELPER: Enviar newsletter manual (admin)
 // ══════════════════════════════════════════════════════
 exports.sendNewsletter = functions.https.onRequest((req, res) => {

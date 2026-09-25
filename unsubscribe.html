@@ -53,7 +53,12 @@
       btn.disabled = true;
       btn.textContent = 'A processar...';
       try {
-        await firebase.firestore().doc(`newsletter_subscribers/${email}`).update({ ativo: false });
+        const resp = await fetch('https://us-central1-kairo-3a7e4.cloudfunctions.net/unsubscribeNewsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
         msg.textContent = 'Subscrição cancelada com sucesso.';
         msg.className = 'success';
         btn.style.display = 'none';
