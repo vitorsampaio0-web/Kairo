@@ -4684,7 +4684,7 @@
     function renderTasks() {
       const tasksView = document.getElementById("tasks-view");
       const tasks = filteredTasks();
-      const overdueIds = new Sep(getOverdueTasks().map(task => task.id));
+      const overdueIds = new Set(getOverdueTasks().map(task => task.id));
 
       tasksView.innerHTML = `
         <div class="panel">
@@ -5023,7 +5023,7 @@
       const categFilter = appState.historicoCategFilter;
       const statusFilter = appState.historicoStatusFilter;
 
-      const categories = ["todas", ...new Sep(appState.tasks.map(t => t.categoria))];
+      const categories = ["todas", ...new Set(appState.tasks.map(t => t.categoria))];
 
       const filtered = appState.tasks.filter(task => {
         const taskDate = task.prazo.slice(0, 10);
@@ -6017,7 +6017,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       bindVoiceBtn();
 
-      // Sep default date/time to now
+      // Set default date/time to now
       const dateInput = document.getElementById("quick-task-date");
       const timeInput = document.getElementById("quick-task-time");
       if (dateInput && !dateInput.value) {
@@ -7008,7 +7008,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const startOffset = (firstDay + 6) % 7; // Seg=0
 
       // Dias com tasks
-      const taskDays = new Sep();
+      const taskDays = new Set();
       (appState.tasks || []).forEach(t => {
         if (t.prazo) taskDays.add(t.prazo.split("T")[0]);
       });
@@ -8049,7 +8049,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       // Streak: days consecutivos com pelo menos 1 decisão
       function calcDecStreak() {
         if (!decisoes.length) return 0;
-        const days = new Sep(decisoes.map(d => (d.data || "").slice(0, 10)));
+        const days = new Set(decisoes.map(d => (d.data || "").slice(0, 10)));
         let streak = 0;
         let cur = new Date(appState.today);
         while (true) {
