@@ -3627,7 +3627,7 @@
     async function loadUserDate(uid) {
       try {
         const [tasksSnap, habitosSnap, eventosSnap] = await Promise.all([
-          db.collection(`users/${uid}/tasks`).get(),
+          db.collection(`users/${uid}/tarefas`).get(),
           db.collection(`users/${uid}/habitos`).get(),
           db.collection(`users/${uid}/eventos`).get()
         ]);
@@ -3655,7 +3655,7 @@
       try {
         const batch = db.batch();
         MOCK_DATA.tasks.forEach(t => {
-          batch.set(db.doc(`users/${uid}/tasks/${t.id}`), t);
+          batch.set(db.doc(`users/${uid}/tarefas/${t.id}`), t);
         });
         MOCK_DATA.habitos.forEach(h => {
           batch.set(db.doc(`users/${uid}/habitos/${h.id}`), h);
@@ -3673,7 +3673,7 @@
       _firestoreUnsubs.forEach(fn => fn());
       _firestoreUnsubs = [];
 
-      const unsub1 = db.collection(`users/${uid}/tasks`).onSnapshot(snap => {
+      const unsub1 = db.collection(`users/${uid}/tarefas`).onSnapshot(snap => {
         appState.tasks = snap.docs.map(d => ({ ...d.data(), id: isNaN(d.id) ? d.id : Number(d.id) }));
         renderAll();
       }, err => console.error("[Firestore] tasks onSnapshot:", err));
@@ -3722,7 +3722,7 @@
             appState.equipa = { id: teamDoc.id, ...teamDoc.data() };
             // Listener para tasks da equipa
             if (_teamTaskUnsub) _teamTaskUnsub();
-            _teamTaskUnsub = db.collection(`teams/${teamDoc.id}/tasks`).onSnapshot(tSnap => {
+            _teamTaskUnsub = db.collection(`teams/${teamDoc.id}/tarefas`).onSnapshot(tSnap => {
               appState.equipaTasks = tSnap.docs.map(d => ({ ...d.data(), id: d.id }));
               renderTeam();
             });
@@ -3896,7 +3896,7 @@
         const task = appState.tasks.find(t => String(t.id) === String(taskId));
         if (task && task.anexos) {
           const updated = task.anexos.filter(a => a.storagePath !== anexo.storagePath);
-          await fsUpdate('tasks', taskId, { anexos: updated });
+          await fsUpdate('tarefas', taskId, { anexos: updated });
           task.anexos = updated;
         }
         await decrementarQuota(anexo.tamanho);
@@ -5439,7 +5439,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         anexos: []
       };
       appState.tasks.unshift(newTask);
-      fsSep("tasks", id, newTask);
+      fsSet("tarefas", id, newTask);
 
       const pendingFiles = window._pendingTaskFiles || [];
       if (pendingFiles.length > 0) {
@@ -5452,7 +5452,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const updatedTask = appState.tasks.find(t => String(t.id) === String(id));
           if (updatedTask) {
             updatedTask.anexos = uploaded;
-            fsSet("tasks", id, updatedTask);
+            fsSet("tarefas", id, updatedTask);
           }
           showToast(`${uploaded.length} attachment(s) uploaded successfully.`);
         }
@@ -5492,7 +5492,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         concluidoToday: false
       };
       appState.habitos.push(newHabit);
-      fsSep("habitos", id, newHabit);
+      fsSet("habitos", id, newHabit);
 
       nameInput.value = "";
       renderAll();
@@ -5543,12 +5543,12 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!task) return;
       if (task.status === "concluida") {
         task.status = "pending";
-        fsUpdate("tasks", taskId, { status: "pending" });
+        fsUpdate("tarefas", taskId, { status: "pending" });
         renderAll();
         showToast(`"${task.titulo}" marcada como pending.`);
       } else {
         task.status = "concluida";
-        fsUpdate("tasks", taskId, { status: "concluida" });
+        fsUpdate("tarefas", taskId, { status: "concluida" });
 
         // Update linked goal progress
         if (task.metaId) {
@@ -5576,7 +5576,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const nextDeadline = calcNextDeadline(task.prazo, task.repeticao, task.daysEspecificos);
           const nextTask = { ...task, id: nextId, status: "pending", prazo: nextDeadline };
           appState.tasks.push(nextTask);
-          fsSep("tasks", nextId, nextTask);
+          fsSet("tarefas", nextId, nextTask);
           const dayNames = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
           const nextDate = new Date(nextDeadline);
           const nextLabel = nextDate.toLocaleDateString("pt-PT", { weekday:"short", day:"numeric", month:"short" });
@@ -5594,7 +5594,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!task) return;
       if (!confirm(`Apagar "${task.titulo}"? Esta ação não pode ser desfeita.`)) return;
       appState.tasks = appState.tasks.filter(item => item.id !== nId);
-      fsDelete("tasks", taskId);
+      fsDelete("tarefas", taskId);
       renderAll();
       showToast(`Task "${task.titulo}" apagada.`);
     }
@@ -5664,7 +5664,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       task.repeticao = document.getElementById("edit-task-repeat")?.value || "nenhuma";
       task.daysEspecificos = task.repeticao === "especifica" ? getSelectedDays("edit") : [];
 
-      fsSep("tasks", id, task);
+      fsSet("tarefas", id, task);
       closeEditModal();
       renderAll();
       showToast(`Task "${task.titulo}" atualizada.`);
@@ -8757,11 +8757,11 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const delegNome  = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Alguém";
 
       if (editId) {
-        await db.doc(`teams/${teamId}/tasks/${editId}`).update({ titulo, atribuidoA: assignee, prazo, prioridade, nota });
+        await db.doc(`teams/${teamId}/tarefas/${editId}`).update({ titulo, atribuidoA: assignee, prazo, prioridade, nota });
         showToast("Task updated!");
       } else {
         const id = Date.now().toString();
-        await db.doc(`teams/${teamId}/tasks/${id}`).set({
+        await db.doc(`teams/${teamId}/tarefas/${id}`).set({
           id, titulo, atribuidoA: assignee, prazo, prioridade, nota,
           status: "pending",
           criadoPor: currentUser.uid, criadoEm: new Date().toISOString(),
@@ -8802,7 +8802,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!task || !appState.equipa) return;
       const cycle = { pending: "andamento", andamento: "concluida", concluida: "pending" };
       const newStatus = cycle[task.status] || "pending";
-      await db.doc(`teams/${appState.equipa.id}/tasks/${taskId}`).update({ status: newStatus });
+      await db.doc(`teams/${appState.equipa.id}/tarefas/${taskId}`).update({ status: newStatus });
       if (newStatus === "concluida") {
         logTeamActivity(appState.equipa.id, { tipo: "tarefa_concluida", titulo: task.titulo || "" });
       }
@@ -8811,7 +8811,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     async function deleteTeamTask(taskId) {
       if (!appState.equipa) return;
       if (!confirm("Apagar esta tarefa?")) return;
-      await db.doc(`teams/${appState.equipa.id}/tasks/${taskId}`).delete();
+      await db.doc(`teams/${appState.equipa.id}/tarefas/${taskId}`).delete();
     }
 
     async function leaveTeam() {
