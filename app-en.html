@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Kairo" />
-  <link rel="apple-torch-icon" href="./logo-kairo.png" />
+  <link rel="apple-touch-icon" href="./logo-kairo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -69,8 +69,8 @@
       min-height: 100%;
       font-family: "Inter", system-ui, sans-serif;
       background:
-        radial-gradient(circle top left, rgba(124, 92, 255, 0.22), transparent 30%),
-        radial-gradient(circle top right, rgba(0, 194, 255, 0.16), transparent 28%),
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.22), transparent 30%),
+        radial-gradient(circle at top right, rgba(0, 194, 255, 0.16), transparent 28%),
         linear-gradient(160deg, #050d18 0%, #07111f 48%, #0a1424 100%);
       color: var(--text);
     }
@@ -353,7 +353,7 @@
       color: #82efd0;
     }
 
-    .status-pending {
+    .status-pendente {
       background: rgba(255, 184, 77, 0.12);
       color: #ffd48f;
     }
@@ -555,7 +555,7 @@
     }
 
     .task-row.done h4 {
-      text-decoration: line-throrgh;
+      text-decoration: line-through;
     }
 
     .task-row.overdue {
@@ -916,7 +916,7 @@
       background: rgba(255, 107, 138, 0.18);
       border-color: rgba(255, 107, 138, 0.55);
       color: var(--danger);
-      animation: pulse-mic 1s ease-in-ort infinite;
+      animation: pulse-mic 1s ease-in-out infinite;
     }
 
     @keyframes pulse-mic {
@@ -1336,7 +1336,7 @@
     .cal-popup-item p  { margin: 0; font-size: 0.75rem; color: #666; }
     .cal-popup-empty   { text-align: center; color: #555; font-size: 0.85rem; padding: 20px 0; }
 
-    /* ---- Feed de Atividade da Team ---- */
+    /* ---- Feed de Atividade da Equipa ---- */
     .feed-wrap { margin-top:20px; }
     .feed-title { font-size:0.72rem; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
     .feed-live-dot { width:7px; height:7px; border-radius:50%; background:#10b981; animation:pulse-dot 2s infinite; }
@@ -1354,7 +1354,7 @@
     .feed-time { font-size:0.68rem; color:#444; margin-top:3px; }
     .feed-empty { text-align:center; color:#444; font-size:0.82rem; padding:24px 0; }
 
-    /* ---- Daily de Decisions ---- */
+    /* ---- Diário de Decisões ---- */
     .dec-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
     .dec-stat  { background:#0d0d1f; border:1px solid #1e1e3a; border-radius:14px; padding:16px; text-align:center; }
     .dec-stat-val { font-size:1.8rem; font-weight:900; color:#e0e0f0; line-height:1; margin-bottom:4px; }
@@ -1415,7 +1415,7 @@
     .ia-bar-val { font-size:0.68rem; color:#666; width:20px; flex-shrink:0; }
     .ia-empty { text-align:center; padding:20px; color:#444; font-size:0.82rem; }
 
-    /* ---- Modo Team ---- */
+    /* ---- Modo Equipa ---- */
     .team-empty { text-align:center; padding:60px 20px; }
     .team-empty-icon { font-size:48px; margin-bottom:12px; }
     .team-empty h3 { color:#e0e0f0; margin:0 0 8px; }
@@ -1444,13 +1444,13 @@
     .team-task-check.done::after { content:'✓'; color:#fff; font-size:0.72rem; font-weight:700; }
     .team-task-info { flex:1; min-width:0; }
     .team-task-title { font-size:0.88rem; color:#c9c9e0; margin:0 0 3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .team-task-title.done { color:#444; text-decoration:line-throrgh; }
+    .team-task-title.done { color:#444; text-decoration:line-through; }
     .team-task-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
     .team-task-assignee { font-size:0.7rem; background:rgba(124,92,255,0.1); color:#9b85ff; border-radius:20px; padding:2px 8px; }
     .team-task-date { font-size:0.7rem; color:#555; }
     .team-leave-btn { background:none; border:1px solid rgba(248,113,113,0.2); color:#f87171; border-radius:8px; padding:6px 12px; font-size:0.75rem; cursor:pointer; }
 
-    /* ---- Comentários + Kanban ---- */
+    /* ---- Comentários em tarefas de equipa ---- */
     .team-task-comment-btn { background:none; border:none; color:#7c5cff; cursor:pointer; font-size:0.72rem; padding:4px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; }
     .comment-avatar { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#4ea8ff,#7c5cff); }
     .kanban-board { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:16px; }
@@ -1484,7 +1484,7 @@
     .team-filter-tab:hover { border-color:#7c5cff; color:#9b85ff; }
     .team-filter-tab.active { background:rgba(124,92,255,0.15); border-color:#7c5cff; color:#9b85ff; }
 
-    /* Badges nas tasks */
+    /* Badges nas tarefas */
     .deleg-badge { font-size:0.62rem; font-weight:700; padding:2px 7px; border-radius:20px; background:rgba(78,168,255,0.1); color:#4ea8ff; white-space:nowrap; }
     .deleg-badge-novo { background:rgba(49,208,170,0.15); color:#31d0aa; animation:pulse-badge 2s infinite; }
     @keyframes pulse-badge { 0%,100%{opacity:1} 50%{opacity:.55} }
@@ -1503,7 +1503,7 @@
     .team-input:focus { border-color:#7c5cff; }
     .team-save-btn { width:100%; background:linear-gradient(135deg,#7c5cff,#4ea8ff); border:none; color:#fff; padding:13px; border-radius:12px; font-size:0.95rem; font-weight:700; cursor:pointer; margin-top:8px; }
 
-    /* ---- Goals (Goals) ---- */
+    /* ---- Metas (Goals) ---- */
     .metas-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
     .metas-header h2 { margin:0; font-size:1.25rem; color:#e0e0f0; }
     .meta-card {
@@ -1553,7 +1553,7 @@
     .subtask-check.done { background:#7c5cff; border-color:#7c5cff; }
     .subtask-check.done::after { content:'✓'; color:#fff; font-size:0.7rem; font-weight:700; }
     .subtask-title { flex:1; font-size:0.85rem; color:#c9c9e0; transition:color 0.15s; }
-    .subtask-title.done { color:#444; text-decoration:line-throrgh; }
+    .subtask-title.done { color:#444; text-decoration:line-through; }
     .subtask-del { background:none; border:none; color:#333; cursor:pointer; font-size:0.85rem; padding:2px 6px; border-radius:4px; }
     .subtask-del:hover { color:#f87171; }
     .add-subtask-row { display:flex; gap:8px; margin-top:10px; }
@@ -1623,7 +1623,7 @@
     .streak-card-center { text-align:center; position:relative; z-index:1; margin-bottom:24px; }
     .streak-card-fire { font-size:52px; line-height:1; margin-bottom:4px; filter:drop-shadow(0 0 16px rgba(245,158,11,0.7)); }
     .streak-card-num  { font-size:88px; font-weight:900; line-height:1; margin-bottom:2px; background:linear-gradient(135deg,#fff 30%,#9b85ff 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:-3px; }
-    .streak-card-days { font-size:1rem; font-weight:700; color:#9b85ff; letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px; }
+    .streak-card-dias { font-size:1rem; font-weight:700; color:#9b85ff; letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px; }
     .streak-card-habit { font-size:0.88rem; color:rgba(255,255,255,0.55); font-weight:500; }
     .streak-card-bar  { display:flex; gap:5px; justify-content:center; margin-bottom:22px; position:relative; z-index:1; }
     .streak-card-dot  { width:26px; height:5px; border-radius:3px; background:rgba(124,92,255,0.18); }
@@ -1701,7 +1701,7 @@
     .notif-badge.denied  { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
     .notif-badge.default { background: rgba(124,92,255,0.1); color: #9b85ff; border: 1px solid rgba(124,92,255,0.2); }
 
-    /* ---- Day Picker Calendar (Repeat Específica) ---- */
+    /* ---- Day Picker Calendar (Repetição Específica) ---- */
     .daycal-wrap { margin-top:8px; background:#0d0d1f; border:1px solid #1e1e3a; border-radius:12px; padding:12px; }
     .daycal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
     .daycal-header span { color:#c9c9e0; font-size:0.85rem; font-weight:600; }
@@ -2116,7 +2116,7 @@
       place-items: center;
       box-shadow: 0 8px 28px rgba(124, 92, 255, 0.48);
       cursor: pointer;
-      animation: kairo-pulse 2.6s ease-in-ort infinite;
+      animation: kairo-pulse 2.6s ease-in-out infinite;
       transition: transform 0.22s ease, box-shadow 0.22s ease;
     }
 
@@ -2333,7 +2333,7 @@
       height: 6px;
       border-radius: 50%;
       background: var(--muted);
-      animation: typing-dot 1.3s ease-in-ort infinite;
+      animation: typing-dot 1.3s ease-in-out infinite;
     }
 
     .chat-typing span:nth-child(2) { animation-delay: 0.18s; }
@@ -2416,8 +2416,8 @@
       justify-content: center;
       padding: 16px;
       background:
-        radial-gradient(circle top left, rgba(124, 92, 255, 0.28), transparent 35%),
-        radial-gradient(circle bottom right, rgba(0, 194, 255, 0.18), transparent 32%),
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.28), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(0, 194, 255, 0.18), transparent 32%),
         linear-gradient(160deg, #050d18 0%, #07111f 48%, #0a1424 100%);
       animation: fadeIn 0.4s ease;
     }
@@ -2589,7 +2589,7 @@
       color: var(--muted);
     }
 
-    .logort-btn {
+    .logout-btn {
       width: 32px;
       height: 32px;
       border-radius: 10px;
@@ -2603,7 +2603,7 @@
       transition: all 0.22s ease;
     }
 
-    .logort-btn:hover {
+    .logout-btn:hover {
       color: var(--danger);
       background: rgba(255, 107, 138, 0.1);
       border-color: rgba(255, 107, 138, 0.25);
@@ -3098,7 +3098,7 @@
           <div class="streak-card-center">
             <div class="streak-card-fire">🔥</div>
             <div class="streak-card-num" id="share-streak-num">0</div>
-            <div class="streak-card-days">Dias Consecutivos</div>
+            <div class="streak-card-dias">Dias Consecutivos</div>
             <div class="streak-card-habit" id="share-streak-habit">of productivity</div>
           </div>
           <div class="streak-card-bar" id="share-streak-bar"></div>
@@ -4894,7 +4894,7 @@
                   </div>
                   <div class="habit-meta">
                     <span class="badge">${progressoReal}% this week (${diasFeitos}/${diasContados} days)</span>
-                    <span class="badge ${habit.concluidoToday ? "status-concluida" : "status-pending"}">${habit.concluidoToday ? "Completed hoje" : "Pending hoje"}</span>
+                    <span class="badge ${habit.concluidoToday ? "status-concluida" : "status-pendente"}">${habit.concluidoToday ? "Completed hoje" : "Pending hoje"}</span>
                   </div>
                 </div>`;
               }).join("")}
@@ -6220,7 +6220,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     });
 
     document.addEventListener("click", (e) => {
-      if (e.target.closest("#logort-btn")) {
+      if (e.target.closest("#logout-btn")) {
         _firestoreUnsubs.forEach(fn => fn());
         _firestoreUnsubs = [];
         auth.signOct();
@@ -7051,7 +7051,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
             <div class="cal-popup-item">
               <div class="cal-popup-dot" style="background:${PRIO_COLOR[t.prioridade] || "#7c5cff"}"></div>
               <div>
-                <h4 style="${t.status === "concluida" ? "text-decoration:line-throrgh;color:#555;" : ""}">${t.titulo}</h4>
+                <h4 style="${t.status === "concluida" ? "text-decoration:line-through;color:#555;" : ""}">${t.titulo}</h4>
                 <p>${t.prazo.substring(11,16)}h · ${t.categoria || ""}${t.status === "concluida" ? " · Completed" : ""}</p>
               </div>
             </div>`).join("");
@@ -8154,7 +8154,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       el.innerHTML = `
         <div class="section-header">
-          <h2 class="section-title">Daily de Decisions</h2>
+          <h2 class="section-title">Diário de Decisões</h2>
           <button class="primary-btn" onclick="openDecisaoModal()" style="padding:8px 16px;font-size:0.85rem;"><i data-lucide="plus" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"></i>New Decision</button>
         </div>
 
