@@ -4392,7 +4392,7 @@
       });
       const weeklyGroups = _weekDates.map(date => {
         const evts = appState.eventos.filter(e => e.data === date).map(e => ({ _type: "event", id: e.id, horario: e.horario, titulo: e.titulo, categoria: e.categoria }));
-        const tsks = appState.tarefas.filter(t => t.prazo.startsWith(date)).map(t => ({
+        const tsks = appState.tasks.filter(t => t.prazo.startsWith(date)).map(t => ({
           _type: "task",
           horario: t.prazo.split("T")[1] ? t.prazo.split("T")[1].slice(0, 5) : "00:00",
           titulo: t.titulo,
