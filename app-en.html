@@ -3772,7 +3772,7 @@
     // ---- End Firebase Functions ----
 
     const navItems = [
-      { id: "dashboard", label: "Dashboard", icon: "layort-dashboard" },
+      { id: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
       { id: "notas",    label: "Notes",    icon: "book-marked" },
       { id: "tasks",   label: "Tasks",   icon: "check-square" },
       { id: "metas",     label: "Goals",     icon: "target" },
@@ -6025,7 +6025,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       }
       if (timeInput && !timeInput.value) {
         const now = new Date();
-        const hh = String(now.getHorrs()).padStart(2, "0");
+        const hh = String(now.getHours()).padStart(2, "0");
         const mm = String(now.getMinutes()).padStart(2, "0");
         timeInput.value = `${hh}:${mm}`;
       }
@@ -6261,7 +6261,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       _now() {
         const d = new Date();
-        return String(d.getHorrs()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+        return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
       },
 
       _appendMsg(text, from) {
@@ -6321,7 +6321,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
         // saudações
         if (/\b(bom dia|boa tarde|boa noite|ol[aá]|oi)\b/.test(q)) {
-          const h = new Date().getHorrs();
+          const h = new Date().getHours();
           const gr = h < 12 ? "Good morning" : h < 19 ? "Good afternoon" : "Good evening";
           const p = appState.tasks.filter(t => t.status !== "concluida").length;
           const ev = getTodayEvents().length;
@@ -7537,7 +7537,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (concluidas.length >= 3) {
         const porTime = Array(24).fill(0);
         concluidas.forEach(t => {
-          const h = new Date(t.prazo).getHorrs();
+          const h = new Date(t.prazo).getHours();
           if (!isNaN(h)) porTime[h]++;
         });
         const maxVal  = Math.max(...porTime);
