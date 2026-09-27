@@ -416,6 +416,62 @@
     }
 
     /* ─── APP MOCKUP ─── */
+    #hero .hero-bg { overflow: hidden; }
+    .hero-bg-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+    .hero-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(2,8,23,0.96) 0%, rgba(2,8,23,0.82) 38%, rgba(2,8,23,0.45) 68%, rgba(2,8,23,0.30) 100%);
+      z-index: 1;
+    }
+    .hero-bg-fade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(2,8,23,0.45) 0%, transparent 26%, transparent 66%, var(--black) 100%);
+      z-index: 1;
+    }
+    .hero-bg .hero-orb { display: none; }
+
+    .hero-capability-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 30px; }
+    .hero-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 100px; border: 1px solid rgba(120,170,255,0.22); background: rgba(120,170,255,0.06); backdrop-filter: blur(6px); font-size: 0.78rem; font-weight: 500; color: var(--off-white); }
+    .hero-chip svg { width: 13px; height: 13px; color: #6CCBFF; }
+
+    .hero-mockup { position: relative; }
+    .hero-mockup-inner { position: relative; padding-right: 30px; padding-bottom: 30px; }
+    .hero-phone {
+      position: absolute;
+      right: -6px;
+      bottom: -14px;
+      width: 148px;
+      border-radius: 26px;
+      border: 1px solid rgba(120,170,255,0.28);
+      background: linear-gradient(180deg, #050C1D, #020817);
+      padding: 8px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 50px rgba(0,140,255,0.18);
+      z-index: 2;
+      animation: mockup-float 7s ease-in-out infinite;
+      animation-delay: -2.5s;
+    }
+    .hero-phone::before { content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 52px; height: 14px; background: #020817; border-radius: 0 0 9px 9px; z-index: 3; }
+    .hp-screen { border-radius: 19px; background: radial-gradient(circle at 50% 0%, rgba(22,139,255,0.12), transparent 55%), #030B1A; padding: 26px 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .hp-header { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
+    .hp-header img { width: 13px; height: 13px; }
+    .hp-header span { font-size: 0.52rem; font-weight: 600; color: var(--white); letter-spacing: 0.03em; }
+    .hp-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 9px; background: rgba(120,170,255,0.06); border: 1px solid rgba(120,170,255,0.09); font-size: 0.52rem; color: var(--off-white); font-weight: 500; white-space: nowrap; }
+    .hp-item.active { background: rgba(22,139,255,0.18); border-color: rgba(0,140,255,0.4); color: var(--white); }
+    .hp-dot { width: 5px; height: 5px; border-radius: 50%; background: #168BFF; flex-shrink: 0; }
+    @media (max-width: 900px) {
+      .hero-phone { display: none; }
+      .hero-mockup-inner { padding-right: 0; padding-bottom: 0; }
+    }
+
     .hero-mockup {
       display: flex;
       justify-content: center;
@@ -1620,9 +1676,9 @@
   <!-- HERO -->
   <section id="hero">
     <div class="hero-bg">
-      <div class="hero-orb hero-orb-1"></div>
-      <div class="hero-orb hero-orb-2"></div>
-      <div class="hero-orb hero-orb-3"></div>
+      <img src="./hero-bg.jpg" alt="" class="hero-bg-img" width="1920" height="1088" fetchpriority="high" />
+      <div class="hero-bg-overlay"></div>
+      <div class="hero-bg-fade"></div>
     </div>
     <div class="container">
       <div class="hero-grid">
@@ -1632,6 +1688,14 @@
           </div>
           <h1 class="hero-headline">Run your life.<br /><em>Don't manage it.</em></h1>
           <p class="hero-desc">One intelligent system for your tasks, habits, decisions and performance. Less noise. More execution.</p>
+          <div class="hero-capability-row">
+            <span class="hero-chip"><i data-lucide="check-square"></i>Tasks</span>
+            <span class="hero-chip"><i data-lucide="repeat"></i>Habits</span>
+            <span class="hero-chip"><i data-lucide="target"></i>Goals</span>
+            <span class="hero-chip"><i data-lucide="calendar"></i>Calendar</span>
+            <span class="hero-chip"><i data-lucide="sparkles"></i>AI</span>
+            <span class="hero-chip"><i data-lucide="users"></i>Teams</span>
+          </div>
           <div class="hero-ctas">
             <a href="login-en.html" class="btn btn-primary btn-lg">
               Start Free
@@ -1645,6 +1709,7 @@
         </div>
 
         <div class="hero-mockup" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+          <div class="hero-mockup-inner">
           <div class="mockup-frame">
             <div class="mockup-titlebar">
               <div class="mockup-dot mockup-dot-r"></div>
@@ -1717,6 +1782,22 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div class="hero-phone">
+            <div class="hp-screen">
+              <div class="hp-header">
+                <img src="./logo-kairo.png" width="1254" height="1254" srcset="./logo-kairo.webp" alt="" loading="lazy" onerror="this.style.display='none'" />
+                <span>Kairo</span>
+              </div>
+              <div class="hp-item active"><span class="hp-dot"></span>Dashboard</div>
+              <div class="hp-item">Notes</div>
+              <div class="hp-item">Tasks</div>
+              <div class="hp-item">Goals</div>
+              <div class="hp-item">Habits</div>
+              <div class="hp-item">Daily Email</div>
+              <div class="hp-item">Weekly Summary</div>
+            </div>
+          </div>
           </div>
         </div>
       </div>
