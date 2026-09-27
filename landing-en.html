@@ -1442,9 +1442,18 @@
   })();
   </script>
   <style>
-    .ab-variant-b .hero-sub-headline { font-size: 2.6rem !important; }
     .ab-variant-b .btn-primary { background: linear-gradient(135deg, #ff6b8a, #e11d48) !important; }
     .ab-variant-b .hero-desc { max-width: 520px !important; }
+
+    /* ─── FAQ ─── */
+    .faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .faq-item { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--radius-md); overflow: hidden; transition: var(--transition); }
+    .faq-item[open] { border-color: rgba(59, 130, 246, 0.35); }
+    .faq-q { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; cursor: pointer; font-size: 0.95rem; font-weight: 500; color: var(--white); list-style: none; }
+    .faq-q::-webkit-details-marker { display: none; }
+    .faq-chevron { flex-shrink: 0; color: var(--gold); transition: var(--transition); }
+    .faq-item[open] .faq-chevron { transform: rotate(180deg); }
+    .faq-a { padding: 0 24px 20px; font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
   </style>
 </head>
 <body>
@@ -1458,12 +1467,12 @@
       </a>
       <ul class="nav-links">
         <li><a href="#features">Features</a></li>
-        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#faq">FAQ</a></li>
         <li><a href="pricing-en.html">Pricing</a></li>
       </ul>
       <div class="nav-cta">
         <div class="nav-language-selector">
-          <a href="landing.html">PT</a>
+          <a href="index.html">PT</a>
           <span style="color:var(--border-2);">|</span>
           <a href="landing-en.html" class="active">EN</a>
         </div>
@@ -1479,7 +1488,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <button class="mobile-close" id="mobileClose" aria-label="Close menu">✕</button>
     <a href="#features" onclick="closeMobileMenu()">Features</a>
-    <a href="#testimonials" onclick="closeMobileMenu()">Testimonials</a>
+    <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
     <a href="pricing-en.html" onclick="closeMobileMenu()">Pricing</a>
     <a href="login-en.html" class="btn btn-primary btn-lg">Get Kairo</a>
   </div>
@@ -1494,11 +1503,10 @@
     <div class="container">
       <div class="hero-grid">
         <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
-          <img src="./logo-kairo.png" width="1254" height="1254" alt="Kairo" class="hero-logo-large" loading="eager" onerror="this.style.display='none'" />
           <div class="hero-eyebrow">
-            <span class="eyebrow"><span class="eyebrow-dot"></span>Used by 2,000+ leaders worldwide</span>
+            <span class="eyebrow"><span class="eyebrow-dot"></span>Early access — built for leaders who execute</span>
           </div>
-          <p class="hero-sub-headline">Execution over intention.</p>
+          <h1 class="hero-headline" style="margin-bottom:20px;">Execution <em>over</em> intention.</h1>
           <p class="hero-desc">Stop managing. Start executing. Kairo is the AI-powered command center built for leaders who deliver — not for those who plan to deliver.</p>
           <div class="hero-ctas">
             <a href="login-en.html" class="btn btn-primary btn-lg">
@@ -1508,14 +1516,7 @@
             <a href="#features" class="btn btn-ghost btn-lg">See it in action</a>
           </div>
           <div class="hero-social-proof">
-            <div class="avatar-stack">
-              <div class="av">MH</div>
-              <div class="av">PN</div>
-              <div class="av">JO</div>
-              <div class="av">AK</div>
-              <div class="av">SR</div>
-            </div>
-            <p class="social-proof-text"><strong>4.9 ★</strong> · Loved by founders and executives in 60+ countries</p>
+            <p class="social-proof-text">Free plan forever · No card required · Cancel anytime</p>
           </div>
         </div>
 
@@ -1838,96 +1839,39 @@
     </div>
   </section>
 
-  <!-- METRICS -->
-  <section id="metrics" class="section-sm">
-    <div class="container">
-      <div class="metrics-grid" data-aos="fade-up">
-        <div class="metric-item">
-          <div class="metric-val">12K+</div>
-          <div class="metric-label">Tasks completed daily</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-val">98%</div>
-          <div class="metric-label">User retention rate</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-val">4.9 ★</div>
-          <div class="metric-label">Average app rating</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-val">2K+</div>
-          <div class="metric-label">Leaders on board</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TESTIMONIALS -->
-  <section id="testimonials" class="section">
+  <!-- FAQ -->
+  <section id="faq" class="section">
     <div class="container">
       <div class="section-header centered" data-aos="fade-up">
-        <span class="eyebrow">Testimonials</span>
-        <h2>What leaders<br>really say.</h2>
-        <p>No marketing speak. No corporate jargon. Just people who use Kairo every day.</p>
+        <span class="eyebrow">FAQ</span>
+        <h2>Frequently asked questions.</h2>
+        <p>Everything you need to know before you start.</p>
       </div>
-      <div class="testimonials-grid">
-        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="0">
-          <div class="testimonial-stars">
-            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-          </div>
-          <p class="testimonial-quote">"Kairo replaced four apps in one week. I never looked back. My mornings are structured, my team is aligned, and I actually leave the office at 6pm."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-av av-gold">MH</div>
-            <div>
-              <div class="testimonial-name">Marcus Holt</div>
-              <div class="testimonial-role">CEO, Veridian Capital</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
-          <div class="testimonial-stars">
-            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-          </div>
-          <p class="testimonial-quote">"The AI suggestions alone are worth the subscription. It is like having a chief of staff in my pocket who truly understands how I think."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-av av-indigo">PN</div>
-            <div>
-              <div class="testimonial-name">Priya Nair</div>
-              <div class="testimonial-role">Co-Founder, Nura Health</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
-          <div class="testimonial-stars">
-            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-          </div>
-          <p class="testimonial-quote">"Simple. Fast. Lightweight. Finally, an app built for people who actually run things — not people who enjoy organizing their organization systems."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-av av-green">JO</div>
-            <div>
-              <div class="testimonial-name">James Okafor</div>
-              <div class="testimonial-role">CTO, Axiom Labs</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="proof-strip" data-aos="fade-up" data-aos-delay="100">
-        <div class="proof-badge">
-          <span class="proof-badge-icon">🏆</span>
-          Featured on Product Hunt
-        </div>
-        <div class="proof-badge">
-          <span class="proof-badge-icon">⭐</span>
-          4.9 stars — App Store
-        </div>
-        <div class="proof-badge">
-          <span class="proof-badge-icon">🌍</span>
-          60+ countries
-        </div>
-        <div class="proof-badge">
-          <span class="proof-badge-icon">🔒</span>
-          SOC 2 Type II certified
-        </div>
+      <div class="faq-list" data-aos="fade-up" data-aos-delay="100">
+        <details class="faq-item">
+          <summary class="faq-q">Is Kairo free?<i data-lucide="chevron-down" class="faq-chevron" style="width:16px;height:16px;"></i></summary>
+          <p class="faq-a">Yes. The free plan includes tasks, habits and the dashboard, forever. Pro (€9.99/month) unlocks Kairo AI, full sync and analytics history.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Do I need a credit card to start?<i data-lucide="chevron-down" class="faq-chevron" style="width:16px;height:16px;"></i></summary>
+          <p class="faq-a">No. Sign up with Google or email and start using it immediately. No card, no commitment.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Is my data safe?<i data-lucide="chevron-down" class="faq-chevron" style="width:16px;height:16px;"></i></summary>
+          <p class="faq-a">Yes. Data is encrypted in transit and at rest via Firebase (Google Cloud), with secure authentication. You can delete your account and all your data at any time from your profile.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Does it work on mobile?<i data-lucide="chevron-down" class="faq-chevron" style="width:16px;height:16px;"></i></summary>
+          <p class="faq-a">Yes. Kairo is a responsive web app that works on any device — desktop, tablet and phone — and keeps working offline.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Can I use it with my team?<i data-lucide="chevron-down" class="faq-chevron" style="width:16px;height:16px;"></i></summary>
+          <p class="faq-a">Yes. With Pro you can create teams, assign tasks, track activity and share notes with your members.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">What if I want to cancel?<i data-lucide="chevron-down" class="faq-chevron" style="width:16px;height:16px;"></i></summary>
+          <p class="faq-a">Cancel anytime, with no penalties. Your account stays active on the free plan and all your data remains intact.</p>
+        </details>
       </div>
     </div>
   </section>
@@ -2086,21 +2030,14 @@
           </a>
           <a href="pricing-en.html" class="btn btn-ghost btn-lg">View pricing</a>
         </div>
-        <div class="store-badges">
-          <a href="#" class="store-badge" aria-label="App Store (coming soon)">
-            <span class="store-badge-icon"></span>
-            <div class="store-badge-label">
-              <span class="store-badge-small">Download on the</span>
-              <span class="store-badge-name">App Store</span>
-            </div>
-          </a>
-          <a href="#" class="store-badge" aria-label="Google Play (coming soon)">
-            <span class="store-badge-icon">▶</span>
-            <div class="store-badge-label">
-              <span class="store-badge-small">Available on</span>
-              <span class="store-badge-name">Google Play</span>
-            </div>
-          </a>
+
+        <!-- NEWSLETTER -->
+        <div id="newsletter" style="margin-top:48px;max-width:480px;margin-left:auto;margin-right:auto;" data-aos="fade-up" data-aos-delay="200">
+          <form id="newsletterForm" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;" onsubmit="handleNewsletter(event)">
+            <input type="email" id="newsletterEmail" placeholder="Your email for updates" required style="flex:1;min-width:240px;padding:12px 16px;border-radius:var(--radius-md);border:1px solid var(--border-2);background:var(--surface-2);color:var(--white);font-family:var(--font-body);font-size:0.88rem;outline:none;transition:var(--transition);" onfocus="this.style.borderColor='var(--gold-dim)'" onblur="this.style.borderColor='var(--border-2)'">
+            <button type="submit" id="newsletterBtn" class="btn btn-primary" style="padding:12px 20px;font-size:0.82rem;white-space:nowrap;">Subscribe</button>
+          </form>
+          <p id="newsletterMsg" style="margin-top:8px;font-size:0.78rem;color:var(--muted);min-height:20px;text-align:center;"></p>
         </div>
       </div>
     </div>
@@ -2116,17 +2053,6 @@
             <span class="footer-logo-text">Kairo</span>
           </a>
           <p class="footer-tagline">The command center for leaders who execute. Built for clarity, designed for execution.</p>
-          <div class="footer-socials">
-            <a href="#" class="footer-social" aria-label="X / Twitter">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25z"/></svg>
-            </a>
-            <a href="#" class="footer-social" aria-label="LinkedIn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-            </a>
-            <a href="#" class="footer-social" aria-label="GitHub">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-            </a>
-          </div>
         </div>
         <div class="footer-col">
           <h5>Product</h5>
@@ -2134,16 +2060,7 @@
             <li><a href="#features">Features</a></li>
             <li><a href="pricing-en.html">Pricing</a></li>
             <li><a href="login-en.html">Open App</a></li>
-            <li><a href="#">What's new</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h5>Company</h5>
-          <ul class="footer-links">
-            <li><a href="#">About</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="mailto:hello@kairo.app">Contact</a></li>
+            <li><a href="#faq">FAQ</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -2221,24 +2138,48 @@
       });
     });
 
-    // Animate numbers in metrics on scroll
-    const metricVals = document.querySelectorAll('.metric-val');
-    const metricObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-          metricObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.5 });
+    // Newsletter subscription handler
+    async function handleNewsletter(e) {
+      e.preventDefault();
+      const input = document.getElementById('newsletterEmail');
+      const btn   = document.getElementById('newsletterBtn');
+      const msg   = document.getElementById('newsletterMsg');
+      const email = input.value.trim().toLowerCase();
 
-    metricVals.forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(20px)';
-      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      metricObserver.observe(el);
-    });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        msg.textContent = 'Invalid email.';
+        msg.style.color = '#ff6b6b';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Subscribing...';
+      msg.textContent = '';
+
+      try {
+        const resp = await fetch('https://us-central1-kairo-3a7e4.cloudfunctions.net/subscribeNewsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, source: 'landing-en', idioma: 'en' }),
+        });
+        const data = await resp.json();
+        if (data.result?.success) {
+          msg.textContent = 'Subscribed! Check your inbox.';
+          msg.style.color = '#4ade80';
+          input.value = '';
+          if (typeof gtag !== 'undefined') gtag('event', 'newsletter_subscribe', { email_domain: email.split('@')[1] });
+        } else {
+          msg.textContent = data.error?.message || 'Error. Please try again.';
+          msg.style.color = '#ff6b6b';
+        }
+      } catch (err) {
+        msg.textContent = 'Connection error. Please try again later.';
+        msg.style.color = '#ff6b6b';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Subscribe';
+      }
+    }
   </script>
 
   <!-- Marketing: Tracking automático de cliques nos CTAs -->
