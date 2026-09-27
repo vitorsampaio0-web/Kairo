@@ -11,33 +11,33 @@
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
   <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
   <link rel="dns-prefetch" href="https://unpkg.com" />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" /></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" /></noscript>
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" media="print" onload="this.media='screen'" />
   <noscript><link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" /></noscript>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --black:      #0d1117;
-      --surface:    #161b22;
-      --surface-2:  #1c2128;
-      --surface-3:  #1A1A1A;
-      --border:     #2d333b;
-      --border-2:   #2A2A2A;
-      --gold:       #2d7ff9;
-      --gold-light: #60a5fa;
-      --gold-dim:   #1d6ce0;
-      --accent:     #4ea8ff;
-      --indigo:     #6B77C0;
-      --indigo-dim: #3D4580;
-      --white:      #F4F2ED;
-      --off-white:  #C8C5BC;
-      --muted:      #6A6A6A;
-      --muted-2:    #444444;
+      --black:      #020817;
+      --surface:    #0B1930;
+      --surface-2:  #071A35;
+      --surface-3:  #0B1930;
+      --border:     rgba(120,170,255,0.16);
+      --border-2:   rgba(120,170,255,0.14);
+      --gold:       #168BFF;
+      --gold-light: #6CCBFF;
+      --gold-dim:   #2D6BFF;
+      --accent:     #00A8FF;
+      --indigo:     #38BDF8;
+      --indigo-dim: #0EA5E9;
+      --white:      #F7FAFF;
+      --off-white:  #AEBFD8;
+      --muted:      #7C90AC;
+      --muted-2:    #4A5A75;
 
-      --font-display: 'Cormorant Garamond', Georgia, serif;
-      --font-body:    'DM Sans', system-ui, sans-serif;
+      --font-display: 'Inter', system-ui, sans-serif;
+      --font-body:    'Inter', system-ui, sans-serif;
 
       --radius-sm: 6px;
       --radius-md: 12px;
@@ -53,7 +53,7 @@
       background-color: var(--black);
       color: var(--white);
       font-family: var(--font-body);
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1.7;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
@@ -79,7 +79,7 @@
     ::selection { background: var(--gold); color: var(--black); }
 
     /* ─── TYPOGRAPHY ─── */
-    h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; }
+    h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 650; line-height: 1.12; letter-spacing: -0.025em; }
     p { color: var(--off-white); }
 
     .eyebrow {
@@ -182,7 +182,7 @@
     }
 
     nav.scrolled {
-      background: rgba(13, 17, 23, 0.85);
+      background: rgba(2, 8, 23, 0.72);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
@@ -205,16 +205,16 @@
     }
 
     .nav-logo img {
-      height: 52px;
+      height: 44px;
       width: auto;
     }
 
     .nav-logo-text {
       font-family: var(--font-display);
-      font-size: 1.4rem;
-      font-weight: 600;
+      font-size: 1.2rem;
+      font-weight: 700;
       color: var(--white);
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
     }
 
     .nav-links {
@@ -284,7 +284,7 @@
       position: absolute;
       border-radius: 50%;
       filter: blur(80px);
-      opacity: 0.12;
+      opacity: 0.16;
     }
 
     .hero-orb-1 {
@@ -334,24 +334,22 @@
 
     .hero-eyebrow { margin-bottom: 32px; }
 
-    .hero-logo-large {
-      display: block;
-      height: 180px;
-      width: auto;
-      margin-bottom: 24px;
-      filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.5));
-    }
-
     .hero-headline {
-      font-size: clamp(3.5rem, 6vw, 6.5rem);
-      line-height: 1.0;
-      margin-bottom: 8px;
+      font-size: clamp(3.1rem, 5.2vw, 5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      margin-bottom: 24px;
       color: var(--white);
     }
 
     .hero-headline em {
-      font-style: italic;
-      color: var(--gold);
+      font-style: normal;
+      background: linear-gradient(100deg, #6CCBFF 0%, #168BFF 55%, #2D6BFF 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
     }
 
     .hero-sub-headline {
@@ -365,7 +363,7 @@
     }
 
     .hero-desc {
-      font-size: 1rem;
+      font-size: 1.06rem;
       color: var(--muted);
       max-width: 460px;
       margin-bottom: 40px;
@@ -1442,7 +1440,7 @@
   })();
   </script>
   <style>
-    .ab-variant-b .btn-primary { background: linear-gradient(135deg, #ff6b8a, #e11d48) !important; }
+    /* Variante B (rosa) desativada — fora da nova identidade navy/azul. Registo analitico mantido. */
     .ab-variant-b .hero-desc { max-width: 520px !important; }
 
     /* ─── FAQ ─── */
@@ -1461,7 +1459,7 @@
   <!-- NAV -->
   <nav id="navbar">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">
+      <a href="landing-en.html" class="nav-logo" aria-label="Kairo — home">
         <img src="./logo-kairo.png" width="1254" height="1254" srcset="./logo-kairo.webp" alt="Kairo" loading="lazy" onerror="this.style.display='none'" />
         <span class="nav-logo-text">Kairo</span>
       </a>
@@ -1504,10 +1502,10 @@
       <div class="hero-grid">
         <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
           <div class="hero-eyebrow">
-            <span class="eyebrow"><span class="eyebrow-dot"></span>Early access — built for leaders who execute</span>
+            <span class="eyebrow"><span class="eyebrow-dot"></span>Kairo — AI Productivity OS</span>
           </div>
-          <h1 class="hero-headline" style="margin-bottom:20px;">Execution <em>over</em> intention.</h1>
-          <p class="hero-desc">Stop managing. Start executing. Kairo is the AI-powered command center built for leaders who deliver — not for those who plan to deliver.</p>
+          <h1 class="hero-headline">Run your life.<br /><em>Don't manage it.</em></h1>
+          <p class="hero-desc">One intelligent system for your tasks, habits, decisions and performance. Less noise. More execution.</p>
           <div class="hero-ctas">
             <a href="login-en.html" class="btn btn-primary btn-lg">
               Start Free
