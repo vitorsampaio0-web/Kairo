@@ -1,4 +1,4 @@
-const CACHE_NAME = "kairo-v3";
+const CACHE_NAME = "kairo-v4";
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
@@ -77,21 +77,20 @@ self.addEventListener("fetch", (event) => {
   /* Never cache analytics / tracking / API */
   if (isApiOrTracking(url)) return;
 
-  /* Navigation: CacheFirst with fallback to index.html */
+  /* Navigation: NetworkFirst — sempre fresco online, cache só offline */
   if (request.mode === "navigate") {
     event.respondWith(
-      caches.match(request).then((cached) => {
-        const fetchPromise = fetch(request)
-          .then((response) => {
-            if (response && response.status === 200) {
-              const clone = response.clone();
-              caches.open(CACHE_NAME).then((c) => c.put(request, clone));
-            }
-            return response;
-          })
-          .catch(() => cached);
-        return cached || fetchPromise;
-      })
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match("./index.html"))
+        )
     );
     return;
   }
