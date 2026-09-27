@@ -1452,6 +1452,104 @@
     .faq-chevron { flex-shrink: 0; color: var(--gold); transition: var(--transition); }
     .faq-item[open] .faq-chevron { transform: rotate(180deg); }
     .faq-a { padding: 0 24px 20px; font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
+    /* ═══ FASE 2 — ONE DAY / KAIRO AI / ONE ICON / TEAMS ═══ */
+    .ai-copy h2, .team-copy h2 { font-size: clamp(2.2rem, 3.6vw, 3.4rem); margin-top: 16px; }
+    .ai-copy p, .team-copy p { margin-top: 20px; max-width: 480px; font-size: 1rem; color: var(--muted); line-height: 1.8; }
+
+    /* — ONE DAY TIMELINE — */
+    #one-day { background: var(--black); position: relative; overflow: hidden; }
+    .timeline-wrap { position: relative; margin-top: 8px; }
+    .timeline-line { position: absolute; top: 26px; left: 0; right: 0; height: 2px; background: rgba(120,170,255,0.12); border-radius: 2px; overflow: hidden; }
+    .timeline-line::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #6CCBFF, #168BFF, #2D6BFF); transform: scaleX(0); transform-origin: left center; transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    .timeline-wrap.in-view .timeline-line::after { transform: scaleX(1); }
+    .timeline-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px; position: relative; }
+    .timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--surface-2); border: 2px solid rgba(120,170,255,0.3); margin: 20px 0 22px; position: relative; z-index: 1; transition: var(--transition); }
+    .timeline-wrap.in-view .timeline-dot { background: #168BFF; border-color: #6CCBFF; box-shadow: 0 0 16px rgba(0,140,255,0.5); }
+    .timeline-time { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; color: #6CCBFF; margin-bottom: 4px; }
+    .timeline-label { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .timeline-title { font-size: 1.1rem; font-weight: 650; color: var(--white); margin-bottom: 8px; letter-spacing: -0.01em; }
+    .timeline-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+    /* — KAIRO AI — */
+    #kairo-ai { background: linear-gradient(180deg, var(--black) 0%, #061226 50%, var(--black) 100%); position: relative; overflow: hidden; }
+    .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .ai-chat { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--radius-lg); padding: 28px; box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 80px rgba(0,140,255,0.06); }
+    .ai-chat-header { display: flex; align-items: center; gap: 12px; padding-bottom: 18px; border-bottom: 1px solid var(--border-2); margin-bottom: 22px; }
+    .ai-core { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #168BFF, #2D6BFF); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; color: #fff; animation: ai-pulse 3.2s ease-in-out infinite; flex-shrink: 0; }
+    @keyframes ai-pulse { 0%, 100% { box-shadow: 0 0 14px rgba(0,140,255,0.35); } 50% { box-shadow: 0 0 30px rgba(0,140,255,0.6); } }
+    .ai-chat-header span { font-size: 0.85rem; font-weight: 600; color: var(--white); letter-spacing: 0.04em; }
+    .ai-msg { max-width: 88%; padding: 14px 18px; border-radius: 16px; font-size: 0.88rem; line-height: 1.65; margin-bottom: 14px; }
+    .ai-msg-user { background: rgba(120,170,255,0.10); border: 1px solid rgba(120,170,255,0.18); color: var(--off-white); margin-left: auto; border-bottom-right-radius: 4px; }
+    .ai-msg-kairo { background: linear-gradient(135deg, rgba(22,139,255,0.14), rgba(45,107,255,0.10)); border: 1px solid rgba(0,140,255,0.25); color: var(--white); border-bottom-left-radius: 4px; }
+    .ai-msg-kairo strong { color: #6CCBFF; font-weight: 600; }
+    .ai-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .ai-action-chip { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 100px; border: 1px solid rgba(120,170,255,0.22); background: rgba(120,170,255,0.05); color: var(--off-white); font-size: 0.78rem; font-weight: 500; text-decoration: none; transition: var(--transition); }
+    .ai-action-chip:hover { border-color: #168BFF; color: #6CCBFF; transform: translateY(-1px); }
+    .ai-note { font-size: 0.72rem; color: var(--muted-2); margin-top: 16px; }
+
+    /* — ONE ICON — */
+    #one-icon { background: #02050e; position: relative; overflow: hidden; }
+    .one-icon-grid { display: grid; grid-template-columns: 1fr auto; gap: 80px; align-items: center; }
+    .oi-copy h2 { font-size: clamp(2.2rem, 3.6vw, 3.4rem); margin: 16px 0 44px; }
+    .oi-lines { display: flex; flex-direction: column; gap: 14px; }
+    .oi-line { font-size: clamp(1.3rem, 2.2vw, 1.8rem); font-weight: 650; color: var(--off-white); letter-spacing: -0.02em; opacity: 0.22; transform: translateY(10px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .oi-lines.in-view .oi-line { opacity: 1; transform: translateY(0); }
+    .oi-lines.in-view .oi-line:nth-child(1) { transition-delay: 0.05s; }
+    .oi-lines.in-view .oi-line:nth-child(2) { transition-delay: 0.15s; }
+    .oi-lines.in-view .oi-line:nth-child(3) { transition-delay: 0.25s; }
+    .oi-lines.in-view .oi-line:nth-child(4) { transition-delay: 0.35s; }
+    .oi-lines.in-view .oi-line:nth-child(5) { transition-delay: 0.45s; }
+    .oi-lines.in-view .oi-line:nth-child(6) { transition-delay: 0.65s; }
+    .oi-line.final { color: var(--white); font-size: clamp(1.7rem, 2.8vw, 2.4rem); margin-top: 12px; }
+    .oi-line.final em { font-style: normal; background: linear-gradient(100deg, #6CCBFF, #168BFF, #2D6BFF); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+    .oi-phone { width: 300px; height: 600px; border-radius: 44px; border: 1px solid rgba(120,170,255,0.18); background: linear-gradient(180deg, #050C1D, #020817); padding: 14px; box-shadow: 0 60px 140px rgba(0,0,0,0.8), 0 0 90px rgba(0,140,255,0.10); position: relative; flex-shrink: 0; }
+    .oi-phone::before { content: ''; position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 90px; height: 24px; background: #020817; border-radius: 0 0 14px 14px; z-index: 2; }
+    .oi-screen { width: 100%; height: 100%; border-radius: 32px; background: radial-gradient(circle at 50% 30%, rgba(22,139,255,0.08), transparent 60%), #030B1A; padding: 58px 22px 22px; display: flex; flex-direction: column; }
+    .oi-apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .oi-app { aspect-ratio: 1; border-radius: 18px; background: rgba(120,170,255,0.06); border: 1px solid rgba(120,170,255,0.08); }
+    .oi-app-kairo { background: linear-gradient(135deg, #0B1930, #071A35); border: 1px solid rgba(0,140,255,0.4); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 34px rgba(0,140,255,0.4); }
+    .oi-app-kairo img { width: 62%; height: auto; }
+    .oi-dock { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding: 12px; border-radius: 22px; background: rgba(120,170,255,0.05); border: 1px solid rgba(120,170,255,0.1); }
+    .oi-dock .oi-app { background: rgba(120,170,255,0.08); }
+
+    /* — TEAMS — */
+    #teams { background: var(--black); position: relative; overflow: hidden; }
+    #teams::before { content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 800px; height: 500px; background: radial-gradient(circle, rgba(22,139,255,0.10) 0%, transparent 70%); pointer-events: none; }
+    .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 1; }
+    .team-demo { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--radius-lg); padding: 28px; box-shadow: 0 40px 120px rgba(0,0,0,0.6); }
+    .team-demo-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
+    .team-demo-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .team-demo-score { font-size: 2.6rem; font-weight: 750; color: var(--white); letter-spacing: -0.03em; }
+    .team-demo-score small { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+    .team-bar { margin-bottom: 18px; }
+    .team-bar-top { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 7px; }
+    .team-bar-name { color: var(--off-white); font-weight: 500; }
+    .team-bar-val { color: #6CCBFF; font-weight: 600; }
+    .team-bar-bg { height: 6px; border-radius: 3px; background: rgba(120,170,255,0.10); overflow: hidden; }
+    .team-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #2D6BFF, #6CCBFF); width: 0; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+    .team-demo.in-view .team-bar-fill { width: var(--w); }
+    .team-note { font-size: 0.72rem; color: var(--muted-2); margin-top: 18px; }
+    .team-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 32px; }
+    .team-chain-step { padding: 8px 14px; border-radius: 100px; border: 1px solid rgba(120,170,255,0.2); background: rgba(120,170,255,0.05); font-size: 0.75rem; font-weight: 600; color: var(--off-white); }
+    .team-chain-arrow { color: var(--muted-2); font-size: 0.8rem; }
+
+    @media (max-width: 1024px) {
+      .timeline-line { left: 5px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; }
+      .timeline-line::after { transform: scaleY(0); transform-origin: top center; }
+      .timeline-wrap.in-view .timeline-line::after { transform: scaleY(1); }
+      .timeline-grid { grid-template-columns: 1fr; gap: 44px; }
+      .timeline-item { position: relative; padding-left: 44px; }
+      .timeline-dot { position: absolute; left: 0; top: 4px; margin: 0; }
+    }
+    @media (max-width: 900px) {
+      .ai-grid, .team-grid { grid-template-columns: 1fr; gap: 48px; }
+      .one-icon-grid { grid-template-columns: 1fr; gap: 56px; justify-items: start; }
+    }
+    @media (max-width: 480px) {
+      .oi-phone { width: 256px; height: 512px; border-radius: 38px; }
+      .oi-screen { border-radius: 26px; }
+    }
   </style>
 </head>
 <body>
@@ -1591,6 +1689,66 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ONE DAY WITH KAIRO -->
+  <section id="one-day" class="section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="eyebrow">Um dia com o Kairo</span>
+        <h2>Da intenção da manhã<br>ao progresso da noite.</h2>
+        <p>O Kairo transforma os teus objetivos num dia estruturado, para te focares no que verdadeiramente importa.</p>
+      </div>
+      <div class="timeline-wrap" data-aos="fade-up" data-aos-delay="100">
+        <div class="timeline-line"></div>
+        <div class="timeline-grid">
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-time">06:30</div>
+            <div class="timeline-label">Construir</div>
+            <div class="timeline-title">Rotina da manhã</div>
+            <p class="timeline-desc">Saúde. Hábitos. Mentalidade. O dia começa antes do primeiro compromisso.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-time">08:45</div>
+            <div class="timeline-label">Priorizar</div>
+            <div class="timeline-title">O que importa hoje</div>
+            <p class="timeline-desc">O Kairo analisa o teu dia e destaca o que verdadeiramente move os teus objetivos.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-time">10:00</div>
+            <div class="timeline-label">Executar</div>
+            <div class="timeline-title">Deep work</div>
+            <p class="timeline-desc">Sem distrações. Foco total no trabalho que exige o teu melhor.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-time">14:00</div>
+            <div class="timeline-label">Liderar</div>
+            <div class="timeline-title">Reuniões e decisões</div>
+            <p class="timeline-desc">Prioridades da equipa alinhadas. Decisões registadas com clareza.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-time">18:30</div>
+            <div class="timeline-label">Fechar</div>
+            <div class="timeline-title">Rever o dia</div>
+            <p class="timeline-desc">Execução revista. Hábitos completados. Progresso medido.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-time">21:00</div>
+            <div class="timeline-label">Preparar</div>
+            <div class="timeline-title">Amanhã já organizado</div>
+            <p class="timeline-desc">O Kairo prepara o dia seguinte enquanto descansas.</p>
           </div>
         </div>
       </div>
@@ -1836,6 +1994,123 @@
 
     </div>
   </section>
+
+  <!-- KAIRO AI -->
+  <section id="kairo-ai" class="section">
+    <div class="container">
+      <div class="ai-grid">
+        <div class="ai-copy" data-aos="fade-up">
+          <span class="eyebrow">Kairo AI</span>
+          <h2>A tua camada de<br>inteligência para executar.</h2>
+          <p>Deixa de gastar energia a decidir o que fazer a seguir. O Kairo transforma prioridades, agenda, hábitos e objetivos num plano de ação mais claro.</p>
+          <div class="ai-actions">
+            <a href="login.html" class="ai-action-chip"><i data-lucide="sparkles" style="width:14px;height:14px;"></i>Repriorizar o meu dia</a>
+            <a href="login.html" class="ai-action-chip"><i data-lucide="shield" style="width:14px;height:14px;"></i>Proteger tempo de foco</a>
+            <a href="login.html" class="ai-action-chip"><i data-lucide="calendar" style="width:14px;height:14px;"></i>Preparar amanhã</a>
+          </div>
+        </div>
+        <div class="ai-chat" data-aos="fade-left" data-aos-delay="150">
+          <div class="ai-chat-header">
+            <div class="ai-core">K</div>
+            <span>Kairo AI</span>
+          </div>
+          <div class="ai-msg ai-msg-user">Em que me devo focar hoje?</div>
+          <div class="ai-msg ai-msg-kairo">Tens <strong>12 tarefas</strong>. Apenas <strong>3</strong> suportam diretamente as prioridades de hoje. Organizei o resto à volta do teu tempo de foco.</div>
+          <p class="ai-note">Experiência ilustrativa da interface Kairo AI.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONE ICON -->
+  <section id="one-icon" class="section">
+    <div class="container">
+      <div class="one-icon-grid">
+        <div class="oi-copy" data-aos="fade-up">
+          <span class="eyebrow">Um ícone</span>
+          <h2>Um ícone.<br>O teu dia inteiro.</h2>
+          <div class="oi-lines">
+            <div class="oi-line">As tuas prioridades.</div>
+            <div class="oi-line">Os teus hábitos.</div>
+            <div class="oi-line">O teu foco.</div>
+            <div class="oi-line">Os teus objetivos.</div>
+            <div class="oi-line">As tuas decisões.</div>
+            <div class="oi-line final"><em>Um só lugar.</em></div>
+          </div>
+        </div>
+        <div class="oi-phone" data-aos="fade-left" data-aos-delay="150">
+          <div class="oi-screen">
+            <div class="oi-apps">
+              <div class="oi-app oi-app-kairo"><img src="./logo-kairo.png" width="1254" height="1254" srcset="./logo-kairo.webp" alt="Kairo" loading="lazy" onerror="this.style.display='none'" /></div>
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+            </div>
+            <div class="oi-dock">
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+              <div class="oi-app"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAMS -->
+  <section id="teams" class="section">
+    <div class="container">
+      <div class="team-grid">
+        <div class="team-copy" data-aos="fade-up">
+          <span class="eyebrow">Kairo para Equipas</span>
+          <h2>Quando todos executam,<br>as empresas avançam mais rápido.</h2>
+          <p>Dá à tua equipa um sistema partilhado para prioridades, foco, alinhamento e execução — com projetos Kanban, permissões por função e atividade em tempo real.</p>
+          <div class="hero-ctas" style="margin-bottom:0;">
+            <a href="login.html" class="btn btn-primary btn-lg">Criar a tua equipa <i data-lucide="arrow-right" style="width:16px;height:16px;"></i></a>
+          </div>
+          <div class="team-chain">
+            <span class="team-chain-step">Objetivo da empresa</span>
+            <span class="team-chain-arrow">→</span>
+            <span class="team-chain-step">Prioridade da equipa</span>
+            <span class="team-chain-arrow">→</span>
+            <span class="team-chain-step">Tarefa individual</span>
+            <span class="team-chain-arrow">→</span>
+            <span class="team-chain-step">Execução diária</span>
+          </div>
+        </div>
+        <div class="team-demo" data-aos="fade-left" data-aos-delay="150">
+          <div class="team-demo-header">
+            <span class="team-demo-label">Execução da equipa</span>
+            <span class="team-demo-score">91<small> / 100</small></span>
+          </div>
+          <div class="team-bar">
+            <div class="team-bar-top"><span class="team-bar-name">Produto</span><span class="team-bar-val">94</span></div>
+            <div class="team-bar-bg"><div class="team-bar-fill" style="--w:94%"></div></div>
+          </div>
+          <div class="team-bar">
+            <div class="team-bar-top"><span class="team-bar-name">Engenharia</span><span class="team-bar-val">88</span></div>
+            <div class="team-bar-bg"><div class="team-bar-fill" style="--w:88%"></div></div>
+          </div>
+          <div class="team-bar">
+            <div class="team-bar-top"><span class="team-bar-name">Vendas</span><span class="team-bar-val">92</span></div>
+            <div class="team-bar-bg"><div class="team-bar-fill" style="--w:92%"></div></div>
+          </div>
+          <div class="team-bar">
+            <div class="team-bar-top"><span class="team-bar-name">Operações</span><span class="team-bar-val">89</span></div>
+            <div class="team-bar-bg"><div class="team-bar-fill" style="--w:89%"></div></div>
+          </div>
+          <p class="team-note">Dashboard de demonstração com valores ilustrativos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
 
   <!-- FAQ -->
   <section id="faq" class="section">
@@ -2099,6 +2374,14 @@
     } else {
       initLibs();
     }
+
+    // Fase 2: animacoes on-view (timeline, one-icon, teams)
+    document.querySelectorAll('.timeline-wrap, .oi-lines, .team-demo').forEach(el => {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in-view'); io.disconnect(); } });
+      }, { threshold: 0.2 });
+      io.observe(el);
+    });
 
     // Navbar scroll effect
     const navbar = document.getElementById('navbar');
