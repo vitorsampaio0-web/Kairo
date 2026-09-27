@@ -1550,6 +1550,32 @@
       .oi-phone { width: 256px; height: 512px; border-radius: 38px; }
       .oi-screen { border-radius: 26px; }
     }
+
+    /* ═══ FASE 3 — MANIFESTO / SECURITY / CTA FINAL ═══ */
+
+    /* — MANIFESTO — */
+    #manifesto { min-height: 100vh; display: flex; align-items: center; background: #02050e; position: relative; overflow: hidden; text-align: center; }
+    .manifesto-line { font-size: clamp(1.3rem, 2.6vw, 2.1rem); font-weight: 500; color: var(--muted); letter-spacing: -0.01em; margin-bottom: 34px; }
+    .manifesto-line:last-of-type { margin-bottom: 72px; }
+    .manifesto-big h2 { font-size: clamp(2.9rem, 7vw, 5.8rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; color: var(--white); }
+    .manifesto-big .manifesto-final { margin-top: 10px; }
+    .manifesto-big em, .cta-headline em { font-style: normal; background: linear-gradient(100deg, #6CCBFF, #168BFF, #2D6BFF); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+    .manifesto-logo { width: 56px; height: auto; margin-top: 72px; filter: drop-shadow(0 0 30px rgba(0,140,255,0.4)); }
+
+    /* — SECURITY — */
+    #security { background: var(--black); }
+    .security-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .security-card { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--radius-lg); padding: 28px 24px; transition: var(--transition); }
+    .security-card:hover { transform: translateY(-2px); border-color: rgba(0,140,255,0.3); }
+    .security-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(22,139,255,0.12); color: #6CCBFF; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+    .security-card h3 { font-size: 1rem; font-weight: 650; color: var(--white); margin-bottom: 10px; letter-spacing: -0.01em; }
+    .security-card p { font-size: 0.84rem; color: var(--muted); line-height: 1.65; }
+
+    /* — CTA FINAL (cinematic) — */
+    #cta::before { width: 1100px; height: 520px; background: radial-gradient(ellipse, rgba(0,140,255,0.14) 0%, transparent 70%); }
+
+    @media (max-width: 1024px) { .security-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .security-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -1563,6 +1589,7 @@
       </a>
       <ul class="nav-links">
         <li><a href="#features">Funcionalidades</a></li>
+        <li><a href="#teams">Equipas</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="pricing.html">Preços</a></li>
       </ul>
@@ -1584,6 +1611,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <button class="mobile-close" id="mobileClose" aria-label="Close menu">✕</button>
     <a href="#features" onclick="closeMobileMenu()">Funcionalidades</a>
+    <a href="#teams" onclick="closeMobileMenu()">Equipas</a>
     <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
     <a href="pricing.html" onclick="closeMobileMenu()">Preços</a>
     <a href="login.html" class="btn btn-primary btn-lg">Obter Kairo</a>
@@ -2112,6 +2140,25 @@
 
   <div class="divider"></div>
 
+  <!-- MANIFESTO -->
+  <section id="manifesto">
+    <div class="container">
+      <div>
+        <p class="manifesto-line" data-aos="fade-up">Ocupado não é produtivo.</p>
+        <p class="manifesto-line" data-aos="fade-up" data-aos-delay="100">Mais tarefas não é progresso.</p>
+        <p class="manifesto-line" data-aos="fade-up" data-aos-delay="200">Mais reuniões não é liderança.</p>
+        <p class="manifesto-line" data-aos="fade-up" data-aos-delay="300">Mais notificações não é clareza.</p>
+        <div class="manifesto-big" data-aos="fade-up" data-aos-delay="200">
+          <h2>Sabe o que importa.</h2>
+          <h2 class="manifesto-final"><em>Executa.</em></h2>
+        </div>
+        <img src="./logo-kairo.png" width="1254" height="1254" srcset="./logo-kairo.webp" alt="Kairo" class="manifesto-logo" loading="lazy" onerror="this.style.display='none'" data-aos="zoom-in" data-aos-delay="400" />
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
   <!-- FAQ -->
   <section id="faq" class="section">
     <div class="container">
@@ -2149,13 +2196,48 @@
     </div>
   </section>
 
+  <!-- SECURITY -->
+  <section id="security" class="section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <span class="eyebrow">Segurança</span>
+        <h2>Construído para trabalho sério.</h2>
+        <p>Autenticação segura, dados isolados por utilizador e controlo total da tua conta — desde o primeiro dia.</p>
+      </div>
+      <div class="security-grid" data-aos="fade-up" data-aos-delay="100">
+        <div class="security-card">
+          <div class="security-icon"><i data-lucide="lock" style="width:19px;height:19px;"></i></div>
+          <h3>Autenticação segura</h3>
+          <p>Sessões protegidas com autenticação gerida pelo Google Firebase e verificação de email.</p>
+        </div>
+        <div class="security-card">
+          <div class="security-icon"><i data-lucide="database" style="width:19px;height:19px;"></i></div>
+          <h3>Dados isolados</h3>
+          <p>Regras de acesso rigorosas: os teus dados só são visíveis por ti, em todas as coleções.</p>
+        </div>
+        <div class="security-card">
+          <div class="security-icon"><i data-lucide="users" style="width:19px;height:19px;"></i></div>
+          <h3>Permissões por função</h3>
+          <p>Em equipas: Admin, Manager e Member, com controlo granular do que cada um vê e faz.</p>
+        </div>
+        <div class="security-card">
+          <div class="security-icon"><i data-lucide="trash-2" style="width:19px;height:19px;"></i></div>
+          <h3>Eliminação de conta (GDPR)</h3>
+          <p>Apagas a tua conta e todos os dados associados, permanentemente, a qualquer momento.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
   <!-- PRICING -->
   <section id="pricing" class="section">
     <div class="container">
       <div class="section-header centered" data-aos="fade-up">
         <span class="eyebrow">Preços</span>
-        <h2>Investe na tua clareza.</h2>
-        <p>Uma subscrição. Acesso total. Menos que o teu café da manhã, a compor diariamente.</p>
+        <h2>Começa pelo teu dia.<br>Escala até à tua empresa.</h2>
+        <p>Plano gratuito para sempre para começares hoje. Faz upgrade quando o teu dia — ou a tua equipa — crescer.</p>
       </div>
       <div class="pricing-grid" data-aos="fade-up" data-aos-delay="100">
 
@@ -2293,15 +2375,15 @@
   <section id="cta" class="section">
     <div class="container" style="position:relative;z-index:1;">
       <div data-aos="fade-up">
-        <span class="eyebrow">Começar</span>
-        <h2 class="cta-headline">"Os melhores líderes não trabalham mais arduamente.<br>Trabalham com <em style="font-style:italic;color:var(--gold);">ferramentas mais precisas.</em>"</h2>
-        <p class="cta-sub">Sem configuração. Sem curva de aprendizagem. Abre o Kairo, e o teu dia está organizado.</p>
+        <span class="eyebrow">Kairo</span>
+        <h2 class="cta-headline">O amanhã já está à espera.<br><em>Faz valer a pena.</em></h2>
+        <p class="cta-sub">Sem configuração. Sem curva de aprendizagem. Abre o Kairo, e o teu dia está organizado. Plano gratuito para sempre · Sem cartão.</p>
         <div class="cta-actions">
           <a href="login.html" class="btn btn-primary btn-lg">
             Começar Grátis
             <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
           </a>
-          <a href="pricing.html" class="btn btn-ghost btn-lg">Ver preços</a>
+          <a href="#teams" class="btn btn-ghost btn-lg">Kairo para Equipas</a>
         </div>
 
         <!-- NEWSLETTER -->
@@ -2321,7 +2403,7 @@
     <div class="container">
       <div class="footer-top">
         <div class="footer-brand">
-          <a href="#" class="footer-logo">
+          <a href="index.html" class="footer-logo">
             <img src="./logo-kairo.png" width="1254" height="1254" srcset="./logo-kairo.webp" alt="Kairo" loading="lazy" onerror="this.style.display='none'" />
             <span class="footer-logo-text">Kairo</span>
           </a>
@@ -2331,6 +2413,7 @@
           <h5>Produto</h5>
           <ul class="footer-links">
             <li><a href="#features">Funcionalidades</a></li>
+            <li><a href="#teams">Equipas</a></li>
             <li><a href="pricing.html">Preços</a></li>
             <li><a href="login.html">Abrir App</a></li>
             <li><a href="#faq">FAQ</a></li>
@@ -2342,12 +2425,12 @@
             <li><a href="./privacidade.html">Política de Privacidade</a></li>
             <li><a href="./termos.html">Termos de Serviço</a></li>
             <li><a href="./privacidade.html#cookies">Política de Cookies</a></li>
-            <li><a href="./privacidade.html">Segurança</a></li>
+            <li><a href="#security">Segurança</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
-        <p class="footer-copy">© 2025 Kairo. Todos os direitos reservados.</p>
+        <p class="footer-copy">© 2026 Kairo. Todos os direitos reservados.</p>
         <div class="footer-legal">
           <a href="./privacidade.html">Privacidade</a>
           <a href="./termos.html">Termos</a>
