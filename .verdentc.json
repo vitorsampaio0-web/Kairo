@@ -1,0 +1,32 @@
+{
+  "deploy": {
+    "type": "static",
+    "rootDir": ".",
+    "exclude": [
+      ".firebase",
+      ".firebaserc",
+      ".git",
+      ".gitignore",
+      "d_e_c_a_e_f_b_mp_.mp4",
+      "e2e",
+      "firebase.json",
+      "firestore.indexes.json",
+      "firestore.rules",
+      "functions",
+      "generate-report.js",
+      "lighthouse",
+      "node_modules",
+      "notas-simples.js",
+      "package-lock.json",
+      "package.json",
+      "playwright-report",
+      "playwright.config.js",
+      "README.md",
+      "renderNotas.js",
+      "replace_agenda.py",
+      "storage.rules",
+      "test-results"
+    ],
+    "entryFile": "index.html"
+  }
+}
