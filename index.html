@@ -3,6 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    // Ingles e o idioma por defeito: redireciona para a landing EN
+    // a menos que o utilizador tenha preferencia explicita por PT.
+    (function () {
+      try {
+        if (localStorage.getItem("kairo-lang") !== "pt") {
+          location.replace("landing-en.html");
+        }
+      } catch (e) { /* storage indisponivel: mantem PT */ }
+    })();
+  </script>
     <link rel="icon" type="image/png" href="./logo-192.png" />
 <title>Kairo — Produtividade de um CEO</title>
   <meta name="description" content="O centro de comando para líderes que executam. O Kairo é a app de produtividade com IA criada para CEOs, fundadores e executivos C-level." />
@@ -1669,9 +1680,9 @@
       </ul>
       <div class="nav-cta">
         <div class="nav-language-selector">
-          <a href="index.html" class="active">PT</a>
+          <a href="index.html" class="active" onclick="try{localStorage.setItem('kairo-lang','pt')}catch(e){}">PT</a>
           <span style="color:var(--border-2);">|</span>
-          <a href="landing-en.html">EN</a>
+          <a href="landing-en.html" onclick="try{localStorage.setItem('kairo-lang','en')}catch(e){}">EN</a>
         </div>
         <a href="login.html" class="btn btn-primary">Obter Kairo</a>
       </div>
