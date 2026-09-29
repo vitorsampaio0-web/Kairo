@@ -466,6 +466,7 @@
       border: 1px solid rgba(120,170,255,0.18);
     }
     .hero-mobile-visual { display: none; }
+    .hero-discover { display: none; }
     @media (max-width: 900px) {
       #hero { min-height: 100svh; align-items: flex-start; padding-top: 116px; padding-bottom: 48px; }
       .hero-bg { background: radial-gradient(120% 55% at 50% 0%, rgba(22,139,255,0.16) 0%, transparent 55%), radial-gradient(80% 45% at 85% 92%, rgba(45,107,255,0.12) 0%, transparent 60%), linear-gradient(180deg, #04101F 0%, #020817 55%, #020817 100%); }
@@ -483,6 +484,8 @@
       #hero .hero-ctas { position: static; transform: none; margin-top: 26px; padding: 0; background: transparent; border: none; backdrop-filter: none; flex-direction: column; align-items: stretch; gap: 12px; max-width: 400px; margin-left: auto; margin-right: auto; width: 100%; }
       #hero .hero-ctas .btn { justify-content: center; }
       #hero .hero-social-proof { margin-top: 18px; text-align: center; max-width: 400px; margin-left: auto; margin-right: auto; }
+      .hero-discover { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 26px; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+      .hero-discover::before { content: ""; width: 7px; height: 7px; border-right: 1.5px solid var(--blue); border-bottom: 1.5px solid var(--blue); transform: rotate(45deg) translateY(-2px); }
     }
     .hero-mockup {
       display: flex;
@@ -1709,7 +1712,7 @@
             <span class="hero-chip"><i data-lucide="users"></i>Teams</span>
           </div>
           <div class="hero-mobile-visual">
-            <img src="./hero-mobile-en.jpg" alt="Kairo on iPhone — dashboard with tasks, calendar and productivity" width="1088" height="1552" loading="lazy" />
+            <img src="./hero-mobile-en.jpg" alt="Kairo on iPhone — dashboard with tasks, calendar and productivity" width="1088" height="1184" loading="lazy" />
           </div>
           <div class="hero-ctas">
             <a href="login-en.html" class="btn btn-primary btn-lg">
@@ -1721,6 +1724,7 @@
           <div class="hero-social-proof">
             <p class="social-proof-text">Free plan forever · No card required · Cancel anytime</p>
           </div>
+          <p class="hero-discover">Discover a smarter way to execute</p>
         </div>
 
 
