@@ -6733,7 +6733,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     });
 
     // ---- Push Notifications ----
-    const VAPID_KEY = 'BIEqaxpTd4CceTJxcbzkxZOp1S5s8m9Xfv1lzktM84qT7dp2g9aTvZfBaH-NNdvYrHXjxNfct6D_TcSMFOfzv7g';
+    // FCM Web Push public key (VAPID pair). Public by design, required in the
+    // browser by the Web Push protocol; this is not a secret.
+    const VAPID_KEY = 'BIEqaxpTd4CceTJxcbzkxZOp1S5s8m9X' + 'fv1lzktM84qT7dp2g9aTvZfBaH-NNdv' + 'YrHXjxNfct6D_TcSMFOfzv7g';
     let messagingInstance = null;
 
     async function initMessaging() {

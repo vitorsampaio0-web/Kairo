@@ -278,7 +278,7 @@ const doc = new Document({
           ['API Version', '2023-10-16'],
           ['Ambiente', 'Teste (sk_test_...)'],
           ['Price ID Pro', 'price_1TWHCbAhC7GjF6oy2gz7Hh2e'],
-          ['Webhook Secret', 'whsec_MkXQ5vTtVYw4D6Ogj2I5JdJkiFxGmHtw'],
+          ['Webhook Secret', 'whsec_[REDACTED — ver functions/.env]'],
           ['Fluxo', 'Checkout Session → Webhook → Atualização Firestore'],
         ],
         [3500, 6000]
