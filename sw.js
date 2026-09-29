@@ -1,4 +1,4 @@
-const CACHE_NAME = "kairo-v8";
+const CACHE_NAME = "kairo-v9";
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
