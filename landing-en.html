@@ -1370,8 +1370,8 @@
     }
 
     /* ─── RESPONSIVE ─── */
-    @media (max-width: 1024px) {
-      .hero-grid { grid-template-columns: 1fr; gap: 60px; }
+    @media (max-width: 1024px) and (min-width: 901px) {
+      #hero .hero-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
       .hero-content { max-width: 100%; }
       .hero-headline { font-size: clamp(3rem, 8vw, 4.5rem); }
       .feature-block { grid-template-columns: 1fr; gap: 48px; }
