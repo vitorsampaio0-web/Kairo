@@ -419,9 +419,9 @@
     #hero .hero-bg { overflow: hidden; }
     .hero-bg {
       background:
-        radial-gradient(120% 55% at 50% 0%, rgba(22,139,255,0.16) 0%, transparent 55%),
-        radial-gradient(80% 45% at 85% 92%, rgba(45,107,255,0.12) 0%, transparent 60%),
-        linear-gradient(180deg, #04101F 0%, #020817 55%, #020817 100%);
+        linear-gradient(180deg, rgba(2,8,23,0.72) 0%, rgba(2,8,23,0.45) 30%, rgba(2,8,23,0.55) 60%, rgba(2,8,23,0.95) 100%),
+        url('./hero-towers-v16.jpg') center 30% / cover no-repeat,
+        linear-gradient(180deg, #04101F 0%, #020817 100%);
     }
     /* Chips removed: redundant with the cards beside the iPhone */
     .hero-capability-row { display: none; }
@@ -435,7 +435,7 @@
     #hero .hero-headline { font-size: clamp(2.4rem, 10.5vw, 3.4rem); margin-bottom: 14px; }
     #hero .hero-desc { margin-bottom: 0; font-size: 0.97rem; max-width: 400px; margin-left: auto; margin-right: auto; }
     .hero-mobile-visual { display: block; width: calc(100% + 32px); margin: 24px -16px 0; max-width: 520px; }
-    .hero-mobile-visual img { width: 100%; height: auto; display: block; border-radius: 26px; border: 1px solid rgba(120,170,255,0.14); box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 0 60px rgba(22,139,255,0.10); }
+    .hero-mobile-visual img { width: 100%; height: auto; display: block; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.55)); }
     .hero-visual-desktop { display: none; }
     #hero .hero-ctas { position: static; transform: none; margin-top: 26px; padding: 0; background: transparent; border: none; backdrop-filter: none; flex-direction: column; align-items: stretch; gap: 12px; max-width: 400px; margin-left: auto; margin-right: auto; width: 100%; display: flex; }
     #hero .hero-ctas .btn { justify-content: center; }
@@ -1674,7 +1674,7 @@
           <h1 class="hero-headline">Own your time.<br /><em>Own your life.</em></h1>
           <p class="hero-desc">One intelligent system for your tasks, habits, decisions and performance. Less noise. More execution.</p>
           <div class="hero-mobile-visual">
-            <img src="./hero-mobile-en-v15.jpg" alt="Kairo on iPhone — dashboard with tasks, calendar and productivity" width="1088" height="1184" loading="lazy" />
+            <img src="./hero-phone-en-v16.png" alt="Kairo on iPhone — dashboard with tasks, calendar and productivity" width="900" height="900" loading="lazy" />
           </div>
           <div class="hero-ctas">
             <a href="login-en.html" class="btn btn-primary btn-lg">
@@ -1689,7 +1689,7 @@
           <p class="hero-discover">Discover a smarter way to execute</p>
         </div>
         <div class="hero-mobile-visual hero-visual-desktop">
-          <img src="./hero-mobile-en-v15.jpg" alt="Kairo on iPhone — dashboard with tasks, calendar and productivity" width="1088" height="1184" loading="lazy" />
+          <img src="./hero-phone-en-v16.png" alt="Kairo on iPhone — dashboard with tasks, calendar and productivity" width="900" height="900" loading="lazy" />
         </div>
       </div>
     </div>
