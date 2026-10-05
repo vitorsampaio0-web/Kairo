@@ -2425,6 +2425,73 @@
       box-shadow: 0 8px 22px rgba(124, 92, 255, 0.48);
     }
 
+    .chat-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 8px 12px 0;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7, 13, 24, 0.45);
+      flex-shrink: 0;
+    }
+
+    .chat-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 4px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .chat-tab svg { width: 14px; height: 14px; }
+
+    .chat-tab:hover { color: var(--text); }
+
+    .chat-tab.active {
+      color: white;
+      border-bottom-color: var(--primary);
+    }
+
+    .chat-summary-bar {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      background: rgba(7, 13, 24, 0.6);
+    }
+
+    .chat-summary-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #5a86ff);
+      color: white;
+      font: inherit;
+      font-size: 0.87rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 5px 16px rgba(124, 92, 255, 0.32);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .chat-summary-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 22px rgba(124, 92, 255, 0.48);
+    }
+
     @media (min-width: 1100px) {
       .kairo-chat-btn {
         bottom: 32px;
@@ -3593,8 +3660,18 @@
       </div>
       <button class="chat-close-btn" id="kairo-chat-close"><i data-lucide="x"></i></button>
     </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-input-row">
+    <div class="chat-tabs">
+      <button class="chat-tab" data-tab="help"><i data-lucide="life-buoy"></i>Ajuda</button>
+      <button class="chat-tab" data-tab="summary"><i data-lucide="sparkles"></i>Resumo</button>
+      <button class="chat-tab" data-tab="chat"><i data-lucide="message-circle"></i>Chat</button>
+    </div>
+    <div class="chat-messages" id="chat-messages-help"></div>
+    <div class="chat-messages" id="chat-messages-summary" style="display:none;"></div>
+    <div class="chat-messages" id="chat-messages" style="display:none;"></div>
+    <div class="chat-summary-bar" id="chat-summary-bar" style="display:none;">
+      <button class="chat-summary-btn" id="chat-summary-btn"><i data-lucide="sparkles"></i>Gerar resumo executivo</button>
+    </div>
+    <div class="chat-input-row" id="chat-input-row">
       <input class="chat-input" id="chat-input" type="text" placeholder="Pergunta algo ao Kairo AI..." autocomplete="off" />
       <button class="chat-send-btn" id="chat-send-btn"><i data-lucide="send"></i></button>
     </div>
@@ -6350,21 +6427,80 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
+    // Base de conhecimento da plataforma (modo Ajuda — gratuito para todos)
+    const KAIRO_HELP_KB = [
+      { keys: /recorr|repeti/,
+        answer: "Ao criar ou editar uma tarefa, escolhe a recorrência: diária, semanal, mensal ou dias específicos da semana. A tarefa reaparece automaticamente conforme a regra definida. Encontras isto no menu Tarefas." },
+      { keys: /dashboard|painel|produtividade executivo|score|pontua/,
+        answer: "O Dashboard é o teu centro de comando: saudação personalizada, tarefas atrasadas e do dia, hábitos, mini calendário e a Produtividade Executivo — um score de 0 a 100% calculado com base nas tuas tarefas e hábitos concluídos hoje. É a primeira opção do menu lateral." },
+      { keys: /nota|ditado|ditar|voz|microfone/,
+        answer: "Em Notas podes registar ideias rapidamente, pesquisar em todas as notas e até ditar por voz (ícone de microfone). As notas ficam guardadas e sincronizadas entre dispositivos." },
+      { keys: /equipa|team|deleg|convite|kanban|membro|accountability/,
+        answer: "Na Equipa crias um espaço partilhado: convidas membros com um código ou link, delegas tarefas com nota, prazo (data + hora) e prioridade, acompanhas tudo num quadro Kanban, comentas e vês o accountability (% de tarefas delegadas concluídas) de cada membro — com feed de atividade em tempo real." },
+      { keys: /decis/,
+        answer: "O Diário de Decisões ajuda-te a registar decisões importantes com um nível de confiança (1-5). Mais tarde revês cada decisão e avalias o resultado (0-10), construindo a tua taxa de sucesso ao longo do tempo." },
+      { keys: /h[aá]bito|streak|lembrete|rotina/,
+        answer: "Em Hábitos defines rotinas com frequência diária, semanal ou Seg-Sex, com lembretes opcionais. Cada dia concluído aumenta o teu streak — e podes partilhar o cartão de streak como imagem." },
+      { keys: /hist[óo]rico|export/,
+        answer: "O Histórico mostra tudo o que concluíste, com filtros por tipo e período, e permite exportar os dados. É a tua memória de execução." },
+      { keys: /relat[óo]rio|pdf/,
+        answer: "O Relatório gera um PDF profissional de 4 páginas: capa, sumário executivo com métricas, hábitos e metas em progresso, e uma página de insights gerados pela IA do Kairo com plano de ação. Ideal para revisões semanais ou mensais." },
+      { keys: /foco|pomodoro|concentr|temporizador|timer/,
+        answer: "O Modo Foco é um temporizador Pomodoro: 25 minutos de foco, pausas de 5 ou 15 minutos, ciclos de 4 sessões. Podes minimizar o widget e continuar a usar a app enquanto o tempo corre." },
+      { keys: /meta|objetivo|sub-?tarefa/,
+        answer: "As Metas são objetivos de 30 ou 90 dias. Cada meta pode ter sub-tarefas, e o progresso é calculado automaticamente à medida que as concluis. Perfeito para objetivos de médio prazo." },
+      { keys: /tarefa|prioridade|atrasad|prazo/,
+        answer: "Em Tarefas crias itens com título, prazo (data e hora), prioridade (alta/média/baixa), categoria e recorrência. As atrasadas ficam destacadas no Dashboard. Concluis com um toque e acompanhas tudo no Histórico." },
+      { keys: /agenda|calend[áa]rio|evento|compromisso/,
+        answer: "A Agenda mostra os teus compromissos numa vista visual com popup de detalhes ao clicar num dia. Os eventos de hoje aparecem também no Dashboard." },
+      { keys: /notifica|email|resumo semanal/,
+        answer: "Nas Definições podes ativar notificações push, o email diário (à hora que escolheres) e o resumo semanal (no dia que preferires — domingo por defeito)." },
+      { keys: /pro|plano|pre[çc]o|assinatura|subscri|gr[aá]tis|gratuito/,
+        answer: "O plano gratuito cobre o essencial para sempre. O Pro desbloqueia o Kairo AI completo (Chat contextual e Resumo executivo), entre outras vantagens. Vê os detalhes na página de preços." },
+      { keys: /kairo ai|o que fazes|o que consegues|quem [ée]s/,
+        answer: "Tenho 3 modos: Ajuda (ensino-te a usar a plataforma — é onde estamos agora), Resumo (gero um resumo executivo dos teus dados) e Chat (respondo com contexto real das tuas tarefas, hábitos e agenda). Resumo e Chat fazem parte do plano Pro." },
+    ];
+
     const kairoChat = {
       isOpen: false,
-      hasOpened: false,
+      activeTab: null,
+      _welcomed: { help: false, chat: false },
+      _containers: { help: "chat-messages-help", summary: "chat-messages-summary", chat: "chat-messages" },
 
       open() {
         document.getElementById("kairo-chat-panel").classList.add("open");
         this.isOpen = true;
-        if (!this.hasOpened) {
-          this.hasOpened = true;
-          setTimeout(() => this._sendWelcome(), 650);
-        }
+        if (!this.activeTab) this.setTab(isPro() ? "chat" : "help");
         setTimeout(() => {
           const inp = document.getElementById("chat-input");
-          if (inp) inp.focus();
+          if (inp && this.activeTab !== "summary") inp.focus();
         }, 320);
+      },
+
+      setTab(name) {
+        if ((name === "chat" || name === "summary") && !isPro()) {
+          showUpgradeModal(name === "chat" ? "Kairo AI Chat" : "Kairo AI Resumo");
+          name = "help";
+        }
+        this.activeTab = name;
+        document.querySelectorAll(".chat-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+        Object.entries(this._containers).forEach(([tab, id]) => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = tab === name ? "flex" : "none";
+        });
+        const isSummary = name === "summary";
+        document.getElementById("chat-summary-bar").style.display = isSummary ? "block" : "none";
+        document.getElementById("chat-input-row").style.display = isSummary ? "none" : "flex";
+        const inp = document.getElementById("chat-input");
+        if (inp) inp.placeholder = name === "help" ? "Pergunta como funciona a plataforma..." : "Pergunta algo ao Kairo AI...";
+        if (name === "help" && !this._welcomed.help) {
+          this._welcomed.help = true;
+          this._sendHelpWelcome();
+        }
+        if (name === "chat" && !this._welcomed.chat) {
+          this._welcomed.chat = true;
+          setTimeout(() => this._sendWelcome(), 650);
+        }
       },
 
       close() {
@@ -6381,8 +6517,8 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
       },
 
-      _appendMsg(text, from) {
-        const container = document.getElementById("chat-messages");
+      _appendMsg(text, from, tab) {
+        const container = document.getElementById(this._containers[tab || this.activeTab] || "chat-messages");
         if (!container) return;
         const ts = this._now();
         const wrap = document.createElement("div");
@@ -6397,11 +6533,10 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         lucide.createIcons();
       },
 
-      _showTyping() {
-        const container = document.getElementById("chat-messages");
-        if (!container || document.getElementById("chat-typing-indicator")) return;
+      _showTyping(tab) {
+        const container = document.getElementById(this._containers[tab || this.activeTab] || "chat-messages");
+        if (!container || container.querySelector(".chat-typing-wrap")) return;
         const wrap = document.createElement("div");
-        wrap.id = "chat-typing-indicator";
         wrap.className = "chat-typing-wrap";
         wrap.innerHTML = `<div class="chat-msg-avatar"><i data-lucide="bot"></i></div><div class="chat-typing"><span></span><span></span><span></span></div>`;
         container.appendChild(wrap);
@@ -6409,8 +6544,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         lucide.createIcons();
       },
 
-      _hideTyping() {
-        const el = document.getElementById("chat-typing-indicator");
+      _hideTyping(tab) {
+        const container = document.getElementById(this._containers[tab || this.activeTab] || "chat-messages");
+        const el = container ? container.querySelector(".chat-typing-wrap") : null;
         if (el) el.remove();
       },
 
@@ -6431,6 +6567,89 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           this._hideTyping();
           this._appendMsg(msg, "ai");
         }, 700);
+      },
+
+      _sendHelpWelcome() {
+        this._showTyping("help");
+        setTimeout(() => {
+          this._hideTyping("help");
+          this._appendMsg(`Olá, ${appState.user.nome}! Sou o guia da plataforma Kairo. Pergunta-me como funciona qualquer área — por exemplo:\n• "Como crio uma tarefa recorrente?"\n• "O que é a Produtividade Executivo?"\n• "Como funciona a Equipa?"\n• "Para que serve o Modo Foco?"`, "ai", "help");
+        }, 600);
+      },
+
+      _getHelpResponse(text) {
+        const q = text.toLowerCase().trim();
+        for (const entry of KAIRO_HELP_KB) {
+          if (entry.keys.test(q)) return entry.answer;
+        }
+        return "Não encontrei essa resposta, mas posso explicar-te qualquer área da plataforma: Dashboard, Notas, Tarefas, Metas, Equipa, Decisões, Hábitos, Histórico, Relatório, Modo Foco, Agenda, Notificações ou Planos. Sobre qual queres saber mais?";
+      },
+
+      generateSummary() {
+        this._appendMsg("Gera o meu resumo executivo.", "user", "summary");
+        this._showTyping("summary");
+        setTimeout(() => {
+          this._hideTyping("summary");
+          this._appendMsg(this._buildSummary(), "ai", "summary");
+        }, 900);
+      },
+
+      _buildSummary() {
+        const h = new Date().getHours();
+        const gr = h < 12 ? "Bom dia" : h < 19 ? "Boa tarde" : "Boa noite";
+        const abertas = appState.tarefas.filter(t => t.status !== "concluida");
+        const atrasadas = getOverdueTasks();
+        const tarefasHoje = getTodayTasks().filter(t => t.status !== "concluida");
+        const concluidasTotal = getCompletedTasks().length;
+        const habHoje = getCompletedHabitsToday().length;
+        const habTotal = appState.habitos.length;
+        const melhorStreak = Math.max(0, ...appState.habitos.map(x => x.streak || 0));
+        const score = getProductivityScore();
+
+        const metas = appState.metas || [];
+        let metasTxt = "Sem metas ativas de momento.";
+        if (metas.length) {
+          const prog = metas.map(m => {
+            const sub = m.subtarefas || [];
+            return sub.length ? Math.round(sub.filter(s => s.concluida).length / sub.length * 100) : 0;
+          });
+          const media = Math.round(prog.reduce((a, b) => a + b, 0) / prog.length);
+          metasTxt = `${metas.length} meta${metas.length !== 1 ? "s" : ""} ativa${metas.length !== 1 ? "s" : ""}, progresso médio de ${media}%.`;
+        }
+
+        const decisoes = appState.decisoes || [];
+        let decTxt = "Ainda sem decisões registadas.";
+        if (decisoes.length) {
+          const rev = decisoes.filter(d => d.resultado != null);
+          const suc = rev.filter(d => d.resultado >= 6).length;
+          decTxt = `${decisoes.length} decis${decisoes.length !== 1 ? "ões" : "ão"} registada${decisoes.length !== 1 ? "s" : ""}`;
+          decTxt += rev.length ? ` — taxa de sucesso de ${Math.round(suc / rev.length * 100)}% em ${rev.length} revista${rev.length !== 1 ? "s" : ""}.` : " (nenhuma revista ainda).";
+        }
+
+        let msg = `${gr}, ${appState.user.nome}. Aqui está o teu resumo executivo:\n\n`;
+        msg += `PRODUTIVIDADE\n• Score de hoje: ${score}%\n• ${concluidasTotal} tarefa${concluidasTotal !== 1 ? "s" : ""} concluída${concluidasTotal !== 1 ? "s" : ""} no total\n\n`;
+        msg += `TAREFAS\n• ${abertas.length} em aberto · ${tarefasHoje.length} para hoje`;
+        msg += atrasadas.length ? ` · ${atrasadas.length} atrasada${atrasadas.length !== 1 ? "s" : ""}` : " · sem atrasos";
+        const top = abertas.filter(t => t.prioridade === "alta").sort((a, b) => new Date(a.prazo) - new Date(b.prazo))[0];
+        if (top) msg += `\n• Prioridade máxima: "${top.titulo}"`;
+        msg += `\n\nHÁBITOS\n• ${habHoje}/${habTotal} concluídos hoje · melhor streak: ${melhorStreak} dia${melhorStreak !== 1 ? "s" : ""}`;
+        msg += `\n\nMETAS\n• ${metasTxt}`;
+        msg += `\n\nDECISÕES\n• ${decTxt}`;
+
+        let insights = [];
+        try { insights = analisarPadroesKairo() || []; } catch (e) { insights = []; }
+        if (insights.length) {
+          msg += `\n\nPADRÕES DETETADOS`;
+          insights.slice(0, 3).forEach(i => { msg += `\n• ${i.title} — ${i.action}`; });
+        }
+
+        let foco;
+        if (atrasadas.length) foco = `Foco sugerido: resolve primeiro ${atrasadas.length === 1 ? "a tarefa atrasada" : `as ${atrasadas.length} tarefas atrasadas`} antes de iniciares algo novo.`;
+        else if (top) foco = `Foco sugerido: bloqueia tempo hoje para "${top.titulo}".`;
+        else if (habHoje < habTotal) foco = "Foco sugerido: completa os hábitos de hoje para manteres os streaks.";
+        else foco = "Foco sugerido: estás em dia — planeia amanhã antes das 22h.";
+        msg += `\n\n${foco}`;
+        return msg;
       },
 
       _getResponse(text) {
@@ -6534,22 +6753,24 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         if (!inp) return;
         const text = inp.value.trim();
         if (!text) return;
-        this._appendMsg(text, "user");
+        const tab = this.activeTab === "help" ? "help" : "chat";
+        this._appendMsg(text, "user", tab);
         inp.value = "";
-        this._showTyping();
+        this._showTyping(tab);
         const delay = 520 + Math.floor(Math.random() * 280);
         setTimeout(() => {
-          this._hideTyping();
-          this._appendMsg(this._getResponse(text), "ai");
+          this._hideTyping(tab);
+          this._appendMsg(tab === "help" ? this._getHelpResponse(text) : this._getResponse(text), "ai", tab);
         }, delay);
       }
     };
 
-    document.getElementById("kairo-chat-btn").addEventListener("click", () => {
-      if (!isPro()) { showUpgradeModal("Kairo AI Chat"); return; }
-      kairoChat.toggle();
-    });
+    document.getElementById("kairo-chat-btn").addEventListener("click", () => kairoChat.toggle());
     document.getElementById("kairo-chat-close").addEventListener("click", () => kairoChat.close());
+    document.querySelectorAll(".chat-tab").forEach(btn => {
+      btn.addEventListener("click", () => kairoChat.setTab(btn.dataset.tab));
+    });
+    document.getElementById("chat-summary-btn").addEventListener("click", () => kairoChat.generateSummary());
     document.getElementById("chat-send-btn").addEventListener("click", () => kairoChat.handleSend());
     document.getElementById("chat-input").addEventListener("keydown", (e) => {
       if (e.key === "Enter") kairoChat.handleSend();
