@@ -4278,14 +4278,48 @@
       return Math.min(100, Math.round(taskScore + habitScore));
     }
 
+    // ---- Fair formula for today's score ----
+    // Priority weights: high=3, medium=2, low=1
+    function getTaskWeight(t) {
+      return t.prioridade === "alta" ? 3 : t.prioridade === "baixa" ? 1 : 2;
+    }
+
+    // Task executed today: completed today (timestamp) or, for legacy data,
+    // completed without timestamp but due today
+    function isDoneToday(t) {
+      if (t.status !== "concluida") return false;
+      if ((t.concluidaEm || "").startsWith(appState.today)) return true;
+      return !t.concluidaEm && (t.prazo || "").split("T")[0] === appState.today;
+    }
+
+    // Tasks expected today: due today + open overdue + any task completed today
+    function getExpectedTodayTasks() {
+      const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Lisbon" }));
+      return appState.tasks.filter(t => {
+        if ((t.prazo || "").split("T")[0] === appState.today) return true;
+        if (isDoneToday(t)) return true;
+        return t.status !== "concluida" && new Date(t.prazo) < now;
+      });
+    }
+
+    function getExpectedTodayInfo() {
+      const expected = getExpectedTodayTasks();
+      return { done: expected.filter(isDoneToday).length, total: expected.length };
+    }
+
     function getTodayScore() {
-      const todayTasks = getTodayTasks();
-      const taskScore = todayTasks.length > 0
-        ? (todayTasks.filter(t => t.status === "concluida").length / todayTasks.length) * 65 : 0;
-      const todayHabits = appState.habitos;
-      const habitScore = todayHabits.length > 0
-        ? (getCompletedHabitsToday().length / todayHabits.length) * 35 : 0;
-      return Math.min(100, Math.round(taskScore + habitScore));
+      const expected = getExpectedTodayTasks();
+      const doneW = expected.filter(isDoneToday).reduce((s, t) => s + getTaskWeight(t), 0);
+      const totW = expected.reduce((s, t) => s + getTaskWeight(t), 0);
+      const habDone = getCompletedHabitsToday().length;
+      const habTot = appState.habitos.length;
+      // No tasks expected today → the 65% shifts to habits (and vice-versa)
+      const wT = totW > 0 ? 65 : 0;
+      const wH = habTot > 0 ? 35 : 0;
+      const base = wT + wH;
+      if (base === 0) return 0;
+      const raw = (totW > 0 ? (doneW / totW) * wT : 0) + (habTot > 0 ? (habDone / habTot) * wH : 0);
+      return Math.min(100, Math.round((raw / base) * 100));
     }
 
     async function saveDailyScoreSeNecessario() {
@@ -4295,17 +4329,18 @@
       const ref = db.collection(`users/${uid}/dailyScores`).doc(hojeStr);
       const snap = await ref.get();
       if (snap.exists) return;
-      const todayTasks = getTodayTasks();
+      const expected = getExpectedTodayTasks();
+      const doneCount = expected.filter(isDoneToday).length;
       const todayHabits = appState.habitos;
       await ref.set({
         date: hojeStr,
-        taskScore: todayTasks.length > 0
-          ? Math.round((todayTasks.filter(t => t.status === "concluida").length / todayTasks.length) * 100) : 0,
+        taskScore: expected.length > 0
+          ? Math.round((doneCount / expected.length) * 100) : 0,
         habitScore: todayHabits.length > 0
           ? Math.round((getCompletedHabitsToday().length / todayHabits.length) * 100) : 0,
         overall: getTodayScore(),
-        tasksCompleted: todayTasks.filter(t => t.status === "concluida").length,
-        tasksTotal: todayTasks.length,
+        tasksCompleted: doneCount,
+        tasksTotal: expected.length,
         habitsCompleted: getCompletedHabitsToday().length,
         habitsTotal: todayHabits.length,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -4449,6 +4484,7 @@
       const topTasks = todayTasks.slice(0, 3);
       const todayHabits = appState.habitos.slice(0, 3);
       const insights = generateKairoInsights();
+      const _expInfo = getExpectedTodayInfo();
 
       // Agenda data for dashboard (day + week mode)
       const _todayEvents = getTodayEvents();
@@ -4599,7 +4635,7 @@
                 </div>
 
                 <p class="exec-prod-sub">
-                  <span><i data-lucide="check-circle-2" style="width:13px;height:13px;color:var(--success);"></i> ${getTodayTasks().filter(t => t.status === "concluida").length}/${getTodayTasks().length} tasks</span>
+                  <span><i data-lucide="check-circle-2" style="width:13px;height:13px;color:var(--success);"></i> ${_expInfo.done}/${_expInfo.total} tasks</span>
                   <span><i data-lucide="flame" style="width:13px;height:13px;color:var(--warning);"></i> ${getCompletedHabitsToday().length}/${appState.habitos.length} habits</span>
                   <span><i data-lucide="trending-up" style="width:13px;height:13px;color:var(--primary-2);"></i> Week: ${weeklyAvg}%</span>
                 </p>
@@ -5628,12 +5664,14 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!task) return;
       if (task.status === "concluida") {
         task.status = "pending";
-        fsUpdate("tarefas", taskId, { status: "pending" });
+        task.concluidaEm = null;
+        fsUpdate("tarefas", taskId, { status: "pending", concluidaEm: null });
         renderAll();
         showToast(`"${task.titulo}" marcada como pending.`);
       } else {
         task.status = "concluida";
-        fsUpdate("tarefas", taskId, { status: "concluida" });
+        task.concluidaEm = new Date().toISOString();
+        fsUpdate("tarefas", taskId, { status: "concluida", concluidaEm: task.concluidaEm });
 
         // Update linked goal progress
         if (task.metaId) {
@@ -5659,7 +5697,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         if (task.repeticao && task.repeticao !== "nenhuma") {
           const nextId = Date.now();
           const nextDeadline = calcNextDeadline(task.prazo, task.repeticao, task.daysEspecificos);
-          const nextTask = { ...task, id: nextId, status: "pending", prazo: nextDeadline };
+          const nextTask = { ...task, id: nextId, status: "pending", prazo: nextDeadline, concluidaEm: null };
           appState.tasks.push(nextTask);
           fsSet("tarefas", nextId, nextTask);
           const dayNames = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
@@ -6495,7 +6533,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const habToday = getCompletedHabitsToday().length;
         const habTotal = appState.habitos.length;
         const bestStreak = Math.max(0, ...appState.habitos.map(x => x.streak || 0));
-        const score = getProductivityScore();
+        const score = getTodayScore();
 
         const goals = appState.metas || [];
         let goalsTxt = "No active goals at the moment.";
