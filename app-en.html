@@ -3118,7 +3118,7 @@
       </div>
       <div class="team-field">
         <label>Title</label>
-        <input id="team-task-titulo" class="team-input" placeholder="O que precisa de ser feito?">
+        <input id="team-task-titulo" class="team-input" placeholder="What needs to be done?">
       </div>
       <div class="team-field">
         <label>Atribuir a</label>
@@ -4462,12 +4462,12 @@
       const eventColornt = getTodayEvents().length;
       const taskColornt = getTodayTasks().filter(task => task.status !== "concluida").length;
       if (eventColornt >= 4 && taskColornt >= 3) {
-        return "A tua agenda está intensa após o almoço. Protect a focus block between 10:00 and 11:30.";
+        return "Your schedule gets intense after lunch. Protect a focus block between 10:00 and 11:30.";
       }
       if (getOverdueTasks().length) {
-        return "Há tasks overdues. Fecha as pendências críticas antes de iniciar novas tasks.";
+        return "There are overdue tasks. Close the critical pending items before starting new tasks.";
       }
-      return "O teu dia está equilibrado. Mantém os blocos de foco e preserva a rotina de habits.";
+      return "Your day is balanced. Keep the focus blocks and preserve your habits routine.";
     }
 
     function generateKairoInsights() {
@@ -4635,12 +4635,12 @@
                 <span class="label">${_overdueColornt > 0 ? 'Click to view →' : 'All caught up ✓'}</span>
               </div>
               <div class="metric-card" style="cursor:pointer;" onclick="appState.priorityFilter='alta'; appState.taskFilter='todas'; switchView('tasks');">
-                <small>Tasks importantes</small>
+                <small>Important tasks</small>
                 <strong>${getImportantTodayCount()}</strong>
                 <span class="label">Click to view →</span>
               </div>
               <div class="metric-card" style="cursor:pointer;" onclick="switchView('habitos');">
-                <small>Habits concluídos</small>
+                <small>Habits completed</small>
                 <strong>${getCompletedHabitsToday().length}/${appState.habitos.length}</strong>
                 <span class="label">Click to view →</span>
               </div>
@@ -6811,12 +6811,12 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const gr = h < 12 ? "Good morning" : h < 19 ? "Good afternoon" : "Good evening";
           const p = appState.tasks.filter(t => t.status !== "concluida").length;
           const ev = getTodayEvents().length;
-          return `${gr}, ${appState.user.nome}! Tens ${p} task${p !== 1 ? "s" : ""} open e ${ev} appointment${ev !== 1 ? "s" : ""} today. How can I help you?`;
+          return `${gr}, ${appState.user.nome}! You have ${p} open task${p !== 1 ? "s" : ""} and ${ev} appointment${ev !== 1 ? "s" : ""} today. How can I help you?`;
         }
 
         // ajuda
         if (/\b(ajuda|help)\b/.test(q)) {
-          return `Podes perguntar-me sobre:\n• Tasks pendings e prioridades\n• Estado dos teus habits e streaks\n• Compromissos agenda do dia\n• Productivity e progresso\n• Tasks overdues\n• Sugestões e dicas personalizadas\n\nExemplos: "o que tenho hoje?", "qual é a minha prioridade?", "como estão os meus habits?"`;
+          return `You can ask me about:\n• Pending tasks and priorities\n• Your habits and streaks status\n• Today's schedule\n• Productivity and progress\n• Overdue tasks\n• Personalized suggestions and tips\n\nExamples: "what do I have today?", "what is my priority?", "how are my habits?"`;
         }
 
         // summary do dia
@@ -6826,7 +6826,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const ph = getPendingHabits().length;
           const sc = getProductivityScore();
           const ov = getOverdueTasks().length;
-          let msg = `Resumo do teu dia:\n• ${ev} appointment${ev !== 1 ? "s" : ""} agendado${ev !== 1 ? "s" : ""}\n• ${p} task${p !== 1 ? "s" : ""} open\n• ${ph} habit${ph !== 1 ? "s" : ""} to complete\n• Productivity: ${sc}%`;
+          let msg = `Your day summary:\n• ${ev} appointment${ev !== 1 ? "s" : ""} scheduled\n• ${p} task${p !== 1 ? "s" : ""} open\n• ${ph} habit${ph !== 1 ? "s" : ""} to complete\n• Productivity: ${sc}%`;
           if (ov) msg += `\n• ${ov} task${ov !== 1 ? "s" : ""} overdue${ov !== 1 ? "s" : ""}`;
           return msg;
         }
@@ -6836,15 +6836,15 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const pendings = appState.tasks.filter(t => t.status !== "concluida");
           if (!pendings.length) return "Congratulations! You have no pending tasks. You are on top of everything!";
           const list = pendings.slice(0, 5).map(t => `• ${t.titulo} (${t.prioridade})`).join("\n");
-          return `Tens ${pendings.length} task${pendings.length !== 1 ? "s" : ""} open:\n${list}${pendings.length > 5 ? `\n…e mais ${pendings.length - 5}.` : ""}`;
+          return `You have ${pendings.length} open task${pendings.length !== 1 ? "s" : ""}:\n${list}${pendings.length > 5 ? `\n…and ${pendings.length - 5} more.` : ""}`;
         }
 
         // prioridade
         if (/prioridade|importante|urgente/.test(q)) {
           const alta = appState.tasks.filter(t => t.status !== "concluida" && t.prioridade === "alta");
-          if (!alta.length) return "No tens tasks alta prioridade open. Good trabalho!";
+          if (!alta.length) return "You have no high-priority tasks open. Great job!";
           const top = alta.sort((a, b) => new Date(a.prazo) - new Date(b.prazo))[0];
-          return `A tua prioridade mais urgente é "${top.titulo}" — prazo: ${new Date(top.prazo).toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", hora: "2-digit", minute: "2-digit" })}.\nTens ${alta.length} task${alta.length !== 1 ? "s" : ""} alta prioridade no total.`;
+          return `Your most urgent priority is "${top.titulo}" — due: ${new Date(top.prazo).toLocaleString("en-GB", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}.\nYou have ${alta.length} high-priority task${alta.length !== 1 ? "s" : ""} in total.`;
         }
 
         // habits / streak
@@ -6852,9 +6852,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const ph = getPendingHabits();
           const dh = getCompletedHabitsToday();
           const best = Math.max(...appState.habitos.map(h => h.streak), 0);
-          let resp = `Habits: ${dh.length} concluído${dh.length !== 1 ? "s" : ""} hoje, ${ph.length} to complete.`;
+          let resp = `Habits: ${dh.length} completed today, ${ph.length} to complete.`;
           if (ph.length) resp += `\nPending: ${ph.map(h => h.nome).join(", ")}.`;
-          resp += `\nMelhor streak actual: ${best} days.`;
+          resp += `\nBest current streak: ${best} days.`;
           return resp;
         }
 
@@ -6863,7 +6863,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const ev = getTodayEvents();
           if (!ev.length) return "You have no appointments scheduled for today.";
           const list = ev.map(e => `• ${e.horario} — ${e.titulo}`).join("\n");
-          return `Tens ${ev.length} appointment${ev.length !== 1 ? "s" : ""} hoje:\n${list}`;
+          return `You have ${ev.length} appointment${ev.length !== 1 ? "s" : ""} today:\n${list}`;
         }
 
         // produtividade / progresso
@@ -6880,7 +6880,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const ov = getOverdueTasks();
           if (!ov.length) return "Great news! You have no overdue tasks.";
           const list = ov.map(t => `• ${t.titulo}`).join("\n");
-          return `Tens ${ov.length} task${ov.length !== 1 ? "s" : ""} overdue${ov.length !== 1 ? "s" : ""}:\n${list}\nI recommend handling these before starting something new.`;
+          return `You have ${ov.length} overdue task${ov.length !== 1 ? "s" : ""}:\n${list}\nI recommend handling these before starting something new.`;
         }
 
         // sugestão / conselho / dica
@@ -6888,14 +6888,14 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const ov = getOverdueTasks().length;
           const ph = getPendingHabits();
           const alta = appState.tasks.filter(t => t.status !== "concluida" && t.prioridade === "alta");
-          if (ov) return `Dica: Tens ${ov} task${ov !== 1 ? "s" : ""} overdue${ov !== 1 ? "s" : ""}. Dedicate the next 30 minutes to closing these pending items before starting something new.`;
+          if (ov) return `Tip: You have ${ov} overdue task${ov !== 1 ? "s" : ""}. Dedicate the next 30 minutes to closing these pending items before starting something new.`;
           if (alta.length) return `Tip: Start with the hardest first. Your highest-priority task is "${alta[0].titulo}". Block 90 minutes without interruptions to complete it.`;
-          if (ph.length) return `Dica: Aproveita um momento tranquilo para completar rapidamente "${ph[0].nome}" — vai reforçar o teu streak de ${ph[0].streak} days.`;
-          return "Dica: You are doing well today! Take time to plan tomorrow before 22:00 — it reduces morning cognitive load.";
+          if (ph.length) return `Tip: Take a quiet moment to quickly complete "${ph[0].nome}" — it will strengthen your ${ph[0].streak}-day streak.`;
+          return "Tip: You are doing well today! Take time to plan tomorrow before 22:00 — it reduces morning cognitive load.";
         }
 
         // resposta genérica
-        return "Posso ajudar-te com tasks, habits, agenda e produtividade. Experimenta perguntar sobre o teu dia, as tuas prioridades or o estado dos teus habits!";
+        return "I can help you with tasks, habits, schedule and productivity. Try asking about your day, your priorities or the state of your habits!";
       },
 
       _appendActionCard(html, action) {
@@ -8371,7 +8371,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           insights.push({
             icon: "🔥", bg: "rgba(245,158,11,0.1)",
             title: `Streak médio: ${avgStreak} days`,
-            desc: `Melhor streak: "${habitoForte.titulo}" com ${habitoForte.streak} days. ${habitoFraco.streak < 2 ? `"${habitoFraco.titulo}" precisa Altação (${habitoFraco.streak} dia${habitoFraco.streak!==1?"s":""}).` : ""}`,
+            desc: `Best streak: "${habitoForte.titulo}" with ${habitoForte.streak} days. ${habitoFraco.streak < 2 ? `"${habitoFraco.titulo}" needs attention (${habitoFraco.streak} day${habitoFraco.streak!==1?"s":""}).` : ""}`,
             action: `Keep the streak of "${habitoForte.titulo}" — you are building a real habit.`,
             extra: ""
           });
@@ -8520,7 +8520,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         { label:"Completed Tasks", value:concluidas.length, sub:`of ${total} created`,   color:"#7c5cff", icon:"✓" },
         { label:"Taxa de Conclusão",   value:taxaConc+"%",      sub:taxaConc>=70?"Excellent":taxaConc>=40?"Good":"A melhorar", color:"#4ea8ff", icon:"%" },
         { label:"Score Productivity", value:prodScore+"%",      sub:"Score de hoje",        color:"#31d0aa", icon:"↑" },
-        { label:"Habits Today",        value:taxaHab+"%",        sub:`${habConc}/${habitos.length} concluídos`, color:"#f59e0b", icon:"★" },
+        { label:"Habits Today",        value:taxaHab+"%",        sub:`${habConc}/${habitos.length} completed`, color:"#f59e0b", icon:"★" },
       ];
       const kpiHtml = kpis.map(k => `
         <div style="flex:1;background:#fff;border-radius:14px;padding:24px 20px;box-shadow:0 2px 18px rgba(0,0,0,0.07);border:1px solid #eef0f7;position:relative;overflow:hidden;">
