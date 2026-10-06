@@ -3177,7 +3177,7 @@
         <div style="font-size:0.78rem;font-weight:600;color:#777;margin-bottom:8px;">💬 Comentários</div>
         <div class="comment-list" id="team-task-comments-list"><div style="color:#555;font-size:0.78rem;">Ainda sem comentários.</div></div>
         <div class="comment-input-wrap">
-          <textarea id="team-task-comment-input" class="comment-input" placeholder="Escreve um comentário..." rows="2"></textarea>
+          <textarea id="team-task-comment-input" class="comment-input" placeholder="Write a comment..." rows="2"></textarea>
           <button class="comment-send-btn" onclick="sendTeamTaskComment()">Enviar</button>
         </div>
       </div>
@@ -3187,8 +3187,8 @@
     <div class="digest-card" style="max-width:440px;">
       <button class="digest-close" onclick="closeReferralModal()"><i data-lucide="x"></i></button>
       <div class="digest-icon">🎁</div>
-      <h2>Convida Amigos</h2>
-      <p>Por cada amigo que subscrever o plano Pro, <strong style="color:#9b85ff;">ganhas 30 days Pro grátis</strong>.</p>
+      <h2>Invite Friends</h2>
+      <p>For each friend who subscribes to the Pro plan, <strong style="color:#9b85ff;">you get 30 days of Pro free</strong>.</p>
 
       <div class="referral-stats">
         <div class="referral-stat">
@@ -3206,7 +3206,7 @@
       </div>
 
       <div class="referral-card">
-        <p style="margin:0 0 4px;font-size:0.78rem;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Yorr invite link</p>
+        <p style="margin:0 0 4px;font-size:0.78rem;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Your invite link</p>
         <div class="referral-link-row">
           <input class="referral-link-input" id="referral-link-input" readonly>
           <button class="referral-copy-btn" onclick="copyReferralLink()" id="referral-copy-btn">Copy</button>
@@ -3214,9 +3214,9 @@
       </div>
 
       <div style="background:#0d0d1f;border-radius:10px;padding:14px;font-size:0.8rem;color:#555;line-height:1.6;">
-        <strong style="color:#777;">Como funciona:</strong><br>
-        1. Partilha o teu link com amigos<br>
-        2. O amigo regista-se e subscreve Pro<br>
+        <strong style="color:#777;">How it works:</strong><br>
+        1. Share your link with friends<br>
+        2. Your friend signs up and subscribes to Pro<br>
         3. Recebes automaticamente <strong style="color:#9b85ff;">30 days Pro grátis</strong>
       </div>
     </div>
@@ -3224,7 +3224,7 @@
   <div class="share-overlay hidden" id="share-modal">
     <div class="share-modal">
       <h3>Share Streak 🔥</h3>
-      <p>Descarrega o card e partilha no Instagram or LinkedIn</p>
+      <p>Download the card and share it on Instagram or LinkedIn</p>
       <div class="streak-card" id="streak-card-el">
         <div class="streak-card-border"></div>
         <div class="streak-card-bg">
@@ -3384,7 +3384,7 @@
           </svg>
           <div class="focus-ring-time">
             <span id="focus-timer-big">25:00</span>
-            <span id="focus-session-label">Sessão 1</span>
+            <span id="focus-session-label">Session 1</span>
           </div>
         </div>
       </div>
@@ -3506,7 +3506,7 @@
       <input type="hidden" id="edit-task-id" />
       <div class="modal-field">
         <label>Title</label>
-        <input id="edit-task-title" class="task-input" type="text" placeholder="Title da tarefa" />
+        <input id="edit-task-title" class="task-input" type="text" placeholder="Task title" />
       </div>
       <div class="modal-field">
         <label>Description</label>
@@ -3643,42 +3643,42 @@
     // ---- Mock Date (usado para novos utilizadores) ----
     const MOCK_DATA = {
       tasks: [
-        { id: 1, titulo: "Revisar proposta comercial", descricao: "Ajustar narrativa do deck e validar números finais.", prioridade: "alta", status: "andamento", prazo: "2026-05-11T10:30", categoria: "Work" },
-        { id: 2, titulo: "Planejar roteiro da demo Kairo", descricao: "Definir sequência de telas e narrativa da gravação.", prioridade: "alta", status: "pending", prazo: "2026-05-11T14:00", categoria: "Work" },
-        { id: 3, titulo: "Reply e-mails estratégicos", descricao: "Retorno para parceiros Alinhamento interno.", prioridade: "media", status: "pending", prazo: "2026-05-11T17:00", categoria: "Work" },
-        { id: 4, titulo: "Treino funcional", descricao: "Sessão de 45 minutos focada em mobilidade.", prioridade: "media", status: "pending", prazo: "2026-05-11T19:00", categoria: "Sports" },
-        { id: 5, titulo: "Update orçamento mensal", descricao: "Consolidar gastos da última semana.", prioridade: "baixa", status: "concluida", prazo: "2026-05-10T18:30", categoria: "Personal" },
-        { id: 6, titulo: "Send briefing para design", descricao: "Detalhar ajustes visuais da próxima campanha.", prioridade: "alta", status: "pending", prazo: "2026-05-10T16:00", categoria: "Work" },
-        { id: 7, titulo: "Ler capítulo de liderança", descricao: "Capítulo 8 do livro de gestão.", prioridade: "baixa", status: "andamento", prazo: "2026-05-11T21:00", categoria: "Personal" },
-        { id: 101, titulo: "Create landing page do produto", descricao: "Estrutura inicial com hero, features e CTA.", prioridade: "alta", status: "concluida", prazo: "2026-05-09T16:00", categoria: "Work" },
-        { id: 102, titulo: "Reunião com investidores", descricao: "Apresentação do deck de captação Series A.", prioridade: "alta", status: "concluida", prazo: "2026-05-08T10:00", categoria: "Work" },
-        { id: 103, titulo: "Revisão do contrato de parceria", descricao: "Verificar cláusulas e enviar feedback ao jurídico.", prioridade: "media", status: "concluida", prazo: "2026-05-07T14:00", categoria: "Work" },
-        { id: 104, titulo: "Sessão de yoga matinal", descricao: "60 minutos de yoga restaurativa e meditação.", prioridade: "baixa", status: "concluida", prazo: "2026-05-07T07:00", categoria: "Health" },
-        { id: 105, titulo: "Send proposta ao cliente enterprise", descricao: "Ajustar valores e enviar revisão final com anexos.", prioridade: "alta", status: "concluida", prazo: "2026-05-06T18:00", categoria: "Work" },
-        { id: 106, titulo: "Treino de força", descricao: "Séries de musculação, core e mobilidade.", prioridade: "media", status: "concluida", prazo: "2026-05-06T19:00", categoria: "Sports" },
-        { id: 107, titulo: "Planeamento quinzenal", descricao: "Definir metas e KPIs das próximas duas semanas.", prioridade: "alta", status: "concluida", prazo: "2026-05-05T09:00", categoria: "Personal" },
-        { id: 108, titulo: "Update perfil LinkedIn", descricao: "Add novas experiências e publicar artigo.", prioridade: "baixa", status: "pending", prazo: "2026-05-04T15:00", categoria: "Personal" },
-        { id: 109, titulo: "Testar integração da API de pagamentos", descricao: "Validar endpoints, webhooks e casos de erro.", prioridade: "alta", status: "concluida", prazo: "2026-05-03T11:00", categoria: "Work" },
-        { id: 110, titulo: "Leitura livro de estratégia", descricao: "Capítulos 5 e 6 do livro de posicionamento.", prioridade: "baixa", status: "concluida", prazo: "2026-05-02T21:00", categoria: "Personal" },
-        { id: 111, titulo: "Configurar pipeline de CI/CD", descricao: "GitHub Actions para deploy automático em staging.", prioridade: "alta", status: "concluida", prazo: "2026-05-01T17:00", categoria: "Work" },
-        { id: 112, titulo: "Consulta médica de rotina", descricao: "Check-up anual com exames de sangue.", prioridade: "media", status: "concluida", prazo: "2026-04-30T09:30", categoria: "Health" }
+        { id: 1, titulo: "Review commercial proposal", descricao: "Adjust the deck narrative and validate final numbers.", prioridade: "alta", status: "andamento", prazo: "2026-05-11T10:30", categoria: "Work" },
+        { id: 2, titulo: "Plan Kairo demo script", descricao: "Define the screen sequence and recording narrative.", prioridade: "alta", status: "pending", prazo: "2026-05-11T14:00", categoria: "Work" },
+        { id: 3, titulo: "Reply to strategic emails", descricao: "Follow-up with partners and internal alignment.", prioridade: "media", status: "pending", prazo: "2026-05-11T17:00", categoria: "Work" },
+        { id: 4, titulo: "Functional training", descricao: "45-minute session focused on mobility.", prioridade: "media", status: "pending", prazo: "2026-05-11T19:00", categoria: "Sports" },
+        { id: 5, titulo: "Update monthly budget", descricao: "Consolidate last week's expenses.", prioridade: "baixa", status: "concluida", prazo: "2026-05-10T18:30", categoria: "Personal" },
+        { id: 6, titulo: "Send briefing to design", descricao: "Detail visual adjustments for the next campaign.", prioridade: "alta", status: "pending", prazo: "2026-05-10T16:00", categoria: "Work" },
+        { id: 7, titulo: "Read leadership chapter", descricao: "Chapter 8 of the management book.", prioridade: "baixa", status: "andamento", prazo: "2026-05-11T21:00", categoria: "Personal" },
+        { id: 101, titulo: "Create product landing page", descricao: "Initial structure with hero, features and CTA.", prioridade: "alta", status: "concluida", prazo: "2026-05-09T16:00", categoria: "Work" },
+        { id: 102, titulo: "Meeting with investors", descricao: "Series A fundraising deck presentation.", prioridade: "alta", status: "concluida", prazo: "2026-05-08T10:00", categoria: "Work" },
+        { id: 103, titulo: "Partnership contract review", descricao: "Check clauses and send feedback to legal.", prioridade: "media", status: "concluida", prazo: "2026-05-07T14:00", categoria: "Work" },
+        { id: 104, titulo: "Morning yoga session", descricao: "60 minutes of restorative yoga and meditation.", prioridade: "baixa", status: "concluida", prazo: "2026-05-07T07:00", categoria: "Health" },
+        { id: 105, titulo: "Send proposal to enterprise client", descricao: "Adjust values and send the final revision with attachments.", prioridade: "alta", status: "concluida", prazo: "2026-05-06T18:00", categoria: "Work" },
+        { id: 106, titulo: "Strength training", descricao: "Weightlifting, core and mobility sets.", prioridade: "media", status: "concluida", prazo: "2026-05-06T19:00", categoria: "Sports" },
+        { id: 107, titulo: "Biweekly planning", descricao: "Set goals and KPIs for the next two weeks.", prioridade: "alta", status: "concluida", prazo: "2026-05-05T09:00", categoria: "Personal" },
+        { id: 108, titulo: "Update LinkedIn profile", descricao: "Add new experience and publish an article.", prioridade: "baixa", status: "pending", prazo: "2026-05-04T15:00", categoria: "Personal" },
+        { id: 109, titulo: "Test payments API integration", descricao: "Validate endpoints, webhooks and error cases.", prioridade: "alta", status: "concluida", prazo: "2026-05-03T11:00", categoria: "Work" },
+        { id: 110, titulo: "Read strategy book", descricao: "Chapters 5 and 6 of the positioning book.", prioridade: "baixa", status: "concluida", prazo: "2026-05-02T21:00", categoria: "Personal" },
+        { id: 111, titulo: "Set up CI/CD pipeline", descricao: "GitHub Actions for automatic staging deploys.", prioridade: "alta", status: "concluida", prazo: "2026-05-01T17:00", categoria: "Work" },
+        { id: 112, titulo: "Routine medical check-up", descricao: "Annual check-up with blood tests.", prioridade: "media", status: "concluida", prazo: "2026-04-30T09:30", categoria: "Health" }
       ],
       eventos: [
-        { id: 1, titulo: "Daily com equipe produto", horario: "09:00", data: "2026-05-11", categoria: "Reunião" },
-        { id: 2, titulo: "Bloco de foco: proposta comercial", horario: "10:00", data: "2026-05-11", categoria: "Foco" },
-        { id: 3, titulo: "Call com cliente enterprise", horario: "13:30", data: "2026-05-11", categoria: "Cliente" },
-        { id: 4, titulo: "Revisão da sprint", horario: "16:00", data: "2026-05-11", categoria: "Reunião" },
-        { id: 5, titulo: "Treino funcional", horario: "19:00", data: "2026-05-11", categoria: "Health" },
-        { id: 6, titulo: "Janela de planeamento semanal", horario: "08:30", data: "2026-05-12", categoria: "Planeamento" },
-        { id: 7, titulo: "Deep work produto", horario: "11:00", data: "2026-05-12", categoria: "Foco" },
-        { id: 8, titulo: "Alinhamento marketing", horario: "15:00", data: "2026-05-13", categoria: "Reunião" }
+        { id: 1, titulo: "Product team daily", horario: "09:00", data: "2026-05-11", categoria: "Meeting" },
+        { id: 2, titulo: "Focus block: commercial proposal", horario: "10:00", data: "2026-05-11", categoria: "Focus" },
+        { id: 3, titulo: "Call with enterprise client", horario: "13:30", data: "2026-05-11", categoria: "Client" },
+        { id: 4, titulo: "Sprint review", horario: "16:00", data: "2026-05-11", categoria: "Meeting" },
+        { id: 5, titulo: "Functional training", horario: "19:00", data: "2026-05-11", categoria: "Health" },
+        { id: 6, titulo: "Weekly planning window", horario: "08:30", data: "2026-05-12", categoria: "Planning" },
+        { id: 7, titulo: "Product deep work", horario: "11:00", data: "2026-05-12", categoria: "Focus" },
+        { id: 8, titulo: "Marketing alignment", horario: "15:00", data: "2026-05-13", categoria: "Meeting" }
       ],
       habitos: [
-        { id: 1, nome: "Beber 2L de água", frequencia: "Daily", progresso: 72, streak: 9, concluidoToday: true },
-        { id: 2, nome: "Leitura de 20 minutos", frequencia: "Daily", progresso: 58, streak: 6, concluidoToday: false },
-        { id: 3, nome: "Planeamento matinal", frequencia: "Mon-Fri", progresso: 84, streak: 14, concluidoToday: true },
-        { id: 4, nome: "Alongamento", frequencia: "Daily", progresso: 41, streak: 4, concluidoToday: false },
-        { id: 5, nome: "Dormir antes de 23h", frequencia: "Daily", progresso: 67, streak: 11, concluidoToday: false }
+        { id: 1, nome: "Drink 2L of water", frequencia: "Daily", progresso: 72, streak: 9, concluidoToday: true },
+        { id: 2, nome: "20 minutes of reading", frequencia: "Daily", progresso: 58, streak: 6, concluidoToday: false },
+        { id: 3, nome: "Morning planning", frequencia: "Mon-Fri", progresso: 84, streak: 14, concluidoToday: true },
+        { id: 4, nome: "Stretching", frequencia: "Daily", progresso: 41, streak: 4, concluidoToday: false },
+        { id: 5, nome: "Sleep before 11pm", frequencia: "Daily", progresso: 67, streak: 11, concluidoToday: false }
       ]
     };
     // ---- End Mock Date ----
@@ -3700,7 +3700,7 @@
       historicoCategFilter: "todas",
       historicoStatusFilter: "todas",
       today: new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Lisbon' }),
-      user: { nome: "Utilizador" },
+      user: { nome: "User" },
       tasks: [],
       eventos: [],
       habitos: [],
@@ -3736,7 +3736,7 @@
     }
 
     function updateSidebarUser(user) {
-      const displayName = user.displayName || user.email || "Utilizador";
+      const displayName = user.displayName || user.email || "User";
       const firstName = displayName.split(" ")[0];
       appState.user.nome = firstName;
 
@@ -4899,9 +4899,9 @@
             <input id="quick-task-client" class="task-input" type="text" placeholder="Client (optional)" list="quick-client-list" />
             <datalist id="quick-client-list">${getUniqueClients().map(c => `<option value="${c}">${c}</option>`).join('')}</datalist>
             <select id="quick-task-priority" class="task-select">
-              <option value="media">Priority média</option>
-              <option value="alta">High prioridade</option>
-              <option value="baixa">Low prioridade</option>
+              <option value="media">Medium priority</option>
+              <option value="alta">High priority</option>
+              <option value="baixa">Low priority</option>
             </select>
             <select id="quick-task-category" class="task-select">
               <option value="Work">Work</option>
@@ -4925,7 +4925,7 @@
                 <button type="button" class="daycal-nav" onclick="daycalNav('quick',1)">&#8250;</button>
               </div>
               <div class="daycal-grid" id="quick-daycal-grid"></div>
-              <div class="daycal-hint">Clica num dia para selecionar esse dia da semana</div>
+              <div class="daycal-hint">Click a day to select that day of the week</div>
               <div class="daycal-selected-days" id="quick-daycal-tags"></div>
             </div>
             <button id="quick-task-submit" class="primary-btn">Add</button>
@@ -4943,7 +4943,7 @@
             <div class="filters">
               <button class="chip ${appState.taskFilter === "todas" ? "active" : ""}" data-task-filter="todas">All</button>
               <button class="chip ${appState.taskFilter === "hoje" ? "active" : ""}" data-task-filter="hoje">Today</button>
-              <button class="chip ${appState.taskFilter === "pending" ? "active" : ""}" data-task-filter="pending">Pendings</button>
+              <button class="chip ${appState.taskFilter === "pending" ? "active" : ""}" data-task-filter="pending">Pending</button>
               <button class="chip ${appState.taskFilter === "concluida" ? "active" : ""}" data-task-filter="concluida">Completeds</button>
               <button class="chip ${appState.taskFilter === "overdues" ? "active" : ""}" data-task-filter="overdues" style="color:var(--danger);border-color:${appState.taskFilter === "overdues" ? "var(--danger)" : ""};">Overdue</button>
             </div>
@@ -5067,7 +5067,7 @@
                       <button class="task-action-btn" data-edit-habit="${habit.id}" title="Edit hábito">
                         <i data-lucide="pencil"></i>
                       </button>
-                      <button class="task-action-btn danger" data-delete-habit="${habit.id}" title="Apagar hábito">
+                      <button class="task-action-btn danger" data-delete-habit="${habit.id}" title="Delete habit">
                         <i data-lucide="trash-2"></i>
                       </button>
                     </div>
@@ -5082,7 +5082,7 @@
                   </div>
                 </div>`;
               }).join("")}
-              ${!appState.habitos.length ? `<div class="empty-state">Nenhum hábito criado ainda. Adiciona o primeiro acima.</div>` : ""}
+              ${!appState.habitos.length ? `<div class="empty-state">No habits created yet. Add your first one above.</div>` : ""}
             </div>
           </div>
 
@@ -5183,12 +5183,12 @@
       if (!isPro()) {
         view.innerHTML = `
           <div class="panel" style="position:relative;min-height:340px;overflow:hidden;">
-            <div class="panel-header"><div><h3>History</h3><p>Análise e exportação de registos</p></div></div>
+            <div class="panel-header"><div><h3>History</h3><p>Analysis and export of records</p></div></div>
             <div class="pro-overlay">
               <div class="pro-overlay-icon">🔒</div>
               <h4>History Pro</h4>
-              <p>Aceder ao histórico completo de tasks, filtros avançados e exportação Word.</p>
-              <button class="primary-btn" onclick="showUpgradeModal('History')">Upgrade para Pro →</button>
+              <p>Access the full task history, advanced filters and Word export.</p>
+              <button class="primary-btn" onclick="showUpgradeModal('History')">Upgrade to Pro →</button>
             </div>
           </div>
 
@@ -5238,7 +5238,7 @@
 
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end;">
             <div style="display:flex;flex-direction:column;gap:5px;">
-              <label style="font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.02em;">Date início</label>
+              <label style="font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.02em;">Start date</label>
               <input type="date" class="task-input" id="hist-date-inicio" value="${dateInicio}" style="max-width:165px;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onkeydown="event.preventDefault();" />
             </div>
             <div style="display:flex;flex-direction:column;gap:5px;">
@@ -5253,7 +5253,7 @@
           <div class="filters" style="margin-bottom:16px;">
             <button class="chip ${statusFilter === "todas" ? "active" : ""}" data-hist-status="todas">Todos status</button>
             <button class="chip ${statusFilter === "concluida" ? "active" : ""}" data-hist-status="concluida">Completeds</button>
-            <button class="chip ${statusFilter === "pending" ? "active" : ""}" data-hist-status="pending">Pendings</button>
+            <button class="chip ${statusFilter === "pending" ? "active" : ""}" data-hist-status="pending">Pending</button>
             <button class="chip ${statusFilter === "andamento" ? "active" : ""}" data-hist-status="andamento">In Progress</button>
           </div>
 
@@ -5367,13 +5367,13 @@
   </div>
   <p style="color:#666;font-size:13px;margin:6px 0 32px;">Date do relat&oacute;rio: ${dateStr} &nbsp;&middot;&nbsp; Total de tasks: ${tasks.length}</p>
 
-  <h2 style="font-size:14px;color:#7c5cff;text-transform:uppercase;letter-spacing:1px;margin:28px 0 10px;border-left:4px solid #31d0aa;padding-left:10px;">Conclu&#237;das (${concluded.length})</h2>
+  <h2 style="font-size:14px;color:#7c5cff;text-transform:uppercase;letter-spacing:1px;margin:28px 0 10px;border-left:4px solid #31d0aa;padding-left:10px;">Completed (${concluded.length})</h2>
   ${taskTable(concluded)}
 
   <h2 style="font-size:14px;color:#7c5cff;text-transform:uppercase;letter-spacing:1px;margin:28px 0 10px;border-left:4px solid #00c2ff;padding-left:10px;">Em Andamento (${inProgress.length})</h2>
   ${taskTable(inProgress)}
 
-  <h2 style="font-size:14px;color:#7c5cff;text-transform:uppercase;letter-spacing:1px;margin:28px 0 10px;border-left:4px solid #ffb84d;padding-left:10px;">Pendings (${pending.length})</h2>
+  <h2 style="font-size:14px;color:#7c5cff;text-transform:uppercase;letter-spacing:1px;margin:28px 0 10px;border-left:4px solid #ffb84d;padding-left:10px;">Pending (${pending.length})</h2>
   ${taskTable(pending)}
 
   <div style="margin-top:40px;padding-top:12px;border-top:1px solid #ddd;color:#999;font-size:12px;text-align:center;">
@@ -5656,7 +5656,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!nameInput) return;
       const name = nameInput.value.trim();
       if (!name) {
-        showToast("Escreve um nome para o hábito.");
+        showToast("Write a name for the habit.");
         return;
       }
 
@@ -5680,29 +5680,29 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       nameInput.value = "";
       renderAll();
-      showToast(`Habit "${name}" criado com sucesso.`);
+      showToast(`Habit "${name}" created successfully.`);
     }
 
     function deleteHabit(habitId) {
       const nId = Number(habitId);
       const habit = appState.habitos.find(item => item.id === nId);
       if (!habit) return;
-      if (!confirm(`Apagar "${habit.nome}"? Esta ação não pode ser desfeita.`)) return;
+      if (!confirm(`Delete "${habit.nome}"? This action cannot be undone.`)) return;
       appState.habitos = appState.habitos.filter(item => item.id !== nId);
       fsDelete("habitos", habitId);
       renderAll();
-      showToast(`Habit "${habit.nome}" apagado.`);
+      showToast(`Habit "${habit.nome}" deleted.`);
     }
 
     function deleteEvent(eventId) {
       const nId = Number(eventId);
       const event = appState.eventos.find(e => e.id === nId);
       if (!event) return;
-      if (!confirm(`Apagar "${event.titulo}"? Esta ação não pode ser desfeita.`)) return;
+      if (!confirm(`Delete "${event.titulo}"? This action cannot be undone.`)) return;
       appState.eventos = appState.eventos.filter(e => e.id !== nId);
       fsDelete("eventos", eventId);
       renderAll();
-      showToast(`Evento "${event.titulo}" apagado.`);
+      showToast(`Event "${event.titulo}" deleted.`);
     }
 
     function calcNextDeadline(prazo, repeticao, daysEspecificos) {
@@ -5730,7 +5730,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         task.concluidaEm = null;
         fsUpdate("tarefas", taskId, { status: "pending", concluidaEm: null });
         renderAll();
-        showToast(`"${task.titulo}" marcada como pending.`);
+        showToast(`"${task.titulo}" marked as pending.`);
       } else {
         task.status = "concluida";
         task.concluidaEm = new Date().toISOString();
@@ -5766,7 +5766,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const dayNames = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
           const nextDate = new Date(nextDeadline);
           const nextLabel = nextDate.toLocaleDateString("pt-PT", { weekday:"short", day:"numeric", month:"short" });
-          showToast(`✓ Completed! Próxima ocorrência: ${nextLabel}.`);
+          showToast(`✓ Completed! Next occurrence: ${nextLabel}.`);
         } else {
           showToast(`Excellent! Task completed.`);
         }
@@ -5778,11 +5778,11 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const nId = Number(taskId);
       const task = appState.tasks.find(item => item.id === nId);
       if (!task) return;
-      if (!confirm(`Apagar "${task.titulo}"? Esta ação não pode ser desfeita.`)) return;
+      if (!confirm(`Delete "${task.titulo}"? This action cannot be undone.`)) return;
       appState.tasks = appState.tasks.filter(item => item.id !== nId);
       fsDelete("tarefas", taskId);
       renderAll();
-      showToast(`Task "${task.titulo}" apagada.`);
+      showToast(`Task "${task.titulo}" deleted.`);
     }
 
     function openEditModal(taskId) {
@@ -5834,7 +5834,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       const title = document.getElementById("edit-task-title").value.trim();
       if (!title) {
-        showToast("O título não pode estar vazio.");
+        showToast("The title cannot be empty.");
         return;
       }
 
@@ -5853,7 +5853,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       fsSet("tarefas", id, task);
       closeEditModal();
       renderAll();
-      showToast(`Task "${task.titulo}" atualizada.`);
+      showToast(`Task "${task.titulo}" updated.`);
     }
 
     function completeHabit(habitId) {
@@ -5874,7 +5874,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         historico: habit.historico
       });
       renderAll();
-      showToast(`Streak atualizado: ${habit.nome} agora está em ${habit.streak} days.`);
+      showToast(`Streak updated: ${habit.nome} is now at ${habit.streak} days.`);
     }
 
     function renderHabitWeekGrid(habit) {
@@ -5932,7 +5932,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         _voiceRecognizer.onstart = () => {
           _voiceListening = true;
           btn.classList.add("recording");
-          showToast("A orvir...");
+          showToast("Listening...");
         };
 
         _voiceRecognizer.onresult = (e) => {
@@ -5955,7 +5955,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const b = document.getElementById("voice-task-btn");
           if (b) b.classList.remove("recording");
           if (e.error !== "no-speech" && e.error !== "aborted") {
-            showToast("No foi possível captar voz. Tente novamente.");
+            showToast("Couldn't capture voice. Try again.");
           }
         };
 
@@ -6308,11 +6308,11 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const confirmPassword = document.getElementById("login-confirm-password").value;
 
         if (!name) {
-          errorEl.textContent = "Por favor indica o teu nome.";
+          errorEl.textContent = "Please enter your name.";
           return;
         }
         if (password !== confirmPassword) {
-          errorEl.textContent = "As passwords não coincidem.";
+          errorEl.textContent = "Passwords don't match.";
           return;
         }
 
@@ -6372,7 +6372,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         // Detectar retorno do Stripe Checkout
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('checkout') === 'success') {
-          showToast('Subscrição Pro ativada! Welcome to Kairo Pro.');
+          showToast('Pro subscription activated! Welcome to Kairo Pro.');
           window.history.replaceState({}, '', '/app.html');
           if (typeof gtag === 'function') gtag('event', 'purchase', { currency: 'EUR', value: 1 });
         } else if (urlParams.get('checkout') === 'cancelled') {
@@ -6853,7 +6853,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const dh = getCompletedHabitsToday();
           const best = Math.max(...appState.habitos.map(h => h.streak), 0);
           let resp = `Habits: ${dh.length} concluído${dh.length !== 1 ? "s" : ""} hoje, ${ph.length} to complete.`;
-          if (ph.length) resp += `\nPendings: ${ph.map(h => h.nome).join(", ")}.`;
+          if (ph.length) resp += `\nPending: ${ph.map(h => h.nome).join(", ")}.`;
           resp += `\nMelhor streak actual: ${best} days.`;
           return resp;
         }
@@ -6872,7 +6872,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const done = getCompletedTasks().length;
           const total = appState.tasks.length;
           const msg2 = sc >= 70 ? "Excellent pace!" : sc >= 40 ? "You are on the right track, keep going!" : "There is still room to improve today.";
-          return `A tua produtividade está em ${sc}%. Concluíste ${done} de ${total} tasks. ${msg2}`;
+          return `Your productivity is at ${sc}%. You completed ${done} of ${total} tasks. ${msg2}`;
         }
 
         // overdues
@@ -6889,7 +6889,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           const ph = getPendingHabits();
           const alta = appState.tasks.filter(t => t.status !== "concluida" && t.prioridade === "alta");
           if (ov) return `Dica: Tens ${ov} task${ov !== 1 ? "s" : ""} overdue${ov !== 1 ? "s" : ""}. Dedicate the next 30 minutes to closing these pending items before starting something new.`;
-          if (alta.length) return `Dica: Start with the hardest first. A tua tarefa de maior prioridade é "${alta[0].titulo}". Block 90 minutes without interruptions to complete it.`;
+          if (alta.length) return `Tip: Start with the hardest first. Your highest-priority task is "${alta[0].titulo}". Block 90 minutes without interruptions to complete it.`;
           if (ph.length) return `Dica: Aproveita um momento tranquilo para completar rapidamente "${ph[0].nome}" — vai reforçar o teu streak de ${ph[0].streak} days.`;
           return "Dica: You are doing well today! Take time to plan tomorrow before 22:00 — it reduces morning cognitive load.";
         }
@@ -7192,7 +7192,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       </ul>
       <div class="upgrade-price">9,99 € <span>/mês</span></div>
       <button id="upgrade-checkout-btn" class="upgrade-checkout-btn">
-        Upgrade para Pro →
+        Upgrade to Pro →
       </button>
       <p class="upgrade-cancel-note">Cancela quando quiseres · Sem compromisso</p>
       <hr style="border:0;border-top:1px solid var(--border);margin:20px 0 14px">
@@ -7364,9 +7364,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         window.location.href = data.result.url;
       } catch (err) {
         console.error('[Checkout]', err);
-        showToast('Error ao iniciar pagamento. Tenta novamente.');
+        showToast('Error starting payment. Please try again.');
         btn.disabled = false;
-        btn.textContent = 'Upgrade para Pro →';
+        btn.textContent = 'Upgrade to Pro →';
       }
     });
 
@@ -7418,7 +7418,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         window.location.href = data.result.url;
       } catch (err) {
         console.error('[Portal]', err);
-        showToast('Error ao abrir portal. Tenta novamente.');
+        showToast('Error opening the customer portal. Please try again.');
         btn.disabled = false;
         btn.innerHTML = orig;
       }
@@ -7447,7 +7447,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const nome = document.getElementById("edit-habit-name").value.trim();
       const frequencia = document.getElementById("edit-habit-freq").value;
       const lembrete = document.getElementById("edit-habit-reminder").value;
-      if (!nome) { showToast("O nome não pode estar vazio."); return; }
+      if (!nome) { showToast("The name cannot be empty."); return; }
       const habit = appState.habitos.find(h => h.id === id);
       if (!habit) return;
       habit.nome = nome;
@@ -7456,7 +7456,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       fsUpdate("habitos", id, { nome, frequencia, lembrete });
       closeEditHabitModal();
       renderAll();
-      showToast(`Habit "${nome}" atualizado.`);
+      showToast(`Habit "${nome}" updated.`);
     }
 
     document.getElementById("edit-habit-modal").addEventListener("click", function(e) {
@@ -7559,7 +7559,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         { merge: true }
       );
 
-      note.textContent = enabled ? `Notifications ativas! Avisamos ${minutos} min antes.` : 'Notifications desativadas.';
+      note.textContent = enabled ? `Notifications on! We'll alert you ${minutos} min before.` : 'Notifications off.';
       note.className = 'digest-note ok';
       setTimeout(closeNotifModal, 1800);
     }
@@ -7598,7 +7598,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       document.getElementById("focus-widget").classList.remove("hidden", "minimized");
       focusUpdateUI();
       lucide.createIcons();
-      showToast(`Modo Foco iniciado: "${task.titulo}"`);
+      showToast(`Focus Mode started: "${task.titulo}"`);
     }
 
     function focusToggle() {
@@ -7627,12 +7627,12 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           focusState.mode = "long-break";
           focusState.timeLeft = focusState.LB * 60;
           focusState.totalTime = focusState.LB * 60;
-          showToast("🎉 4 sessões completas! Pausa longa de " + focusState.LB + " min.");
+          showToast("🎉 4 sessions complete! Long break of " + focusState.LB + " min.");
         } else {
           focusState.mode = "short-break";
           focusState.timeLeft = focusState.SB * 60;
           focusState.totalTime = focusState.SB * 60;
-          showToast("✓ Sessão " + focusState.session + " completa! Pausa de " + focusState.SB + " min.");
+          showToast("✓ Session " + focusState.session + " complete! Break of " + focusState.SB + " min.");
         }
       } else {
         if (focusState.mode === "long-break") focusState.session = 1;
@@ -7640,7 +7640,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         focusState.mode = "work";
         focusState.timeLeft = focusState.W * 60;
         focusState.totalTime = focusState.W * 60;
-        showToast("▶ Ready para a sessão " + focusState.session + "!");
+        showToast("▶ Ready for session " + focusState.session + "!");
       }
       focusUpdateUI();
     }
@@ -7679,7 +7679,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       document.getElementById("focus-header-timer").textContent = timeStr;
       document.getElementById("focus-mode-pill").textContent = modeLabel;
       document.getElementById("focus-mode-pill").className = `focus-mode-pill${isBreak ? " break" : ""}`;
-      document.getElementById("focus-session-label").textContent = `Sessão ${focusState.session} de 4`;
+      document.getElementById("focus-session-label").textContent = `Session ${focusState.session} of 4`;
       document.getElementById("focus-dot").className = `focus-dot${isBreak ? " break" : ""}${!focusState.running ? " paused" : ""}`;
 
       // Ring progress
@@ -7890,12 +7890,12 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error?.message || 'Error ' + resp.status);
         note.textContent = enabled
-          ? `Digest ativado! Receiveás um email às ${String(horr).padStart(2,'0')}:00.`
-          : 'Digest desativado.';
+          ? `Digest activated! You'll receive an email at ${String(horr).padStart(2,'0')}:00.`
+          : 'Digest disabled.';
         note.className = 'digest-note ok';
         setTimeout(closeDigestModal, 1800);
       } catch (err) {
-        note.textContent = err.message || 'Error ao guardar. Tenta novamente.';
+        note.textContent = err.message || 'Error saving. Please try again.';
         note.className = 'digest-note err';
       } finally {
         btn.disabled = false;
@@ -7941,7 +7941,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           <div class="subtask-item">
             <div class="subtask-check ${s.concluida ? 'done' : ''}" onclick="toggleSubtask('${meta.id}','${s.id}')"></div>
             <span class="subtask-title ${s.concluida ? 'done' : ''}">${s.titulo}</span>
-            <button class="subtask-del" onclick="deleteSubtask('${meta.id}','${s.id}')" title="Apagar">✕</button>
+            <button class="subtask-del" onclick="deleteSubtask('${meta.id}','${s.id}')" title="Delete">✕</button>
           </div>`).join("");
 
         return `
@@ -7987,7 +7987,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         ${sorted.length === 0
           ? `<div class="meta-empty">
                <i data-lucide="target"></i>
-               <p style="font-size:1rem;color:#555;margin:0 0 6px;">Nenhuma meta ainda</p>
+               <p style="font-size:1rem;color:#555;margin:0 0 6px;">No goals yet</p>
                <p style="font-size:0.82rem;color:#333;">Define o teu primeiro objetivo de 30/60/90 days</p>
              </div>`
           : cards}`;
@@ -8071,13 +8071,13 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
     async function saveGoal() {
       const titulo = document.getElementById("meta-titulo").value.trim();
-      if (!titulo) { showToast("Insere um título para a meta."); return; }
+      if (!titulo) { showToast("Enter a title for the goal."); return; }
       const durBtn = document.querySelector(".meta-dur-btn.active");
       const duracao = parseInt(durBtn?.dataset.dur || "30", 10);
       let prazo;
       if (duracao === 0) {
         prazo = document.getElementById("meta-prazo-custom").value;
-        if (!prazo) { showToast("Escolhe uma data limite."); return; }
+        if (!prazo) { showToast("Choose a deadline."); return; }
       } else {
         const d = new Date(); d.setDate(d.getDate() + duracao);
         prazo = d.toISOString().split("T")[0];
@@ -8100,9 +8100,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     }
 
     function deleteGoal(id) {
-      if (!confirm("Apagar esta meta?")) return;
+      if (!confirm("Delete this goal?")) return;
       db.collection(`users/${currentUser.uid}/metas`).doc(id).delete();
-      showToast("Goal apagada.");
+      showToast("Goal deleted.");
     }
 
     function toggleSubtasksPanel(metaId) {
@@ -8156,7 +8156,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           await db.doc(`users/${currentUser.uid}`).set({ codigoInvite: codigo }, { merge: true });
           await db.doc(`referrals/${codigo}`).set({ uid: currentUser.uid, criadoEm: new Date().toISOString() });
         } catch (e) {
-          console.warn("[Referral] Error ao guardar código:", e.message);
+          console.warn("[Referral] Error saving code:", e.message);
         }
         appState.codigoInvite = codigo;
       }
@@ -8211,7 +8211,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     function openShareModal() {
       const maxStreak = appState.habitos.length > 0
         ? Math.max(...appState.habitos.map(h => h.streak || 0)) : 0;
-      const userName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Utilizador";
+      const userName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "User";
 
       document.getElementById("share-streak-num").textContent = maxStreak;
 
@@ -8250,9 +8250,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         link.download = "kairo-streak.png";
         link.href = canvas.toDateURL("image/png");
         link.click();
-        showToast("Imagem guardada! Partilha no Instagram or LinkedIn 🚀");
+        showToast("Image saved! Share it on Instagram or LinkedIn 🚀");
       } catch (e) {
-        showToast("Error ao gerar imagem. Tenta de novo.");
+        showToast("Error generating image. Try again.");
         console.error(e);
       } finally {
         btn.innerHTML = '<i data-lucide="download" style="width:15px;height:15px;"></i> Save imagem';
@@ -8415,7 +8415,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         insights.push({
           icon: emoji, bg: "rgba(124,92,255,0.08)",
           title: `Taxa de conclusão: ${pctG}% — ${label}`,
-          desc: `Concluíste ${doneN} de ${total} tasks criadas até agora.`,
+          desc: `You completed ${doneN} of ${total} tasks created so far.`,
           action: pctG < 50 ? "Consider reducing the number of daily tasks to increase focus." : "Keep this pace — you are above the productivity average.",
           extra: ""
         });
@@ -8450,7 +8450,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const habConc    = habitos.filter(h => h.concluidoToday).length;
       const taxaHab    = habitos.length > 0 ? Math.round(habConc / habitos.length * 100) : 0;
       const prodScore  = getProductivityScore();
-      const userName   = appState.user.nome || "Utilizador";
+      const userName   = appState.user.nome || "User";
       const now        = new Date();
       const meses      = ["January","Febereiro","March","April","May","June","July","Augsto","Sepembro","Octubro","November","Decembro"];
       const periodo    = `${meses[now.getMonth()]} ${now.getFullYear()}`;
@@ -8517,7 +8517,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       // ── PÁGINA 2 — SUMÁRIO EXECUTIVO ────────────────────────────
       const kpis = [
-        { label:"Tasks Completeds", value:concluidas.length, sub:`de ${total} criadas`,   color:"#7c5cff", icon:"✓" },
+        { label:"Completed Tasks", value:concluidas.length, sub:`of ${total} created`,   color:"#7c5cff", icon:"✓" },
         { label:"Taxa de Conclusão",   value:taxaConc+"%",      sub:taxaConc>=70?"Excellent":taxaConc>=40?"Good":"A melhorar", color:"#4ea8ff", icon:"%" },
         { label:"Score Productivity", value:prodScore+"%",      sub:"Score de hoje",        color:"#31d0aa", icon:"↑" },
         { label:"Habits Today",        value:taxaHab+"%",        sub:`${habConc}/${habitos.length} concluídos`, color:"#f59e0b", icon:"★" },
@@ -8535,7 +8535,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       const statusBoxes = [
         { label:"Completeds", n:concluidas.length,             color:"#31d0aa", bg:"rgba(49,208,170,0.1)"  },
-        { label:"Pendings",  n:pendings.length-overdues.length, color:"#7c5cff", bg:"rgba(124,92,255,0.1)" },
+        { label:"Pending",  n:pendings.length-overdues.length, color:"#7c5cff", bg:"rgba(124,92,255,0.1)" },
         { label:"Overdue",  n:overdues.length,              color:"#f87171", bg:"rgba(248,113,113,0.1)" },
         { label:"Goals",      n:metas.length,                  color:"#4ea8ff", bg:"rgba(78,168,255,0.1)"  },
       ].map(s => `<div style="flex:1;text-align:center;padding:16px 12px;background:${s.bg};border-radius:12px;">
@@ -8625,7 +8625,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
                 <th style="text-align:left;font-size:9px;letter-spacing:1px;color:#bbb;text-transform:uppercase;padding-bottom:8px;padding-left:8px;font-family:Arial,sans-serif;">Desempenho</th>
               </tr></thead>
               <tbody>${habitRowsHtml}</tbody>
-            </table>` : `<div style="color:#bbb;font-size:12px;font-family:Arial,sans-serif;">Sem habits registados.</div>`}
+            </table>` : `<div style="color:#bbb;font-size:12px;font-family:Arial,sans-serif;">No habits registered.</div>`}
           </div>
         </div>
         ${metas.length > 0 ? `<div style="padding:0 58px;">
@@ -8653,7 +8653,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         </div>`).join("");
 
       const recs = [];
-      if (overdues.length > 0) recs.push({ title:"Resolver Atrasos Urgents", text:`${overdues.length} tarefa(s) overdue(s). Bloquear tempo esta semana para fechar.`, color:"#f87171" });
+      if (overdues.length > 0) recs.push({ title:"Resolve Urgent Overdues", text:`${overdues.length} overdue task(s). Block time this week to close them.`, color:"#f87171" });
       if (taxaHab < 70) recs.push({ title:"Reforçar Consistency de Habits", text:`Taxa de hoje: ${taxaHab}%. Objetivo: acima de 70% para criar momentum.`, color:"#f59e0b" });
       if (taxaConc < 50) recs.push({ title:"Reduzir e Focar", text:`Taxa de conclusão global: ${taxaConc}%. Menos tasks, mais foco = melhor resultado.`, color:"#7c5cff" });
       if (recs.length < 3) recs.push({ title:"Keep the Pace", text:"Performance is above average. Keep the consistency and gradually scale the volume.", color:"#31d0aa" });
@@ -8974,7 +8974,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         data:         id ? undefined : new Date().toISOString(),
         updatedAt:    new Date().toISOString(),
       };
-      if (!data.decisao) return alert("Escrever decisão.");
+      if (!data.decisao) return alert("Write the decision.");
       const ref = db.collection("users").doc(uid).collection("decisoes");
       if (id) {
         await ref.doc(id).update(data);
@@ -9090,7 +9090,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     }
 
     async function deleteDecisao(id) {
-      if (!confirm("Apagar decisão?")) return;
+      if (!confirm("Delete this decision?")) return;
       const uid = firebase.auth().currentUser?.uid; if (!uid) return;
       await db.collection("users").doc(uid).collection("decisoes").doc(id).delete();
     }
@@ -9279,10 +9279,10 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       const tabDefs = [
         { key:"todas",   label:`All (${tasks.length})` },
-        { key:"pendings",label:`Pendings` },
+        { key:"pendings",label:`Pending` },
         { key:"overdues",label:`⚠ Overdue${lateColornt>0?` (${lateColornt})`:""}` },
-        { key:"minhas",  label:`Para mim${mineColornt>0?` (${mineColornt})`:""}` },
-        { key:"delegadas",label:`Por mim${delegColornt>0?` (${delegColornt})`:""}` },
+        { key:"minhas",  label:`Assigned to me${mineColornt>0?` (${mineColornt})`:""}` },
+        { key:"delegadas",label:`Delegated by me${delegColornt>0?` (${delegColornt})`:""}` },
       ];
       const memberTabs = membros.map(m => ({ key:`uid_${m.uid}`, label:`@${m.nome.split(" ")[0]}` }));
       const allTabs = [...tabDefs, ...memberTabs];
@@ -9355,7 +9355,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="team-btn-primary" style="padding:8px 16px;font-size:0.82rem;" onclick="openTeamModal('task')">+ Delegar Task</button>
-            ${isAdmin ? `<button class="team-leave-btn" onclick="deleteTeam()">Apagar equipa</button>` : `<button class="team-leave-btn" onclick="leaveTeam()">Sign Oct da equipa</button>`}
+            ${isAdmin ? `<button class="team-leave-btn" onclick="deleteTeam()">Delete team</button>` : `<button class="team-leave-btn" onclick="leaveTeam()">Leave team</button>`}
           </div>
         </div>
 
@@ -9379,7 +9379,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         <div class="team-tasks-header">
           <h3>Tasks (${tasksFiltradas.length}${tasksFiltradas.length!==tasks.length?" filtradas":""})</h3>
         </div>
-        ${taskItems || `<p style="color:#555;font-size:0.85rem;padding:20px 0;">Nenhuma tarefa neste filtro.</p>`}
+        ${taskItems || `<p style="color:#555;font-size:0.85rem;padding:20px 0;">No tasks in this filter.</p>`}
         ` : renderTeamKanban(tasksFiltradas, membros)}
 
         <!-- Feed de Atividade -->
@@ -9425,7 +9425,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     async function createTeam() {
       const nome = document.getElementById("team-create-nome").value.trim();
       const note = document.getElementById("team-create-note");
-      if (!nome) { note.textContent = "Insere um nome para a equipa."; return; }
+      if (!nome) { note.textContent = "Enter a name for the team."; return; }
       if (!currentUser) return;
 
       note.textContent = "A criar...";
@@ -9442,19 +9442,19 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       });
 
       closeTeamModal("create");
-      showToast(`Team "${nome}" criada! Code: ${codigo}`);
+      showToast(`Team "${nome}" created! Code: ${codigo}`);
     }
 
     async function joinTeam() {
       const code = document.getElementById("team-join-code").value.trim().toUpperCase();
       const note = document.getElementById("team-join-note");
-      if (!code) { note.textContent = "Insere o código da equipa."; return; }
+      if (!code) { note.textContent = "Enter the team code."; return; }
       if (!currentUser) return;
 
       note.textContent = "A procurar equipa...";
       try {
         const snap = await db.collection("teams").where("codigo", "==", code).limit(1).get();
-        if (snap.empty) { note.textContent = "Code inválido. Verifica e tenta de novo."; return; }
+        if (snap.empty) { note.textContent = "Invalid code. Check it and try again."; return; }
 
         const teamDoc = snap.docs[0];
         const teamDate = teamDoc.data();
@@ -9476,7 +9476,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         logTeamActivity(teamDoc.id, { tipo: "membro_entrou" });
 
         closeTeamModal("join");
-        showToast(`Entraste na equipa "${teamDate.nome}"!`);
+        showToast(`You joined team "${teamDate.nome}"!`);
       } catch (e) {
         note.textContent = "Error: " + e.message;
       }
@@ -9492,7 +9492,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const prioridade= document.getElementById("team-task-prioridade").value;
       const nota      = document.getElementById("team-task-nota")?.value.trim() || "";
       const editId    = document.getElementById("team-task-edit-id").value;
-      if (!titulo) { showToast("Insere o título da tarefa."); return; }
+      if (!titulo) { showToast("Enter the task title."); return; }
       if (!appState.equipa) return;
 
       const teamId     = appState.equipa.id;
@@ -9510,7 +9510,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           delegadoPor: currentUser.uid, delegadoNome: delegNome,
           delegadoEm: new Date().toISOString()
         });
-        showToast(`Task delegada a ${(appState.equipa.membros||[]).find(m=>m.uid===assignee)?.nome || "equipa"}!`);
+        showToast(`Task delegated to ${(appState.equipa.membros||[]).find(m=>m.uid===assignee)?.nome || "the team"}!`);
         // Register no feed
         const paraNome = (appState.equipa.membros||[]).find(m=>m.uid===assignee)?.nome || "";
         logTeamActivity(teamId, {
@@ -9552,20 +9552,20 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
     async function deleteTeamTask(taskId) {
       if (!appState.equipa) return;
-      if (!confirm("Apagar esta tarefa?")) return;
+      if (!confirm("Delete this task?")) return;
       await db.doc(`teams/${appState.equipa.id}/tarefas/${taskId}`).delete();
     }
 
     async function leaveTeam() {
       if (!appState.equipa || !currentUser) return;
-      if (!confirm("Tens a certeza que queres sair da equipa?")) return;
+      if (!confirm("Are you sure you want to leave the team?")) return;
       const uid = currentUser.uid;
       const membro = (appState.equipa.membros || []).find(m => m.uid === uid);
       await db.doc(`teams/${appState.equipa.id}`).update({
         membros: firebase.firestore.FieldValue.arrayRemove(membro),
         membrosUids: firebase.firestore.FieldValue.arrayRemove(uid)
       });
-      showToast("Saíste da equipa.");
+      showToast("You left the team.");
     }
 
     async function deleteFeedItem(id) {
@@ -9593,9 +9593,9 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
     async function deleteTeam() {
       if (!appState.equipa) return;
-      if (!confirm("Apagar a equipa para todos os membros?")) return;
+      if (!confirm("Delete the team for all members?")) return;
       await db.doc(`teams/${appState.equipa.id}`).delete();
-      showToast("Team apagada.");
+      showToast("Team deleted.");
     }
 
     /* ---- Comentários em tarefas de equipa ---- */
@@ -9741,7 +9741,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const teamName = appState.equipa?.nome || "Team";
       const fromName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Alguém";
       const link = `https://kairoelite.app/?join=${encodeURIComponent(teamCode)}`;
-      if (!toEmail || !toEmail.includes("@")) { showToast("Insere um email válido."); return; }
+      if (!toEmail || !toEmail.includes("@")) { showToast("Enter a valid email."); return; }
       const subject = encodeURIComponent(`Invite to team "${teamName}" on Kairo`);
       const body = encodeURIComponent(`Hello!\n\n${fromName} invited you to the team "${teamName}" on Kairo.\n\nJoin here: ${link}\n\nCode: ${teamCode}`);
       window.open(`mailto:${toEmail}?subject=${subject}&body=${body}`, "_blank");
@@ -9816,7 +9816,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const sorted = [...s.days].sort((a,b) => a - b);
       tags.innerHTML = sorted.length > 0
         ? sorted.map(d => `<span class="daycal-tag">${_dayNames[d]}</span>`).join("")
-        : `<span style="font-size:0.72rem;color:#444;">Nenhum dia selecionado</span>`;
+        : `<span style="font-size:0.72rem;color:#444;">No day selected</span>`;
     }
 
     function getSelectedDays(ctx) { return [..._daycalState[ctx].days]; }
@@ -9859,7 +9859,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const btn  = document.querySelector('#weekly-modal .digest-save-btn');
       const enabled = document.getElementById('weekly-enabled').checked;
 
-      if (!currentUser) { note.textContent = 'Sessão expirada.'; return; }
+      if (!currentUser) { note.textContent = 'Session expired.'; return; }
       note.textContent = '';
 
       if (!enabled) {
@@ -9874,7 +9874,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const horr  = parseInt(document.getElementById('weekly-horr').value, 10);
       const days  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-      if (!email || !/\S+@\S+\.\S+/.test(email)) { note.textContent = 'Insere um email válido.'; return; }
+      if (!email || !/\S+@\S+\.\S+/.test(email)) { note.textContent = 'Enter a valid email.'; return; }
 
       btn.disabled = true;
       btn.innerHTML = '<i data-lucide="loader"></i> A guardar...';
