@@ -6586,13 +6586,17 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const mnoite = resto.match(/(?:^|[\s,.:;!?])meia[- ]noite(?![a-zA-Z0-9À-ÿ])/i);
       const mhora = resto.match(/(?:^|[\s,.:;!?])[àa]s\s+(\d{1,2})(?:h|horas?|:)?\s*(\d{2})?(?:\s+d[aeo]\s+(manh[ãa]|tarde|noite))?(?![a-zA-Z0-9À-ÿ])/i)
         || resto.match(/(?:^|[\s,.:;!?])(\d{1,2})(?:h|horas?)\s*(\d{2})?(?![a-zA-Z0-9À-ÿ])/i);
+      let timeFound = false, dateFound = false;
       if (mdia) {
         timeStr = "12:00";
+        timeFound = true;
         matched.push(mdia[0]);
       } else if (mnoite) {
         timeStr = "00:00";
+        timeFound = true;
         matched.push(mnoite[0]);
       } else if (mhora) {
+        timeFound = true;
         matched.push(mhora[0]);
         let hh = parseInt(mhora[1], 10);
         const mm = mhora[2] ? parseInt(mhora[2], 10) : 0;
@@ -6606,14 +6610,17 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const mdd = resto.match(/(?:^|[\s,.:;!?])depois\s+d[ea]\s+amanh[ãa](?![a-zA-Z0-9À-ÿ])/i);
       const mam = resto.match(/(?:^|[\s,.:;!?])amanh[ãa](?![a-zA-Z0-9À-ÿ])/i);
       if (/\bhoje\b/i.test(resto)) {
+        dateFound = true;
         matched.push("hoje");
       } else if (mdd) {
         dateISO = _kairoISOOffset(2);
         whenLabel = "depois de amanhã";
+        dateFound = true;
         matched.push(mdd[0]);
       } else if (mam) {
         dateISO = _kairoISOOffset(1);
         whenLabel = "amanhã";
+        dateFound = true;
         matched.push(mam[0]);
       } else {
         for (const [nome, dow] of Object.entries(KAIRO_PT_DIAS)) {
@@ -6627,13 +6634,14 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
             const dObj = _kairoNow();
             dObj.setDate(dObj.getDate() + ahead);
             whenLabel = dObj.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "short" });
+            dateFound = true;
             matched.push(dm[0]);
             break;
           }
         }
       }
 
-      return { dateISO, timeStr, whenLabel, matched };
+      return { dateISO, timeStr, whenLabel, matched, dateFound, timeFound };
     }
 
     function parseKairoCommand(raw) {
@@ -6660,12 +6668,15 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!resto) return null;
 
       let prioridade = "media";
+      let hadPrio = false;
       const pm = resto.match(/\b(?:com\s+)?prioridade\s+(alta|m[ée]dia|baixa)\b/i);
       if (pm) {
+        hadPrio = true;
         const p = pm[1].toLowerCase();
         prioridade = p.startsWith("alt") ? "alta" : p.startsWith("bai") ? "baixa" : "media";
         resto = resto.replace(pm[0], " ");
       } else if (/\burgente\b/i.test(resto)) {
+        hadPrio = true;
         prioridade = "alta";
         resto = resto.replace(/\burgente\b/ig, " ");
       }
@@ -6675,18 +6686,18 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       // limpar conectores só nas pontas (não mexer no meio do título)
       resto = resto.replace(/["“”'‘’]/g, "").replace(/\s+/g, " ").trim();
-      resto = resto.replace(/^(?:para|de|do|da|no|na|ao|à|às|as|um|uma|:|-)\s*/i, "").trim();
-      resto = resto.replace(/\s*(?:para|no|na|às|as|de|do|da)\s*$/i, "").trim();
+      resto = resto.replace(/^(?:(?:para|de|do|da|no|na|ao|à|às|as|um|uma)\s+|[:\-]\s*)/i, "").trim();
+      resto = resto.replace(/\s+(?:para|no|na|às|as|de|do|da)\s*$/i, "").trim();
       if (resto.length > 120) resto = resto.slice(0, 117) + "...";
       if (!resto) return null;
       const titulo = resto.charAt(0).toUpperCase() + resto.slice(1);
-      return { type: "tarefa", payload: { titulo, prioridade, date: dt.dateISO, time: dt.timeStr, dateLabel: `${dt.whenLabel} às ${dt.timeStr.replace(":", "h")}` } };
+      return { type: "tarefa", explicit: { date: dt.dateFound, time: dt.timeFound, prio: hadPrio }, payload: { titulo, prioridade, date: dt.dateISO, time: dt.timeStr, whenLabel: dt.whenLabel, dateLabel: `${dt.whenLabel} às ${dt.timeStr.replace(":", "h")}` } };
     }
 
     function createTaskFromAI(p) {
       if (!isPro() && appState.tarefas.length >= 10) { showUpgradeModal("Tarefas ilimitadas"); return false; }
       const id = Date.now();
-      const newTask = { id, titulo: p.titulo, descricao: "", cliente: null, prioridade: p.prioridade, status: "pendente", prazo: `${p.date}T${p.time}`, categoria: "Trabalho", repeticao: "nenhuma", diasEspecificos: [], anexos: [] };
+      const newTask = { id, titulo: p.titulo, descricao: "", cliente: p.cliente || null, prioridade: p.prioridade, status: "pendente", prazo: `${p.date}T${p.time}`, categoria: "Trabalho", repeticao: "nenhuma", diasEspecificos: [], anexos: [] };
       appState.tarefas.unshift(newTask);
       fsSet("tarefas", id, newTask);
       renderAll();
@@ -6707,6 +6718,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       activeTab: null,
       _welcomed: { help: false, chat: false },
       _pendingAction: null,
+      _conv: null,
       _containers: { help: "chat-messages-help", summary: "chat-messages-summary", chat: "chat-messages" },
 
       open() {
@@ -6803,6 +6815,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         let msg = `Olá, ${appState.user.nome}! Tens ${pending.length} tarefa${pending.length !== 1 ? "s" : ""} pendente${pending.length !== 1 ? "s" : ""} e ${pendingH.length} hábito${pendingH.length !== 1 ? "s" : ""} por completar hoje.`;
         if (topTask) msg += ` Recomendo começar pela tarefa de alta prioridade: "${topTask.titulo}".`;
         if (overdue.length) msg += `\nAtenção: tens ${overdue.length} tarefa${overdue.length !== 1 ? "s" : ""} atrasada${overdue.length !== 1 ? "s" : ""}!`;
+        msg += `\n\nPosso também criar tarefas e notas por ti — experimenta dizer "cria uma tarefa" ou "toma nota: ...".`;
 
         this._showTyping();
         setTimeout(() => {
@@ -6815,7 +6828,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         this._showTyping("help");
         setTimeout(() => {
           this._hideTyping("help");
-          this._appendMsg(`Olá, ${appState.user.nome}! Sou o guia da plataforma Kairo. Pergunta-me como funciona qualquer área — por exemplo:\n• "Como crio uma tarefa recorrente?"\n• "O que é a Produtividade Executivo?"\n• "Como funciona a Equipa?"\n• "Para que serve o Modo Foco?"`, "ai", "help");
+          this._appendMsg(`Olá, ${appState.user.nome}! Sou o guia da plataforma Kairo. Pergunta-me como funciona qualquer área — por exemplo:\n• "Como crio uma tarefa recorrente?"\n• "O que é a Produtividade Executivo?"\n• "Como funciona a Equipa?"\n• "Para que serve o Modo Foco?"\n\nTambém posso criar tarefas e notas por ti — diz "cria uma tarefa" ou "toma nota: ...".`, "ai", "help");
         }, 600);
       },
 
@@ -7024,6 +7037,107 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         }
       },
 
+      // ---- Fluxo conversacional de criação (passo a passo) ----
+      _startGuided(type, payload, steps) {
+        this._conv = { type, steps, idx: 0, payload };
+        this._askNext();
+      },
+
+      _askNext() {
+        const c = this._conv;
+        if (!c) return;
+        if (c.idx >= c.steps.length) {
+          const p = c.payload;
+          this._conv = null;
+          if (c.type === "nota") {
+            this._appendActionCard(`Vou criar esta nota:<br><strong>${_escapeHTML(p.titulo)}</strong>`, { type: "nota", payload: p });
+          } else {
+            const label = `${p.whenLabel || "hoje"} às ${p.time.replace(":", "h")}`;
+            this._appendActionCard(`Vou criar esta tarefa:<br><strong>${_escapeHTML(p.titulo)}</strong><br><span style="opacity:0.75;font-size:0.82rem;">${_escapeHTML(label)} · prioridade ${p.prioridade}${p.cliente ? ` · cliente: ${_escapeHTML(p.cliente)}` : ""}</span>`, { type: "tarefa", payload: { ...p, dateLabel: label } });
+          }
+          return;
+        }
+        const asks = {
+          titulo: "Qual é a tarefa?",
+          quando: "Para quando é a tarefa? Podes dizer, por exemplo: 'amanhã às 18h', 'sexta às 9h30' ou 'hoje'.",
+          prioridade: "E qual é a prioridade? Alta, média ou baixa?",
+          cliente: "Queres associar a tarefa a um cliente? Diz o nome ou responde 'nenhum'.",
+          conteudo: "O que queres anotar?",
+        };
+        this._appendMsg(asks[c.steps[c.idx]], "ai");
+      },
+
+      _advanceConv(text) {
+        const c = this._conv;
+        if (!c) return false;
+        const low = text.toLowerCase().trim();
+        if (/^(?:cancelar|cancela|esquece|esquece\s+isso|deixa\s+isso|n[ãa]o\s+quero)\b/i.test(low)) {
+          this._conv = null;
+          this._appendMsg("Cancelado. Nada foi criado. Quando quiseres, diz 'cria uma tarefa' ou 'toma nota'.", "ai");
+          return true;
+        }
+        const step = c.steps[c.idx];
+        if (step === "titulo") {
+          let resto = text.replace(/["“”'‘’]/g, "").replace(/\s+/g, " ").trim();
+          let hadPrio = false;
+          const pm = resto.match(/\b(?:com\s+)?prioridade\s+(alta|m[ée]dia|baixa)\b/i);
+          if (pm) { hadPrio = true; resto = resto.replace(pm[0], " "); }
+          else if (/\burgente\b/i.test(resto)) { hadPrio = true; c.payload.prioridade = "alta"; resto = resto.replace(/\burgente\b/ig, " "); }
+          if (pm) {
+            const pv = pm[1].toLowerCase();
+            c.payload.prioridade = pv.startsWith("alt") ? "alta" : pv.startsWith("bai") ? "baixa" : "media";
+          }
+          const dt = _kairoParseDateTime(resto);
+          dt.matched.forEach(s => { resto = resto.replace(s, " "); });
+          resto = resto.replace(/\s+/g, " ").trim();
+          resto = resto.replace(/^(?:(?:para|de|do|da|no|na|ao|à|às|as|um|uma)\s+|[:\-]\s*)/i, "").trim();
+          resto = resto.replace(/\s+(?:para|no|na|às|as|de|do|da)\s*$/i, "").trim();
+          if (!resto) { this._appendMsg("Não percebi o título. Diz-me outra vez: qual é a tarefa?", "ai"); return true; }
+          if (resto.length > 120) resto = resto.slice(0, 117) + "...";
+          c.payload.titulo = resto.charAt(0).toUpperCase() + resto.slice(1);
+          if (hadPrio) c.steps = c.steps.filter(s => s !== "prioridade");
+          if (dt.dateFound) { c.payload.date = dt.dateISO; c.payload.whenLabel = dt.whenLabel; c.steps = c.steps.filter(s => s !== "quando"); }
+          if (dt.timeFound) { c.payload.time = dt.timeStr; }
+          this._appendMsg(`✓ Tarefa: ${_escapeHTML(c.payload.titulo)}`, "ai");
+        } else if (step === "quando") {
+          const dt = _kairoParseDateTime(text);
+          if (dt.dateFound) { c.payload.date = dt.dateISO; c.payload.whenLabel = dt.whenLabel; }
+          if (dt.timeFound) { c.payload.time = dt.timeStr; }
+          if (!dt.dateFound && !dt.timeFound && /\bagora\b/i.test(low)) {
+            const now = _kairoNow();
+            c.payload.time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+          }
+          this._appendMsg(`✓ Data definida: ${c.payload.whenLabel || "hoje"} às ${c.payload.time.replace(":", "h")}.`, "ai");
+        } else if (step === "prioridade") {
+          let p = "media";
+          if (/alta|urgente|importante|m[áa]xima/.test(low)) p = "alta";
+          else if (/baixa|pouco\s+importante|m[íi]nima/.test(low)) p = "baixa";
+          c.payload.prioridade = p;
+          this._appendMsg(`✓ Prioridade ${p}.`, "ai");
+        } else if (step === "cliente") {
+          if (/^(?:nenhum|nenhuma|n[ãa]o|sem\s+cliente|ningu[ée]m)\b/i.test(low)) {
+            c.payload.cliente = null;
+            this._appendMsg("✓ Sem cliente associado.", "ai");
+          } else {
+            let nome = text.replace(/["“”]/g, "").replace(/\s+/g, " ").trim();
+            if (nome.length > 40) nome = nome.slice(0, 40);
+            c.payload.cliente = nome.charAt(0).toUpperCase() + nome.slice(1);
+            this._appendMsg(`✓ Cliente: ${_escapeHTML(c.payload.cliente)}.`, "ai");
+          }
+        } else if (step === "conteudo") {
+          const resto = text.trim();
+          if (!resto) { this._appendMsg("Não percebi. O que queres anotar?", "ai"); return true; }
+          let titulo = resto, conteudo = resto;
+          const sep = resto.match(/^(.{3,60}?)[.:]\s+(.+)$/);
+          if (sep) { titulo = sep[1]; conteudo = sep[2]; }
+          if (titulo.length > 60) titulo = titulo.slice(0, 57) + "...";
+          c.payload = { titulo: titulo.charAt(0).toUpperCase() + titulo.slice(1), conteudo };
+        }
+        c.idx++;
+        this._askNext();
+        return true;
+      },
+
       handleSend() {
         const inp = document.getElementById("chat-input");
         if (!inp) return;
@@ -7032,7 +7146,32 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const tab = this.activeTab === "help" ? "help" : "chat";
         this._appendMsg(text, "user", tab);
         inp.value = "";
+        const low = text.toLowerCase().trim();
+
+        // 1) conversa guiada em curso → tratar como resposta ao passo atual
+        if (this._conv) {
+          this._showTyping(tab);
+          setTimeout(() => { this._hideTyping(tab); this._advanceConv(text); }, 450);
+          return;
+        }
+
+        // 2) comando completo numa frase → confirmação direta
         const cmd = parseKairoCommand(text);
+        if (cmd && cmd.type === "tarefa" && (!cmd.explicit.date || !cmd.explicit.time || !cmd.explicit.prio)) {
+          // comando parcial → continuar em modo guiado com o que já se sabe
+          this._showTyping(tab);
+          setTimeout(() => {
+            this._hideTyping(tab);
+            const p = cmd.payload;
+            const steps = [];
+            if (!cmd.explicit.date || !cmd.explicit.time) steps.push("quando");
+            if (!cmd.explicit.prio) steps.push("prioridade");
+            steps.push("cliente");
+            this._appendMsg(`✓ Tarefa: ${_escapeHTML(p.titulo)}`, "ai");
+            this._startGuided("tarefa", p, steps);
+          }, 500);
+          return;
+        }
         if (cmd) {
           this._showTyping(tab);
           setTimeout(() => {
@@ -7045,6 +7184,26 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           }, 500);
           return;
         }
+
+        // 3) intenção simples ("cria uma tarefa" / "toma nota") → fluxo guiado
+        if (/^(?:cria(?:-?me)?|criar|adiciona(?:-?me)?|nova|quero\s+criar)\s+(?:uma\s+|a\s+)?tarefa(?:\s*[:,]|\s|$)/.test(low)) {
+          this._showTyping(tab);
+          setTimeout(() => {
+            this._hideTyping(tab);
+            this._startGuided("tarefa", { titulo: "", prioridade: "media", date: appState.today, time: "18:00", whenLabel: "hoje", cliente: null }, ["titulo", "quando", "prioridade", "cliente"]);
+          }, 500);
+          return;
+        }
+        if (/^(?:toma(?:\s+uma)?\s+nota|anota(?:\s+isto)?|nota)(?:\s*[:,]|\s|$)/.test(low)) {
+          this._showTyping(tab);
+          setTimeout(() => {
+            this._hideTyping(tab);
+            this._startGuided("nota", {}, ["conteudo"]);
+          }, 500);
+          return;
+        }
+
+        // 4) conversa normal
         this._showTyping(tab);
         const delay = 520 + Math.floor(Math.random() * 280);
         setTimeout(() => {

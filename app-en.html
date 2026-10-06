@@ -6478,13 +6478,17 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const mmid = resto.match(/\bmidnight\b/i);
       const mhora = resto.match(/\b(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)(?:\s+in\s+the\s+(morning|afternoon|evening))?\b/i)
         || resto.match(/\bat\s+(\d{1,2})(?::(\d{2}))?(?:\s+in\s+the\s+(morning|afternoon|evening|at\s+night))?\b/i);
+      let timeFound = false, dateFound = false;
       if (mnoon) {
         timeStr = "12:00";
+        timeFound = true;
         matched.push(mnoon[0]);
       } else if (mmid) {
         timeStr = "00:00";
+        timeFound = true;
         matched.push(mmid[0]);
       } else if (mhora) {
+        timeFound = true;
         matched.push(mhora[0]);
         let hh = parseInt(mhora[1], 10);
         const mm = mhora[2] ? parseInt(mhora[2], 10) : 0;
@@ -6501,14 +6505,17 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       const mdd = resto.match(/\bday\s+after\s+tomorrow\b/i);
       const mtom = resto.match(/\btomorrow\b/i);
       if (/\btoday\b/i.test(resto)) {
+        dateFound = true;
         matched.push("today");
       } else if (mdd) {
         dateISO = _kairoISOOffset(2);
         whenLabel = "the day after tomorrow";
+        dateFound = true;
         matched.push(mdd[0]);
       } else if (mtom) {
         dateISO = _kairoISOOffset(1);
         whenLabel = "tomorrow";
+        dateFound = true;
         matched.push(mtom[0]);
       } else {
         for (const [nome, dow] of Object.entries(KAIRO_EN_DIAS)) {
@@ -6522,13 +6529,14 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
             const dObj = _kairoNow();
             dObj.setDate(dObj.getDate() + ahead);
             whenLabel = dObj.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" });
+            dateFound = true;
             matched.push(dm[0]);
             break;
           }
         }
       }
 
-      return { dateISO, timeStr, whenLabel, matched };
+      return { dateISO, timeStr, whenLabel, matched, dateFound, timeFound };
     }
 
     function parseKairoCommand(raw) {
@@ -6555,12 +6563,15 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       if (!resto) return null;
 
       let prioridade = "media";
+      let hadPrio = false;
       const pm = resto.match(/\b(?:with\s+)?(?:high|top|medium|low)\s+priority\b/i);
       if (pm) {
+        hadPrio = true;
         const p = pm[0].toLowerCase();
         prioridade = /high|top/.test(p) ? "alta" : /low/.test(p) ? "baixa" : "media";
         resto = resto.replace(pm[0], " ");
       } else if (/\burgent\b/i.test(resto)) {
+        hadPrio = true;
         prioridade = "alta";
         resto = resto.replace(/\burgent\b/ig, " ");
       }
@@ -6570,18 +6581,18 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
 
       // clean connectors only at the edges (never inside the title)
       resto = resto.replace(/["“”'‘’]/g, "").replace(/\s+/g, " ").trim();
-      resto = resto.replace(/^(?:for|to|of|on|in|at|a|an|:|-)\s*/i, "").trim();
-      resto = resto.replace(/\s*(?:for|on|in|at|of)\s*$/i, "").trim();
+      resto = resto.replace(/^(?:(?:for|to|of|on|in|at|a|an)\s+|[:\-]\s*)/i, "").trim();
+      resto = resto.replace(/\s+(?:for|on|in|at|of)\s*$/i, "").trim();
       if (resto.length > 120) resto = resto.slice(0, 117) + "...";
       if (!resto) return null;
       const titulo = resto.charAt(0).toUpperCase() + resto.slice(1);
-      return { type: "tarefa", payload: { titulo, prioridade, date: dt.dateISO, time: dt.timeStr, dateLabel: `${dt.whenLabel} at ${dt.timeStr.replace(":", "h")}` } };
+      return { type: "tarefa", explicit: { date: dt.dateFound, time: dt.timeFound, prio: hadPrio }, payload: { titulo, prioridade, date: dt.dateISO, time: dt.timeStr, whenLabel: dt.whenLabel, dateLabel: `${dt.whenLabel} at ${dt.timeStr.replace(":", "h")}` } };
     }
 
     function createTaskFromAI(p) {
       if (!isPro() && appState.tasks.length >= 10) { showUpgradeModal("Tasks ilimitadas"); return false; }
       const id = Date.now();
-      const newTask = { id, titulo: p.titulo, descricao: "", cliente: null, prioridade: p.prioridade, status: "pending", prazo: `${p.date}T${p.time}`, categoria: "Work", repeticao: "nenhuma", daysEspecificos: [], anexos: [] };
+      const newTask = { id, titulo: p.titulo, descricao: "", cliente: p.cliente || null, prioridade: p.prioridade, status: "pending", prazo: `${p.date}T${p.time}`, categoria: "Work", repeticao: "nenhuma", daysEspecificos: [], anexos: [] };
       appState.tasks.unshift(newTask);
       fsSet("tarefas", id, newTask);
       renderAll();
@@ -6602,6 +6613,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
       activeTab: null,
       _welcomed: { help: false, chat: false },
       _pendingAction: null,
+      _conv: null,
       _containers: { help: "chat-messages-help", summary: "chat-messages-summary", chat: "chat-messages" },
 
       open() {
@@ -6695,9 +6707,10 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           .filter(t => t.status !== "concluida" && t.prioridade === "alta")
           .sort((a, b) => new Date(a.prazo) - new Date(b.prazo))[0];
 
-        let msg = `Hello, ${appState.user.nome}! Tens ${pending.length} task${pending.length !== 1 ? "s" : ""} pending${pending.length !== 1 ? "s" : ""} e ${pendingH.length} habit${pendingH.length !== 1 ? "s" : ""} to complete today.`;
-        if (topTask) msg += ` Recomendo começar pela tarefa alta prioridade: "${topTask.titulo}".`;
-        if (overdue.length) msg += `\nAtenção: tens ${overdue.length} task${overdue.length !== 1 ? "s" : ""} overdue${overdue.length !== 1 ? "s" : ""}!`;
+        let msg = `Hello, ${appState.user.nome}! You have ${pending.length} task${pending.length !== 1 ? "s" : ""} pending and ${pendingH.length} habit${pendingH.length !== 1 ? "s" : ""} to complete today.`;
+        if (topTask) msg += ` I recommend starting with the high priority task: "${topTask.titulo}".`;
+        if (overdue.length) msg += `\nWatch out: you have ${overdue.length} overdue task${overdue.length !== 1 ? "s" : ""}!`;
+        msg += `\n\nI can also create tasks and notes for you — try saying "create a task" or "take a note: ...".`;
 
         this._showTyping();
         setTimeout(() => {
@@ -6710,7 +6723,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         this._showTyping("help");
         setTimeout(() => {
           this._hideTyping("help");
-          this._appendMsg(`Hello, ${appState.user.nome}! I'm your Kairo platform guide. Ask me how any area works — for example:\n• "How do I create a recurring task?"\n• "What is Executive Productivity?"\n• "How does the Team work?"\n• "What is Focus Mode for?"`, "ai", "help");
+          this._appendMsg(`Hello, ${appState.user.nome}! I'm your Kairo platform guide. Ask me how any area works — for example:\n• "How do I create a recurring task?"\n• "What is Executive Productivity?"\n• "How does the Team work?"\n• "What is Focus Mode for?"\n\nI can also create tasks and notes for you — say "create a task" or "take a note: ...".`, "ai", "help");
         }, 600);
       },
 
@@ -6919,6 +6932,107 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         }
       },
 
+      // ---- Guided creation flow (step by step) ----
+      _startGuided(type, payload, steps) {
+        this._conv = { type, steps, idx: 0, payload };
+        this._askNext();
+      },
+
+      _askNext() {
+        const c = this._conv;
+        if (!c) return;
+        if (c.idx >= c.steps.length) {
+          const p = c.payload;
+          this._conv = null;
+          if (c.type === "nota") {
+            this._appendActionCard(`I'll create this note:<br><strong>${_escapeHTML(p.titulo)}</strong>`, { type: "nota", payload: p });
+          } else {
+            const label = `${p.whenLabel || "today"} at ${p.time.replace(":", "h")}`;
+            this._appendActionCard(`I'll create this task:<br><strong>${_escapeHTML(p.titulo)}</strong><br><span style="opacity:0.75;font-size:0.82rem;">${_escapeHTML(label)} · priority ${p.prioridade === "alta" ? "high" : p.prioridade === "baixa" ? "low" : "medium"}${p.cliente ? ` · client: ${_escapeHTML(p.cliente)}` : ""}</span>`, { type: "tarefa", payload: { ...p, dateLabel: label } });
+          }
+          return;
+        }
+        const asks = {
+          titulo: "What's the task?",
+          quando: "When is the task due? For example: 'tomorrow at 6pm', 'friday at 9:30am' or 'today'.",
+          prioridade: "And what's the priority? High, medium or low?",
+          cliente: "Do you want to link the task to a client? Say the name or answer 'no'.",
+          conteudo: "What do you want to note down?",
+        };
+        this._appendMsg(asks[c.steps[c.idx]], "ai");
+      },
+
+      _advanceConv(text) {
+        const c = this._conv;
+        if (!c) return false;
+        const low = text.toLowerCase().trim();
+        if (/^(?:cancel|stop|forget\s+it|never\s+mind|cancel\s+it)\b/i.test(low)) {
+          this._conv = null;
+          this._appendMsg("Cancelled. Nothing was created. Whenever you want, say 'create a task' or 'take a note'.", "ai");
+          return true;
+        }
+        const step = c.steps[c.idx];
+        if (step === "titulo") {
+          let resto = text.replace(/["“”'‘’]/g, "").replace(/\s+/g, " ").trim();
+          let hadPrio = false;
+          const pm = resto.match(/\b(?:with\s+)?(?:high|top|medium|low)\s+priority\b/i);
+          if (pm) { hadPrio = true; resto = resto.replace(pm[0], " "); }
+          else if (/\burgent\b/i.test(resto)) { hadPrio = true; c.payload.prioridade = "alta"; resto = resto.replace(/\burgent\b/ig, " "); }
+          if (pm) {
+            const pv = pm[0].toLowerCase();
+            c.payload.prioridade = /high|top/.test(pv) ? "alta" : /low/.test(pv) ? "baixa" : "media";
+          }
+          const dt = _kairoParseDateTime(resto);
+          dt.matched.forEach(s => { resto = resto.replace(s, " "); });
+          resto = resto.replace(/\s+/g, " ").trim();
+          resto = resto.replace(/^(?:(?:for|to|of|on|in|at|a|an)\s+|[:\-]\s*)/i, "").trim();
+          resto = resto.replace(/\s+(?:for|on|in|at|of)\s*$/i, "").trim();
+          if (!resto) { this._appendMsg("I didn't catch the title. Tell me again: what's the task?", "ai"); return true; }
+          if (resto.length > 120) resto = resto.slice(0, 117) + "...";
+          c.payload.titulo = resto.charAt(0).toUpperCase() + resto.slice(1);
+          if (hadPrio) c.steps = c.steps.filter(s => s !== "prioridade");
+          if (dt.dateFound) { c.payload.date = dt.dateISO; c.payload.whenLabel = dt.whenLabel; c.steps = c.steps.filter(s => s !== "quando"); }
+          if (dt.timeFound) { c.payload.time = dt.timeStr; }
+          this._appendMsg(`✓ Task: ${_escapeHTML(c.payload.titulo)}`, "ai");
+        } else if (step === "quando") {
+          const dt = _kairoParseDateTime(text);
+          if (dt.dateFound) { c.payload.date = dt.dateISO; c.payload.whenLabel = dt.whenLabel; }
+          if (dt.timeFound) { c.payload.time = dt.timeStr; }
+          if (!dt.dateFound && !dt.timeFound && /\bnow\b|\bright\s+now\b/i.test(low)) {
+            const now = _kairoNow();
+            c.payload.time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+          }
+          this._appendMsg(`✓ Date set: ${c.payload.whenLabel || "today"} at ${c.payload.time.replace(":", "h")}.`, "ai");
+        } else if (step === "prioridade") {
+          let p = "media";
+          if (/\bhigh\b|\btop\b|urgent|important|maximum/.test(low)) p = "alta";
+          else if (/\blow\b|minor|minimum/.test(low)) p = "baixa";
+          c.payload.prioridade = p;
+          this._appendMsg(`✓ Priority ${p === "alta" ? "high" : p === "baixa" ? "low" : "medium"}.`, "ai");
+        } else if (step === "cliente") {
+          if (/^(?:no|nope|none|nobody|no\s+one|without)\b/i.test(low)) {
+            c.payload.cliente = null;
+            this._appendMsg("✓ No client linked.", "ai");
+          } else {
+            let nome = text.replace(/["“”]/g, "").replace(/\s+/g, " ").trim();
+            if (nome.length > 40) nome = nome.slice(0, 40);
+            c.payload.cliente = nome.charAt(0).toUpperCase() + nome.slice(1);
+            this._appendMsg(`✓ Client: ${_escapeHTML(c.payload.cliente)}.`, "ai");
+          }
+        } else if (step === "conteudo") {
+          const resto = text.trim();
+          if (!resto) { this._appendMsg("I didn't catch that. What do you want to note down?", "ai"); return true; }
+          let titulo = resto, conteudo = resto;
+          const sep = resto.match(/^(.{3,60}?)[.:]\s+(.+)$/);
+          if (sep) { titulo = sep[1]; conteudo = sep[2]; }
+          if (titulo.length > 60) titulo = titulo.slice(0, 57) + "...";
+          c.payload = { titulo: titulo.charAt(0).toUpperCase() + titulo.slice(1), conteudo };
+        }
+        c.idx++;
+        this._askNext();
+        return true;
+      },
+
       handleSend() {
         const inp = document.getElementById("chat-input");
         if (!inp) return;
@@ -6927,7 +7041,32 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const tab = this.activeTab === "help" ? "help" : "chat";
         this._appendMsg(text, "user", tab);
         inp.value = "";
+        const low = text.toLowerCase().trim();
+
+        // 1) guided flow in progress → treat as answer to the current step
+        if (this._conv) {
+          this._showTyping(tab);
+          setTimeout(() => { this._hideTyping(tab); this._advanceConv(text); }, 450);
+          return;
+        }
+
+        // 2) full one-shot command → direct confirmation
         const cmd = parseKairoCommand(text);
+        if (cmd && cmd.type === "tarefa" && (!cmd.explicit.date || !cmd.explicit.time || !cmd.explicit.prio)) {
+          // partial command → continue guided with what we already know
+          this._showTyping(tab);
+          setTimeout(() => {
+            this._hideTyping(tab);
+            const p = cmd.payload;
+            const steps = [];
+            if (!cmd.explicit.date || !cmd.explicit.time) steps.push("quando");
+            if (!cmd.explicit.prio) steps.push("prioridade");
+            steps.push("cliente");
+            this._appendMsg(`✓ Task: ${_escapeHTML(p.titulo)}`, "ai");
+            this._startGuided("tarefa", p, steps);
+          }, 500);
+          return;
+        }
         if (cmd) {
           this._showTyping(tab);
           setTimeout(() => {
@@ -6940,6 +7079,26 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           }, 500);
           return;
         }
+
+        // 3) simple intent ("create a task" / "take a note") → guided flow
+        if (/^(?:create(?:\s+me)?|add|new|i\s+want\s+to\s+create)\s+(?:a\s+)?task(?:\s*[:,]|\s|$)/.test(low)) {
+          this._showTyping(tab);
+          setTimeout(() => {
+            this._hideTyping(tab);
+            this._startGuided("tarefa", { titulo: "", prioridade: "media", date: appState.today, time: "18:00", whenLabel: "today", cliente: null }, ["titulo", "quando", "prioridade", "cliente"]);
+          }, 500);
+          return;
+        }
+        if (/^(?:take(?:\s+a)?\s+note|note)(?:\s*[:,]|\s|$)/.test(low)) {
+          this._showTyping(tab);
+          setTimeout(() => {
+            this._hideTyping(tab);
+            this._startGuided("nota", {}, ["conteudo"]);
+          }, 500);
+          return;
+        }
+
+        // 4) normal chat
         this._showTyping(tab);
         const delay = 520 + Math.floor(Math.random() * 280);
         setTimeout(() => {
