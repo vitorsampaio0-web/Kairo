@@ -7058,7 +7058,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           return;
         }
         const asks = {
-          titulo: "Qual é a tarefa?",
+          titulo: "Qual é a tarefa? Se te enganares a qualquer momento, diz 'apagar a tarefa' para recomeçar.",
           quando: "Para quando é a tarefa? Podes dizer, por exemplo: 'amanhã às 18h', 'sexta às 9h30' ou 'hoje'.",
           prioridade: "E qual é a prioridade? Alta, média ou baixa?",
           cliente: "Queres associar a tarefa a um cliente? Diz o nome ou responde 'nenhum'.",
@@ -7071,6 +7071,15 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const c = this._conv;
         if (!c) return false;
         const low = text.toLowerCase().trim();
+        // Recomeçar do zero: "apagar a tarefa", "recomeça", "enganei-me", "vamos de novo"...
+        if (/(?:apag\w*|recome\w*|refaz\w*|anul\w*|restart\w*)\b|\bde\s+novo\b|\boutra\s+vez\b|\bdo\s+zero\b|\benganei\b|\berrei\b|\bengano\b/i.test(low)) {
+          const tipo = c.type;
+          this._conv = null;
+          this._appendMsg(tipo === "nota" ? "Ok, apaguei tudo — vamos recomeçar a nota do zero." : "Ok, apaguei tudo — vamos recomeçar a tarefa do zero.", "ai");
+          if (tipo === "nota") this._startGuided("nota", {}, ["conteudo"]);
+          else this._startGuided("tarefa", { titulo: "", prioridade: "media", date: appState.today, time: "18:00", whenLabel: "hoje", cliente: null }, ["titulo", "quando", "prioridade", "cliente"]);
+          return true;
+        }
         if (/^(?:cancelar|cancela|esquece|esquece\s+isso|deixa\s+isso|n[ãa]o\s+quero)\b/i.test(low)) {
           this._conv = null;
           this._appendMsg("Cancelado. Nada foi criado. Quando quiseres, diz 'cria uma tarefa' ou 'toma nota'.", "ai");

@@ -6953,7 +6953,7 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
           return;
         }
         const asks = {
-          titulo: "What's the task?",
+          titulo: "What's the task? If you make a mistake at any point, say 'delete the task' to restart.",
           quando: "When is the task due? For example: 'tomorrow at 6pm', 'friday at 9:30am' or 'today'.",
           prioridade: "And what's the priority? High, medium or low?",
           cliente: "Do you want to link the task to a client? Say the name or answer 'no'.",
@@ -6966,6 +6966,15 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const c = this._conv;
         if (!c) return false;
         const low = text.toLowerCase().trim();
+        // Restart from scratch: "delete the task", "start over", "scratch that", "i made a mistake"...
+        if (/(?:delet\w+|remov\w+|eras\w+|restart\w*|redo|start\s+over|scratch\s+(?:that|it)|do\s+over)\b|\bmy\s+bad\b|\bi\s+(?:made\s+a\s+mistake|messed\s+up|got\s+(?:it\s+)?wrong)\b/i.test(low)) {
+          const tipo = c.type;
+          this._conv = null;
+          this._appendMsg(tipo === "nota" ? "Ok, deleted everything — let's restart the note from scratch." : "Ok, deleted everything — let's restart the task from scratch.", "ai");
+          if (tipo === "nota") this._startGuided("nota", {}, ["conteudo"]);
+          else this._startGuided("tarefa", { titulo: "", prioridade: "media", date: appState.today, time: "18:00", whenLabel: "today", cliente: null }, ["titulo", "quando", "prioridade", "cliente"]);
+          return true;
+        }
         if (/^(?:cancel|stop|forget\s+it|never\s+mind|cancel\s+it)\b/i.test(low)) {
           this._conv = null;
           this._appendMsg("Cancelled. Nothing was created. Whenever you want, say 'create a task' or 'take a note'.", "ai");
