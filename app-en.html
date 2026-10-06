@@ -2466,6 +2466,68 @@
       box-shadow: 0 8px 22px rgba(124, 92, 255, 0.48);
     }
 
+    .chat-mic-btn {
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(124, 92, 255, 0.08);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .chat-mic-btn svg { width: 16px; height: 16px; }
+
+    .chat-mic-btn:hover {
+      color: var(--text);
+      border-color: var(--primary);
+    }
+
+    .chat-mic-btn.listening {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+      animation: micPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+      50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    }
+
+    .chat-confirm-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .chat-confirm-actions button {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: none;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chat-confirm-actions .chat-confirm-yes {
+      background: linear-gradient(135deg, var(--primary), #5a86ff);
+      color: white;
+    }
+
+    .chat-confirm-actions .chat-confirm-no {
+      background: transparent;
+      border: 1px solid var(--border) !important;
+      color: var(--muted);
+    }
+
     @media (min-width: 1100px) {
       .kairo-chat-btn {
         bottom: 32px;
@@ -3543,6 +3605,7 @@
       <button class="chat-summary-btn" id="chat-summary-btn"><i data-lucide="sparkles"></i>Generate executive summary</button>
     </div>
     <div class="chat-input-row" id="chat-input-row">
+      <button class="chat-mic-btn" id="chat-mic-btn" title="Talk to Kairo AI"><i data-lucide="mic"></i></button>
       <input class="chat-input" id="chat-input" type="text" placeholder="Ask Kairo AI anything..." autocomplete="off" />
       <button class="chat-send-btn" id="chat-send-btn"><i data-lucide="send"></i></button>
     </div>
@@ -6390,10 +6453,155 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         answer: "I have 3 modes: Help (I teach you how to use the platform — that's where we are now), Summary (I generate an executive summary of your data) and Chat (I answer with real context from your tasks, habits and schedule). Summary and Chat are part of the Pro plan." },
     ];
 
+    // ---- Kairo AI: voice/text commands (tasks and notes) ----
+    function _kairoNow() {
+      return new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Lisbon" }));
+    }
+
+    function _kairoISOOffset(days) {
+      const d = _kairoNow();
+      d.setDate(d.getDate() + days);
+      const p = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    }
+
+    const KAIRO_EN_DIAS = { "sunday": 0, "monday": 1, "tuesday": 2, "wednesday": 3, "thursday": 4, "friday": 5, "saturday": 6 };
+
+    function _kairoParseDateTime(resto) {
+      let dateISO = appState.today;
+      let whenLabel = "today";
+      let timeStr = "18:00";
+      const matched = [];
+
+      // time (at 6, at 6pm, 6:30pm, at 18:00, noon, midnight)
+      const mnoon = resto.match(/\bnoon\b/i);
+      const mmid = resto.match(/\bmidnight\b/i);
+      const mhora = resto.match(/\b(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)(?:\s+in\s+the\s+(morning|afternoon|evening))?\b/i)
+        || resto.match(/\bat\s+(\d{1,2})(?::(\d{2}))?(?:\s+in\s+the\s+(morning|afternoon|evening|at\s+night))?\b/i);
+      if (mnoon) {
+        timeStr = "12:00";
+        matched.push(mnoon[0]);
+      } else if (mmid) {
+        timeStr = "00:00";
+        matched.push(mmid[0]);
+      } else if (mhora) {
+        matched.push(mhora[0]);
+        let hh = parseInt(mhora[1], 10);
+        const mm = mhora[2] ? parseInt(mhora[2], 10) : 0;
+        const ampm = (mhora[3] || "").toLowerCase();
+        const mod = (mhora[4] || mhora[3] || "").toLowerCase();
+        if (ampm === "pm" && hh < 12) hh += 12;
+        if (ampm === "am" && hh === 12) hh = 0;
+        if (!ampm && /afternoon|evening|night/.test(mod) && hh < 12) hh += 12;
+        if (hh >= 24) hh = 23;
+        timeStr = `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+      }
+
+      // date (today, tomorrow, day after tomorrow, weekdays)
+      const mdd = resto.match(/\bday\s+after\s+tomorrow\b/i);
+      const mtom = resto.match(/\btomorrow\b/i);
+      if (/\btoday\b/i.test(resto)) {
+        matched.push("today");
+      } else if (mdd) {
+        dateISO = _kairoISOOffset(2);
+        whenLabel = "the day after tomorrow";
+        matched.push(mdd[0]);
+      } else if (mtom) {
+        dateISO = _kairoISOOffset(1);
+        whenLabel = "tomorrow";
+        matched.push(mtom[0]);
+      } else {
+        for (const [nome, dow] of Object.entries(KAIRO_EN_DIAS)) {
+          const re = new RegExp(`\\b(?:next\\s+|on\\s+)?${nome}\\b`, "i");
+          const dm = resto.match(re);
+          if (dm) {
+            const hojeDow = _kairoNow().getDay();
+            let ahead = (dow - hojeDow + 7) % 7;
+            if (ahead === 0) ahead = 7;
+            dateISO = _kairoISOOffset(ahead);
+            const dObj = _kairoNow();
+            dObj.setDate(dObj.getDate() + ahead);
+            whenLabel = dObj.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" });
+            matched.push(dm[0]);
+            break;
+          }
+        }
+      }
+
+      return { dateISO, timeStr, whenLabel, matched };
+    }
+
+    function parseKairoCommand(raw) {
+      const text = raw.trim();
+      const low = text.toLowerCase();
+
+      // Note: "take a note: ...", "note: ..."
+      const nm = low.match(/^(?:take(?:\s+a)?\s+note|note)(?:\s*[:,]|\s)\s*(.+)$/);
+      if (nm) {
+        const resto = text.slice(text.length - nm[1].length).trim();
+        if (!resto) return null;
+        let titulo = resto, conteudo = resto;
+        const sep = resto.match(/^(.{3,60}?)[.:]\s+(.+)$/);
+        if (sep) { titulo = sep[1]; conteudo = sep[2]; }
+        if (titulo.length > 60) titulo = titulo.slice(0, 57) + "...";
+        titulo = titulo.charAt(0).toUpperCase() + titulo.slice(1);
+        return { type: "nota", payload: { titulo, conteudo } };
+      }
+
+      // Task: "create task X for tomorrow at 6pm with high priority"
+      const tm = low.match(/^(?:create(?:\s+me)?|add|new)\s+(?:a\s+)?task(?:\s*[:,]|\s)\s*(.+)$/);
+      if (!tm) return null;
+      let resto = text.slice(text.length - tm[1].length).trim();
+      if (!resto) return null;
+
+      let prioridade = "media";
+      const pm = resto.match(/\b(?:with\s+)?(?:high|top|medium|low)\s+priority\b/i);
+      if (pm) {
+        const p = pm[0].toLowerCase();
+        prioridade = /high|top/.test(p) ? "alta" : /low/.test(p) ? "baixa" : "media";
+        resto = resto.replace(pm[0], " ");
+      } else if (/\burgent\b/i.test(resto)) {
+        prioridade = "alta";
+        resto = resto.replace(/\burgent\b/ig, " ");
+      }
+
+      const dt = _kairoParseDateTime(resto);
+      dt.matched.forEach(s => { resto = resto.replace(s, " "); });
+
+      // clean connectors only at the edges (never inside the title)
+      resto = resto.replace(/["“”'‘’]/g, "").replace(/\s+/g, " ").trim();
+      resto = resto.replace(/^(?:for|to|of|on|in|at|a|an|:|-)\s*/i, "").trim();
+      resto = resto.replace(/\s*(?:for|on|in|at|of)\s*$/i, "").trim();
+      if (resto.length > 120) resto = resto.slice(0, 117) + "...";
+      if (!resto) return null;
+      const titulo = resto.charAt(0).toUpperCase() + resto.slice(1);
+      return { type: "tarefa", payload: { titulo, prioridade, date: dt.dateISO, time: dt.timeStr, dateLabel: `${dt.whenLabel} at ${dt.timeStr.replace(":", "h")}` } };
+    }
+
+    function createTaskFromAI(p) {
+      if (!isPro() && appState.tasks.length >= 10) { showUpgradeModal("Tasks ilimitadas"); return false; }
+      const id = Date.now();
+      const newTask = { id, titulo: p.titulo, descricao: "", cliente: null, prioridade: p.prioridade, status: "pending", prazo: `${p.date}T${p.time}`, categoria: "Work", repeticao: "nenhuma", daysEspecificos: [], anexos: [] };
+      appState.tasks.unshift(newTask);
+      fsSet("tarefas", id, newTask);
+      renderAll();
+      return true;
+    }
+
+    function createNoteFromAI(p) {
+      const id = Date.now().toString();
+      const agora = new Date().toISOString();
+      const nova = { id, titulo: p.titulo, conteudo: p.conteudo, tags: [], userId: currentUser.uid, createdAt: agora, updatedAt: agora };
+      appState.notas.unshift(nova);
+      fsSet("notas", id, nova);
+      return true;
+    }
+
     const kairoChat = {
       isOpen: false,
       activeTab: null,
       _welcomed: { help: false, chat: false },
+      _pendingAction: null,
       _containers: { help: "chat-messages-help", summary: "chat-messages-summary", chat: "chat-messages" },
 
       open() {
@@ -6677,6 +6885,40 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         return "Posso ajudar-te com tasks, habits, agenda e produtividade. Experimenta perguntar sobre o teu dia, as tuas prioridades or o estado dos teus habits!";
       },
 
+      _appendActionCard(html, action) {
+        const container = document.getElementById(this._containers[this.activeTab] || "chat-messages");
+        if (!container) return;
+        this._pendingAction = action;
+        const ts = this._now();
+        const wrap = document.createElement("div");
+        wrap.className = "chat-msg ai";
+        wrap.innerHTML = `<div class="chat-msg-avatar"><i data-lucide="bot"></i></div><div><div class="chat-bubble">${html}<div class="chat-confirm-actions"><button class="chat-confirm-yes"><i data-lucide="check" style="width:13px;height:13px;"></i> Create</button><button class="chat-confirm-no">Cancel</button></div></div><div class="chat-timestamp">${ts}</div></div>`;
+        container.appendChild(wrap);
+        container.scrollTop = container.scrollHeight;
+        wrap.querySelector(".chat-confirm-yes").addEventListener("click", () => this._runPending(true, wrap));
+        wrap.querySelector(".chat-confirm-no").addEventListener("click", () => this._runPending(false, wrap));
+        lucide.createIcons();
+      },
+
+      _runPending(ok, wrap) {
+        const a = this._pendingAction;
+        this._pendingAction = null;
+        const actions = wrap.querySelector(".chat-confirm-actions");
+        if (actions) actions.remove();
+        if (!ok || !a) {
+          this._appendMsg("Cancelled. Nothing was created.", "ai");
+          return;
+        }
+        if (a.type === "tarefa") {
+          if (createTaskFromAI(a.payload)) {
+            this._appendMsg(`✓ Task "${a.payload.titulo}" created for ${a.payload.dateLabel} (priority ${a.payload.prioridade === "alta" ? "high" : a.payload.prioridade === "baixa" ? "low" : "medium"}). See it in the Tasks menu.`, "ai");
+          }
+        } else if (a.type === "nota") {
+          createNoteFromAI(a.payload);
+          this._appendMsg(`✓ Note "${a.payload.titulo}" created. See it in the Notes menu.`, "ai");
+        }
+      },
+
       handleSend() {
         const inp = document.getElementById("chat-input");
         if (!inp) return;
@@ -6685,6 +6927,19 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
         const tab = this.activeTab === "help" ? "help" : "chat";
         this._appendMsg(text, "user", tab);
         inp.value = "";
+        const cmd = parseKairoCommand(text);
+        if (cmd) {
+          this._showTyping(tab);
+          setTimeout(() => {
+            this._hideTyping(tab);
+            if (cmd.type === "tarefa") {
+              this._appendActionCard(`I'll create this task:<br><strong>${_escapeHTML(cmd.payload.titulo)}</strong><br><span style="opacity:0.75;font-size:0.82rem;">${_escapeHTML(cmd.payload.dateLabel)} · priority ${cmd.payload.prioridade === "alta" ? "high" : cmd.payload.prioridade === "baixa" ? "low" : "medium"}</span>`, cmd);
+            } else {
+              this._appendActionCard(`I'll create this note:<br><strong>${_escapeHTML(cmd.payload.titulo)}</strong>`, cmd);
+            }
+          }, 500);
+          return;
+        }
         this._showTyping(tab);
         const delay = 520 + Math.floor(Math.random() * 280);
         setTimeout(() => {
@@ -6704,6 +6959,51 @@ table { border-collapse: collapse; width: 100%; font-family: Calibri, Segoe UI, 
     document.getElementById("chat-input").addEventListener("keydown", (e) => {
       if (e.key === "Enter") kairoChat.handleSend();
     });
+
+    // ---- Kairo AI: microphone (voice → text → command/chat) ----
+    const kairoMic = {
+      rec: null,
+      listening: false,
+      toggle() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { showToast("Voice dictation not supported in this browser."); return; }
+        if (this.listening) { if (this.rec) this.rec.stop(); return; }
+        this.rec = new SR();
+        this.rec.lang = "en-US";
+        this.rec.continuous = false;
+        this.rec.interimResults = true;
+        let finalText = "";
+        this.rec.onresult = (e) => {
+          let interim = "";
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
+            else interim += e.results[i][0].transcript;
+          }
+          const inp = document.getElementById("chat-input");
+          if (inp) inp.value = (finalText + " " + interim).trim();
+        };
+        this.rec.onend = () => {
+          this.listening = false;
+          document.getElementById("chat-mic-btn")?.classList.remove("listening");
+          const inp = document.getElementById("chat-input");
+          const val = (finalText || (inp ? inp.value : "")).trim();
+          if (inp) inp.value = val;
+          if (val) kairoChat.handleSend();
+        };
+        this.rec.onerror = () => {
+          this.listening = false;
+          document.getElementById("chat-mic-btn")?.classList.remove("listening");
+        };
+        this.listening = true;
+        document.getElementById("chat-mic-btn")?.classList.add("listening");
+        try { this.rec.start(); }
+        catch (e) {
+          this.listening = false;
+          document.getElementById("chat-mic-btn")?.classList.remove("listening");
+        }
+      }
+    };
+    document.getElementById("chat-mic-btn").addEventListener("click", () => kairoMic.toggle());
     // ---- End Kairo AI Chat ----
   </script>
 
